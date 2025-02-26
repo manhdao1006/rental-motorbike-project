@@ -18,6 +18,5 @@ public class NhanVienDTO {
     private String trangThaiXoa;
     private String maNguoiDung;
     private List<XuLyKhieuNaiDTO> xuLyKhieuNais;
-    private List<DonHangDTO> donHangs;
 
 }

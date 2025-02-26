@@ -62,8 +62,8 @@ public class DonHangEntity {
     private KhachHangEntity khachHang;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "maNhanVien")
-    private NhanVienEntity nhanVien;
+    @JoinColumn(name = "maChuCuaHang")
+    private ChuCuaHangEntity chuCuaHang;
 
     @OneToMany(mappedBy = "donHang")
     private List<ChiTietDonHangEntity> chiTietDonHangs = new ArrayList<>();

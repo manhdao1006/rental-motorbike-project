@@ -26,7 +26,7 @@ public class DonHangDTO {
     private String lyDoHuy;
     private String trangThaiXoa;
     private String maKhachHang;
-    private String maNhanVien;
+    private String maChuCuaHang;
     private List<ChiTietDonHangDTO> chiTietDonHangs;
 
 }

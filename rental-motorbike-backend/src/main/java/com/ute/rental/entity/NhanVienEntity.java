@@ -40,7 +40,4 @@ public class NhanVienEntity {
     @OneToMany(mappedBy = "nhanVien")
     private List<XuLyKhieuNaiEntity> xuLyKhieuNais = new ArrayList<>();
 
-    @OneToMany(mappedBy = "nhanVien")
-    private List<DonHangEntity> donHangs = new ArrayList<>();
-
 }
