@@ -1,0 +1,72 @@
+package com.ute.rental.service.impl;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.ute.rental.converter.DanhMucXeConverter;
+import com.ute.rental.dto.DanhMucXeDTO;
+import com.ute.rental.entity.DanhMucXeEntity;
+import com.ute.rental.exception.ResourceNotFoundException;
+import com.ute.rental.repository.DanhMucXeRepository;
+import com.ute.rental.service.IDanhMucXeService;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class DanhMucXeService implements IDanhMucXeService {
+
+    private final DanhMucXeRepository danhMucXeRepository;
+    private final DanhMucXeConverter danhMucXeConverter;
+
+    @Override
+    public List<DanhMucXeDTO> getDanhMucXes() {
+        List<DanhMucXeEntity> entities = danhMucXeRepository.findDanhMucsByTrangThaiXoa("1");
+        return entities.stream().map(danhMucXeConverter::toDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public DanhMucXeDTO addDanhMucXe(DanhMucXeDTO danhMucXeDTO) {
+        DanhMucXeEntity danhMucXeEntity = danhMucXeConverter.toEntity(danhMucXeDTO);
+        return danhMucXeConverter.toDTO(danhMucXeRepository.save(danhMucXeEntity));
+    }
+
+    @Transactional
+    @Override
+    public DanhMucXeDTO updateDanhMucXe(String maDanhMucXe, DanhMucXeDTO updatedDanhMucXe) {
+        DanhMucXeEntity danhMucXeEntity = danhMucXeRepository.findOneByMaDanhMucXe(maDanhMucXe)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không tìm thấy danh mục nào với mã danh mục là " + maDanhMucXe));
+        DanhMucXeEntity danhMucUpdated = danhMucXeConverter.toEntity(updatedDanhMucXe, danhMucXeEntity);
+        return danhMucXeConverter.toDTO(danhMucXeRepository.save(danhMucUpdated));
+    }
+
+    @Transactional
+    @Override
+    public void deleteDanhMucXe(String maDanhMucXe) {
+        DanhMucXeEntity danhMucXeEntity = danhMucXeRepository.findOneByMaDanhMucXe(maDanhMucXe)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không tìm thấy danh mục nào với mã danh mục là " + maDanhMucXe));
+        danhMucXeEntity.setTrangThaiXoa("0");
+        danhMucXeRepository.save(danhMucXeEntity);
+    }
+
+    @Override
+    public DanhMucXeDTO getDanhMucXeByMaDanhMucXe(String maDanhMucXe) {
+        DanhMucXeEntity danhMucXeEntity = danhMucXeRepository.findOneByMaDanhMucXe(maDanhMucXe)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không tìm thấy danh mục nào với mã danh mục là " + maDanhMucXe));
+        return danhMucXeConverter.toDTO(danhMucXeEntity);
+    }
+
+    @Override
+    public List<DanhMucXeDTO> getNavigations() {
+        List<DanhMucXeEntity> entities = danhMucXeRepository.findFirst6ByTrangThaiXoaOrderByMaDanhMucXeAsc("1");
+        return entities.stream().map(danhMucXeConverter::toDTO).collect(Collectors.toList());
+    }
+
+}

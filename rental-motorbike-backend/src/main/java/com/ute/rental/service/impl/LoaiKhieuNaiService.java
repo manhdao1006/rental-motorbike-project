@@ -1,0 +1,67 @@
+package com.ute.rental.service.impl;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.ute.rental.converter.LoaiKhieuNaiConverter;
+import com.ute.rental.dto.LoaiKhieuNaiDTO;
+import com.ute.rental.entity.LoaiKhieuNaiEntity;
+import com.ute.rental.exception.ResourceNotFoundException;
+import com.ute.rental.repository.LoaiKhieuNaiRepository;
+import com.ute.rental.service.ILoaiKhieuNaiService;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class LoaiKhieuNaiService implements ILoaiKhieuNaiService {
+
+    private final LoaiKhieuNaiRepository loaiKhieuNaiRepository;
+    private final LoaiKhieuNaiConverter loaiKhieuNaiConverter;
+
+    @Override
+    public List<LoaiKhieuNaiDTO> getLoaiKhieuNais() {
+        List<LoaiKhieuNaiEntity> entities = loaiKhieuNaiRepository.findLoaiKhieuNaisByTrangThaiXoa("1");
+        return entities.stream().map(loaiKhieuNaiConverter::toDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public LoaiKhieuNaiDTO addLoaiKhieuNai(LoaiKhieuNaiDTO loaiKhieuNaiDTO) {
+        LoaiKhieuNaiEntity loaiKhieuNaiEntity = loaiKhieuNaiConverter.toEntity(loaiKhieuNaiDTO);
+        return loaiKhieuNaiConverter.toDTO(loaiKhieuNaiRepository.save(loaiKhieuNaiEntity));
+    }
+
+    @Transactional
+    @Override
+    public LoaiKhieuNaiDTO updateLoaiKhieuNai(String maLoaiKhieuNai, LoaiKhieuNaiDTO updatedLoaiKhieuNai) {
+        LoaiKhieuNaiEntity loaiKhieuNaiEntity = loaiKhieuNaiRepository.findOneByMaLoaiKhieuNai(maLoaiKhieuNai)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không tìm thấy danh mục nào với mã danh mục là " + maLoaiKhieuNai));
+        LoaiKhieuNaiEntity loaiKhieuNaiUpdated = loaiKhieuNaiConverter.toEntity(updatedLoaiKhieuNai,
+                loaiKhieuNaiEntity);
+        return loaiKhieuNaiConverter.toDTO(loaiKhieuNaiRepository.save(loaiKhieuNaiUpdated));
+    }
+
+    @Transactional
+    @Override
+    public void deleteLoaiKhieuNai(String maLoaiKhieuNai) {
+        LoaiKhieuNaiEntity loaiKhieuNaiEntity = loaiKhieuNaiRepository.findOneByMaLoaiKhieuNai(maLoaiKhieuNai)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không tìm thấy danh mục nào với mã danh mục là " + maLoaiKhieuNai));
+        loaiKhieuNaiEntity.setTrangThaiXoa("0");
+        loaiKhieuNaiRepository.save(loaiKhieuNaiEntity);
+    }
+
+    @Override
+    public LoaiKhieuNaiDTO getLoaiKhieuNaiByMaLoaiKhieuNai(String maLoaiKhieuNai) {
+        LoaiKhieuNaiEntity loaiKhieuNaiEntity = loaiKhieuNaiRepository.findOneByMaLoaiKhieuNai(maLoaiKhieuNai)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không tìm thấy danh mục nào với mã danh mục là " + maLoaiKhieuNai));
+        return loaiKhieuNaiConverter.toDTO(loaiKhieuNaiEntity);
+    }
+
+}
