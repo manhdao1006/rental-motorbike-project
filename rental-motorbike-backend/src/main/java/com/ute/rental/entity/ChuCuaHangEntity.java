@@ -32,6 +32,12 @@ public class ChuCuaHangEntity {
     @Column(name = "tenCuaHang")
     private String tenCuaHang;
 
+    @Column(name = "diaChiCuaHang")
+    private String diaChiCuaHang;
+
+    @Column(name = "soDienThoaiCuaHang")
+    private String soDienThoaiCuaHang;
+
     @Column(name = "ngayDangKy")
     private LocalDateTime ngayDangKy;
 
@@ -49,5 +55,8 @@ public class ChuCuaHangEntity {
 
     @OneToMany(mappedBy = "chuCuaHang")
     private List<XeMayEntity> xeMays = new ArrayList<>();
+
+    @OneToMany(mappedBy = "chuCuaHang")
+    private List<HopDongEntity> hopDongs = new ArrayList<>();
 
 }

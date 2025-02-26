@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnhXeMayDTO {
+public class AnhHopDongDTO {
 
-    private String maAnhXeMay;
+    private String maAnhHopDong;
     private String tenAnh;
     private String duongDan;
-    private String maXeMay;
+    private String maHopDong;
 
 }

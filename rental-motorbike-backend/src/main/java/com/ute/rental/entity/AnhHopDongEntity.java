@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "ANHCAVETXE")
-public class AnhCaVetXeEntity {
+@Table(name = "ANHHOPDONG")
+public class AnhHopDongEntity {
 
     @Id
-    @Column(name = "maAnhCaVet")
-    private String maAnhCaVet;
+    @Column(name = "maAnhHopDong")
+    private String maAnhHopDong;
 
     @Column(name = "tenAnh")
     private String tenAnh;
@@ -29,7 +29,7 @@ public class AnhCaVetXeEntity {
     private String duongDan;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "maXeMay")
-    private XeMayEntity xeMay;
+    @JoinColumn(name = "maHopDong")
+    private HopDongEntity hopDong;
 
 }

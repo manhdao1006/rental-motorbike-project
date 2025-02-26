@@ -16,10 +16,13 @@ public class ChuCuaHangDTO {
 
     private String maChuCuaHang;
     private String tenCuaHang;
+    private String diaChiCuaHang;
+    private String soDienThoaiCuaHang;
     private LocalDateTime ngayDangKy;
     private String trangThaiXoa;
     private String maNguoiDung;
     private String maPhuongXa;
     private List<XeMayDTO> xeMays;
+    private List<HopDongDTO> hopDongs;
 
 }

@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class AnhCaVetXeDTO {
 
     private String maAnhCaVet;
-    private String tenAnhId;
     private String tenAnh;
+    private String duongDan;
     private String maXeMay;
 
 }

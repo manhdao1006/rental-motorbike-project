@@ -22,11 +22,11 @@ public class AnhXeMayEntity {
     @Column(name = "maAnhXeMay")
     private String maAnhXeMay;
 
-    @Column(name = "tenAnhId")
-    private String tenAnhId;
-
     @Column(name = "tenAnh")
     private String tenAnh;
+
+    @Column(name = "duongDan")
+    private String duongDan;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "maXeMay")

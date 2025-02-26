@@ -44,4 +44,7 @@ public class KhachHangEntity {
     @OneToMany(mappedBy = "khachHang")
     private List<DonHangEntity> donHangs = new ArrayList<>();
 
+    @OneToMany(mappedBy = "khachHang")
+    private List<HopDongEntity> hopDongs = new ArrayList<>();
+
 }

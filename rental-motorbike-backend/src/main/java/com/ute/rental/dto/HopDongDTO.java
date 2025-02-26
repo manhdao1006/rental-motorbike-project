@@ -12,14 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KhachHangDTO {
+public class HopDongDTO {
 
-    private String maKhachHang;
-    private String soGPLX;
-    private LocalDateTime ngayDangKy;
+    private String maHopDong;
+    private String tenHopDong;
+    private LocalDateTime ngayTao;
     private String trangThaiXoa;
-    private String maNguoiDung;
-    private List<DonHangDTO> donHangs;
-    private List<HopDongDTO> hopDongs;
-
+    private String maKhachHang;
+    private String maChuCuaHang;
+    private List<AnhHopDongDTO> anhHopDongs;
 }
