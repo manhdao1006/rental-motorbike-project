@@ -9,12 +9,14 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
+    "axios": "^1.8.1",
     "bootstrap": "^5.3.3",
     "rental-motorbike-frontend": "file:",
     "vue": "^3.2.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@types/node": "^22.13.5",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
