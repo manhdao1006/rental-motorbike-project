@@ -1,5 +1,7 @@
 package com.ute.rental.service.impl;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,6 +108,7 @@ public class DonHangService implements IDonHangService {
                         "Không tìm thấy khách hàng nào với mã khách hàng là: "
                                 + donHangDTO.getMaKhachHang()));
         DonHangEntity donHangEntity = donHangConverter.toEntity(donHangDTO);
+        donHangEntity.setMaDonHang(generateMaDonHang());
         donHangEntity.setChuCuaHang(chuCuaHangEntity);
         donHangEntity.setKhachHang(khachHangEntity);
         donHangEntity = donHangRepository.save(donHangEntity);
@@ -167,6 +170,18 @@ public class DonHangService implements IDonHangService {
         KhachHangDTO khachHangDTO = khachHangConverter.toDTO(khachHangEntity);
 
         return new DonHangResponseDTO(donHangDTO, khachHangDTO, chuCuaHangDTO);
+    }
+
+    private String generateMaDonHang() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        int count = donHangRepository.countByMaDonHangStartingWith("DH" + datePart) + 1;
+
+        String stt = String.valueOf(count);
+
+        return "DH" + datePart + stt;
     }
 
 }

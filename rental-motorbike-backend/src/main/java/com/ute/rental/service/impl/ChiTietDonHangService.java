@@ -1,5 +1,7 @@
 package com.ute.rental.service.impl;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +89,7 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
                         "Không tìm thấy xe máy nào với mã xe máy là: "
                                 + chiTietDonHangDTO.getMaXeMay()));
         ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangConverter.toEntity(chiTietDonHangDTO);
+        chiTietDonHangEntity.setMaChiTietDonHang(generateMaChiTietDonHang());
         chiTietDonHangEntity.setDonHang(donHangEntity);
         chiTietDonHangEntity.setXeMay(xeMayEntity);
         chiTietDonHangEntity = chiTietDonHangRepository.save(chiTietDonHangEntity);
@@ -233,6 +236,18 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
         }
 
         return responseList;
+    }
+
+    private String generateMaChiTietDonHang() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        int count = chiTietDonHangRepository.countByMaChiTietDonHangStartingWith("CTDH" + datePart) + 1;
+
+        String stt = String.valueOf(count);
+
+        return "CTDH" + datePart + stt;
     }
 
 }

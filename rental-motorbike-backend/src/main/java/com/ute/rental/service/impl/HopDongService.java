@@ -1,6 +1,8 @@
 package com.ute.rental.service.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -129,6 +131,7 @@ public class HopDongService implements IHopDongService {
                         "Không tìm thấy khách hàng nào với mã khách hàng là: "
                                 + hopDongDTO.getMaKhachHang()));
         HopDongEntity hopDongEntity = hopDongConverter.toEntity(hopDongDTO);
+        hopDongEntity.setMaHopDong(generateMaHopDong());
         hopDongEntity.setChuCuaHang(chuCuaHangEntity);
         hopDongEntity.setKhachHang(khachHangEntity);
         hopDongEntity = hopDongRepository.save(hopDongEntity);
@@ -138,6 +141,7 @@ public class HopDongService implements IHopDongService {
             for (MultipartFile file : anhHopDongList) {
                 Map<String, String> anhHopDongInfo = uploadAnhHopDong(file);
                 AnhHopDongEntity anhHopDong = new AnhHopDongEntity();
+                anhHopDong.setMaAnhHopDong(generateMaAnhHopDong());
                 anhHopDong.setDuongDan(anhHopDongInfo.get("publicId"));
                 anhHopDong.setTenAnh(anhHopDongInfo.get("url"));
                 anhHopDong.setHopDong(hopDongEntity);
@@ -254,6 +258,30 @@ public class HopDongService implements IHopDongService {
         List<AnhHopDongDTO> anhHopDongDTOs = anhHopDongConverter.toDTOs(anhHopDongEntities);
 
         return new HopDongResponseDTO(hopDongDTO, khachHangDTO, chuCuaHangDTO, anhHopDongDTOs);
+    }
+
+    private String generateMaHopDong() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        int count = hopDongRepository.countByMaHopDongStartingWith("HD" + datePart) + 1;
+
+        String stt = String.valueOf(count);
+
+        return "HD" + datePart + stt;
+    }
+
+    private String generateMaAnhHopDong() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        int count = anhHopDongRepository.countByMaAnhHopDongStartingWith("AHD" + datePart) + 1;
+
+        String stt = String.valueOf(count);
+
+        return "AHD" + datePart + stt;
     }
 
 }

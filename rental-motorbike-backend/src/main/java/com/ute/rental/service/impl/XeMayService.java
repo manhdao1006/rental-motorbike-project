@@ -1,6 +1,8 @@
 package com.ute.rental.service.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,6 +121,7 @@ public class XeMayService implements IXeMayService {
                                 + xeMayDTO.getMaDanhMucXe()));
 
         XeMayEntity xeMayEntity = xeMayConverter.toEntity(xeMayDTO);
+        xeMayEntity.setMaXeMay(generateMaXeMay());
         xeMayEntity.setChuCuaHang(chuCuaHangEntity);
         xeMayEntity.setDanhMucXe(danhMucXeEntity);
         xeMayEntity = xeMayRepository.save(xeMayEntity);
@@ -128,6 +131,7 @@ public class XeMayService implements IXeMayService {
             for (MultipartFile file : anhXeMayList) {
                 Map<String, String> anhXeMayInfo = uploadAnh(file, "xe-may");
                 AnhXeMayEntity anhXeMay = new AnhXeMayEntity();
+                anhXeMay.setMaAnhXeMay(generateMaAnhXeMay());
                 anhXeMay.setDuongDan(anhXeMayInfo.get("publicId"));
                 anhXeMay.setTenAnh(anhXeMayInfo.get("url"));
                 anhXeMay.setXeMay(xeMayEntity);
@@ -140,6 +144,7 @@ public class XeMayService implements IXeMayService {
             for (MultipartFile file : anhCaVetList) {
                 Map<String, String> anhCaVetXeInfo = uploadAnh(file, "ca-vet");
                 AnhCaVetXeEntity anhCaVetXe = new AnhCaVetXeEntity();
+                anhCaVetXe.setMaAnhCaVet(generateMaAnhCaVet());
                 anhCaVetXe.setDuongDan(anhCaVetXeInfo.get("publicId"));
                 anhCaVetXe.setTenAnh(anhCaVetXeInfo.get("url"));
                 anhCaVetXe.setXeMay(xeMayEntity);
@@ -192,6 +197,7 @@ public class XeMayService implements IXeMayService {
             for (MultipartFile file : anhXeMayList) {
                 Map<String, String> anhXeMayInfo = uploadAnh(file, "xe-may");
                 AnhXeMayEntity anhXeMay = new AnhXeMayEntity();
+                anhXeMay.setMaAnhXeMay(generateMaAnhXeMay());
                 anhXeMay.setDuongDan(anhXeMayInfo.get("publicId"));
                 anhXeMay.setTenAnh(anhXeMayInfo.get("url"));
                 anhXeMay.setXeMay(xeMayEntity);
@@ -213,6 +219,7 @@ public class XeMayService implements IXeMayService {
             for (MultipartFile file : anhCaVetList) {
                 Map<String, String> anhCaVetXeInfo = uploadAnh(file, "ca-vet");
                 AnhCaVetXeEntity anhCaVetXe = new AnhCaVetXeEntity();
+                anhCaVetXe.setMaAnhCaVet(generateMaAnhCaVet());
                 anhCaVetXe.setDuongDan(anhCaVetXeInfo.get("publicId"));
                 anhCaVetXe.setTenAnh(anhCaVetXeInfo.get("url"));
                 anhCaVetXe.setXeMay(xeMayEntity);
@@ -283,6 +290,42 @@ public class XeMayService implements IXeMayService {
         List<AnhCaVetXeDTO> anhCaVetXeDTOs = anhCaVetXeConverter.toDTOs(anhCaVetXeEntities);
 
         return new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, anhXeMayDTOs, anhCaVetXeDTOs);
+    }
+
+    private String generateMaXeMay() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        int count = xeMayRepository.countByMaXeMayStartingWith("XM" + datePart) + 1;
+
+        String stt = String.valueOf(count);
+
+        return "XM" + datePart + stt;
+    }
+
+    private String generateMaAnhXeMay() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        int count = anhXeMayRepository.countByMaAnhXeMayStartingWith("AXM" + datePart) + 1;
+
+        String stt = String.valueOf(count);
+
+        return "AXM" + datePart + stt;
+    }
+
+    private String generateMaAnhCaVet() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        int count = anhCaVetXeRepository.countByMaAnhCaVetStartingWith("ACV" + datePart) + 1;
+
+        String stt = String.valueOf(count);
+
+        return "ACV" + datePart + stt;
     }
 
 }

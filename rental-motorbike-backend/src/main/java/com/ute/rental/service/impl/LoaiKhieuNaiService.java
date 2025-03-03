@@ -1,5 +1,7 @@
 package com.ute.rental.service.impl;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,7 @@ public class LoaiKhieuNaiService implements ILoaiKhieuNaiService {
     @Override
     public LoaiKhieuNaiDTO addLoaiKhieuNai(LoaiKhieuNaiDTO loaiKhieuNaiDTO) {
         LoaiKhieuNaiEntity loaiKhieuNaiEntity = loaiKhieuNaiConverter.toEntity(loaiKhieuNaiDTO);
+        loaiKhieuNaiEntity.setMaLoaiKhieuNai(generateMaLoaiKhieuNai());
         return loaiKhieuNaiConverter.toDTO(loaiKhieuNaiRepository.save(loaiKhieuNaiEntity));
     }
 
@@ -64,4 +67,15 @@ public class LoaiKhieuNaiService implements ILoaiKhieuNaiService {
         return loaiKhieuNaiConverter.toDTO(loaiKhieuNaiEntity);
     }
 
+    private String generateMaLoaiKhieuNai() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = today.format(formatter);
+
+        int count = loaiKhieuNaiRepository.countByMaLoaiKhieuNaiStartingWith("LKN" + datePart) + 1;
+
+        String stt = String.valueOf(count);
+
+        return "LKN" + datePart + stt;
+    }
 }
