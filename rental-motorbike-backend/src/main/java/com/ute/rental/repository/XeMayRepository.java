@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ute.rental.entity.XeMayEntity;
@@ -16,5 +18,8 @@ public interface XeMayRepository extends JpaRepository<XeMayEntity, String> {
     List<XeMayEntity> findXeMaysByTrangThaiXoa(String trangThaiXoa);
 
     Optional<XeMayEntity> findOneByMaXeMay(String maXeMay);
+
+    @Query("SELECT COUNT(xm) FROM XeMayEntity xm WHERE xm.maXeMay LIKE :prefix%")
+    int countByMaXeMayStartingWith(@Param("prefix") String prefix);
 
 }

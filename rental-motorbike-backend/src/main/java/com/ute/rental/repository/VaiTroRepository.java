@@ -12,4 +12,6 @@ public interface VaiTroRepository extends JpaRepository<VaiTroEntity, String> {
 
     Optional<VaiTroEntity> findOneByTenVaiTro(String tenVaiTro);
 
+    Optional<VaiTroEntity> findOneByMaVaiTro(String maVaiTro);
+
 }
