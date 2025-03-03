@@ -14,29 +14,31 @@ import com.ute.rental.constant.ApiName;
 import com.ute.rental.constant.ApiUrl;
 import com.ute.rental.dto.ApiResponse;
 import com.ute.rental.dto.KhieuNaiDTO;
+import com.ute.rental.dto.KhieuNaiResponseDTO;
 import com.ute.rental.service.IKhieuNaiService;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController(value = "khieuNai" + ApiName.WEB)
+@RestController(value = "khieuNaiKhachHang" + ApiName.WEB)
 @RequestMapping(ApiUrl.API_KHACHHANG + "/khieu-nai")
 public class KhieuNaiController {
 
     private final IKhieuNaiService khieuNaiService;
 
-    @GetMapping("/list")
-    public ApiResponse<List<KhieuNaiDTO>> getKhieuNais() {
-        return ApiResponse.<List<KhieuNaiDTO>>builder()
+    @GetMapping("/list/{maNguoiDung}")
+    public ApiResponse<List<KhieuNaiResponseDTO>> getKhieuNaisByMaKhachHang(
+            @PathVariable("maNguoiDung") String maNguoiDung) {
+        return ApiResponse.<List<KhieuNaiResponseDTO>>builder()
                 .code(200)
                 .message("Danh sách khiếu nại")
-                .result(khieuNaiService.getKhieuNais())
+                .result(khieuNaiService.getKhieuNaisByMaKhachHang(maNguoiDung))
                 .build();
     }
 
     @GetMapping("/maKhieuNai={maKhieuNai}")
-    public ApiResponse<KhieuNaiDTO> getKhieuNaiByMaKhieuNai(@PathVariable("maKhieuNai") String maKhieuNai) {
-        return ApiResponse.<KhieuNaiDTO>builder()
+    public ApiResponse<KhieuNaiResponseDTO> getKhieuNaiByMaKhieuNai(@PathVariable("maKhieuNai") String maKhieuNai) {
+        return ApiResponse.<KhieuNaiResponseDTO>builder()
                 .code(200)
                 .message("Khiếu nại với mã khiếu nại là " + maKhieuNai)
                 .result(khieuNaiService.getKhieuNaiByMaKhieuNai(maKhieuNai))

@@ -45,21 +45,21 @@ public class LoaiKhieuNaiController {
     }
 
     @PostMapping("/add")
-    public ApiResponse<LoaiKhieuNaiDTO> addLoaiKhieuNai(@RequestBody LoaiKhieuNaiDTO danhMucXeDTO) {
+    public ApiResponse<LoaiKhieuNaiDTO> addLoaiKhieuNai(@RequestBody LoaiKhieuNaiDTO loaiKhieuNaiDTO) {
         return ApiResponse.<LoaiKhieuNaiDTO>builder()
                 .code(200)
                 .message("Thêm mới thành công")
-                .result(loaiKhieuNaiService.addLoaiKhieuNai(danhMucXeDTO))
+                .result(loaiKhieuNaiService.addLoaiKhieuNai(loaiKhieuNaiDTO))
                 .build();
     }
 
     @PutMapping("edit/{maLoaiKhieuNai}")
     public ApiResponse<LoaiKhieuNaiDTO> updateLoaiKhieuNai(@PathVariable("maLoaiKhieuNai") String maLoaiKhieuNai,
-            @RequestBody LoaiKhieuNaiDTO danhMucXeDTO) {
+            @RequestBody LoaiKhieuNaiDTO loaiKhieuNaiDTO) {
         return ApiResponse.<LoaiKhieuNaiDTO>builder()
                 .code(200)
                 .message("Cập nhật thành công")
-                .result(loaiKhieuNaiService.updateLoaiKhieuNai(maLoaiKhieuNai, danhMucXeDTO))
+                .result(loaiKhieuNaiService.updateLoaiKhieuNai(maLoaiKhieuNai, loaiKhieuNaiDTO))
                 .build();
     }
 

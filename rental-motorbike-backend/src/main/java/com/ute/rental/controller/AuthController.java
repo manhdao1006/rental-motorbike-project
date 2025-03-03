@@ -116,6 +116,15 @@ public class AuthController {
                 .build();
     }
 
+    @PostMapping("/register-lessor")
+    public ApiResponse<NguoiDungDTO> registerLessor(@RequestBody NguoiDungDTO nguoiDungDTO) {
+        return ApiResponse.<NguoiDungDTO>builder()
+                .code(200)
+                .message("Đăng ký thành công")
+                .result(nguoiDungService.registerLessor(nguoiDungDTO))
+                .build();
+    }
+
     @PostMapping("/register-staff")
     public ApiResponse<NguoiDungDTO> registerStaff(@RequestBody NguoiDungDTO nguoiDungDTO) {
         return ApiResponse.<NguoiDungDTO>builder()
