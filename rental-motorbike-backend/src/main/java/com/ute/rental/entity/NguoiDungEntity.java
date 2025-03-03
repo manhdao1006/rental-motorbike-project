@@ -63,7 +63,7 @@ public class NguoiDungEntity {
     private String gioiTinh;
 
     @Column(name = "trangThaiXoa", nullable = false)
-    private String trangThaiXoa;
+    private String trangThaiXoa = "1";
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "VAITRO_NGUOIDUNG", joinColumns = @JoinColumn(name = "maNguoiDung", referencedColumnName = "maNguoiDung"), inverseJoinColumns = @JoinColumn(name = "maVaiTro", referencedColumnName = "maVaiTro"))

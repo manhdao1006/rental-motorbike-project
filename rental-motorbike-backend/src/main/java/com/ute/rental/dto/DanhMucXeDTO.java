@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DanhMucXeDTO {
 
-    private String maDanhMuc;
-    private String tenDanhMuc;
+    private String maDanhMucXe;
+    private String tenDanhMucXe;
     private String trangThaiXoa;
     private List<XeMayDTO> xeMays;
 

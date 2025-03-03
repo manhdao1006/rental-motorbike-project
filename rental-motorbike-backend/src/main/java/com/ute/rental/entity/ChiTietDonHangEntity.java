@@ -41,7 +41,7 @@ public class ChiTietDonHangEntity {
     private LocalDateTime denNgay;
 
     @Column(name = "trangThaiXoa", nullable = false)
-    private String trangThaiXoa;
+    private String trangThaiXoa = "1";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "maDonHang")

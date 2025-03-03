@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class XeMayResponseDTO {
-    private XeMayDTO sanPham;
-    private DanhMucXeDTO nguoiBan;
-    private ChuCuaHangDTO danhMucCon;
+    private XeMayDTO xeMay;
+    private DanhMucXeDTO danhMucXe;
+    private ChuCuaHangDTO chuCuaHang;
     private List<AnhXeMayDTO> anhXeMays;
     private List<AnhCaVetXeDTO> anhCaVets;
 }

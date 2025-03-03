@@ -42,7 +42,7 @@ public class ChuCuaHangEntity {
     private LocalDateTime ngayDangKy;
 
     @Column(name = "trangThaiXoa", nullable = false)
-    private String trangThaiXoa;
+    private String trangThaiXoa = "1";
 
     @MapsId
     @OneToOne

@@ -31,7 +31,7 @@ public class XuLyKhieuNaiEntity {
     private LocalDateTime ngayXuLy;
 
     @Column(name = "trangThaiXoa", nullable = false)
-    private String trangThaiXoa;
+    private String trangThaiXoa = "1";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "maKhieuNai")

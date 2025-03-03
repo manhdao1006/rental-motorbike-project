@@ -30,7 +30,7 @@ public class NhanVienEntity {
     private String chucVu;
 
     @Column(name = "trangThaiXoa", nullable = false)
-    private String trangThaiXoa;
+    private String trangThaiXoa = "1";
 
     @MapsId
     @OneToOne

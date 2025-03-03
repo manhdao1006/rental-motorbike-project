@@ -27,7 +27,7 @@ public class LoaiKhieuNaiEntity {
     private String tenLoaiKhieuNai;
 
     @Column(name = "trangThaiXoa", nullable = false)
-    private String trangThaiXoa;
+    private String trangThaiXoa = "1";
 
     @OneToMany(mappedBy = "loaiKhieuNai")
     private List<KhieuNaiEntity> khieuNais = new ArrayList<>();

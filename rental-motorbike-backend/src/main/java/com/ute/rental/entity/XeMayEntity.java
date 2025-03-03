@@ -41,13 +41,13 @@ public class XeMayEntity {
     private BigDecimal giaThue;
 
     @Column(name = "soKhung")
-    private BigDecimal soKhung;
+    private String soKhung;
 
     @Column(name = "soMay")
-    private BigDecimal soMay;
+    private String soMay;
 
     @Column(name = "loaiXeMay")
-    private BigDecimal loaiXeMay;
+    private String loaiXeMay;
 
     @Column(name = "lyDoTuChoi")
     private String lyDoTuChoi;
@@ -56,7 +56,7 @@ public class XeMayEntity {
     private String trangThaiHoatDong;
 
     @Column(name = "trangThaiXoa", nullable = false)
-    private String trangThaiXoa;
+    private String trangThaiXoa = "1";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "maDanhMucXe")

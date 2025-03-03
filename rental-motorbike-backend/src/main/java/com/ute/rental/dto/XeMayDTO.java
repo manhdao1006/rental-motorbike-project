@@ -19,9 +19,9 @@ public class XeMayDTO {
     private String tenXeMay;
     private String mauXeMay;
     private BigDecimal giaThue;
-    private BigDecimal soKhung;
-    private BigDecimal soMay;
-    private BigDecimal loaiXeMay;
+    private String soKhung;
+    private String soMay;
+    private String loaiXeMay;
     private String lyDoTuChoi;
     private String trangThaiHoatDong;
     private String trangThaiXoa;
