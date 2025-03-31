@@ -15,20 +15,18 @@ import lombok.NoArgsConstructor;
 public class XeMayDTO {
 
     private String maXeMay;
-    private String bienSoXeMay;
-    private String tenXeMay;
-    private String mauXeMay;
+    private String bienSoXe;
+    private String tenXe;
+    private String mauXe;
     private BigDecimal giaThue;
     private String soKhung;
     private String soMay;
-    private String loaiXeMay;
-    private String lyDoTuChoi;
+    private String loaiXe;
     private String trangThaiHoatDong;
     private String trangThaiXoa;
     private String maDanhMucXe;
     private String maChuCuaHang;
     private List<ChiTietDonHangDTO> chiTietDonHangs;
     private List<AnhXeMayDTO> anhXeMays;
-    private List<AnhCaVetXeDTO> anhCaVetXes;
 
 }

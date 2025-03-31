@@ -1,6 +1,7 @@
 package com.ute.rental.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class NguoiDungEntity {
     @Column(name = "diaChi")
     private String diaChi;
 
-    @Column(name = " trangThaiHoatDong")
+    @Column(name = "trangThaiHoatDong")
     private String trangThaiHoatDong;
 
     @Column(name = "anhDaiDienId")
@@ -62,6 +63,9 @@ public class NguoiDungEntity {
     @Column(name = "gioiTinh")
     private String gioiTinh;
 
+    @Column(name = "ngayDangKy")
+    private LocalDateTime ngayDangKy;
+
     @Column(name = "trangThaiXoa", nullable = false)
     private String trangThaiXoa = "1";
 
@@ -73,9 +77,9 @@ public class NguoiDungEntity {
     private KhachHangEntity khachHang;
 
     @OneToOne(mappedBy = "nguoiDung")
-    private NhanVienEntity nhanVien;
+    private ChuCuaHangEntity chuCuaHang;
 
     @OneToOne(mappedBy = "nguoiDung")
-    private ChuCuaHangEntity chuCuaHang;
+    private NhanVienEntity nhanVien;
 
 }

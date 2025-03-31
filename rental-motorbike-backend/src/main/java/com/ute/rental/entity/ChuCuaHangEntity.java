@@ -1,6 +1,5 @@
 package com.ute.rental.entity;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +37,8 @@ public class ChuCuaHangEntity {
     @Column(name = "soDienThoaiCuaHang")
     private String soDienThoaiCuaHang;
 
-    @Column(name = "ngayDangKy")
-    private LocalDateTime ngayDangKy;
+    @Column(name = "lyDoTuChoi")
+    private String lyDoTuChoi;
 
     @Column(name = "trangThaiXoa", nullable = false)
     private String trangThaiXoa = "1";
@@ -57,6 +56,6 @@ public class ChuCuaHangEntity {
     private List<XeMayEntity> xeMays = new ArrayList<>();
 
     @OneToMany(mappedBy = "chuCuaHang")
-    private List<HopDongEntity> hopDongs = new ArrayList<>();
+    private List<NhanVienEntity> nhanViens = new ArrayList<>();
 
 }

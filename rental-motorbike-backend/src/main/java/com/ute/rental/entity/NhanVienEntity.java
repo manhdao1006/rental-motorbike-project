@@ -5,8 +5,10 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -26,18 +28,18 @@ public class NhanVienEntity {
     @Column(name = "maNhanVien")
     private String maNhanVien;
 
-    @Column(name = "chucVu")
-    private String chucVu;
-
     @Column(name = "trangThaiXoa", nullable = false)
     private String trangThaiXoa = "1";
 
     @MapsId
     @OneToOne
-    @JoinColumn(name = "maNhanVien", referencedColumnName = "id")
+    @JoinColumn(name = "maNhanVien", referencedColumnName = "maNguoiDung")
     private NguoiDungEntity nguoiDung;
 
-    @OneToMany(mappedBy = "nhanVien")
-    private List<XuLyKhieuNaiEntity> xuLyKhieuNais = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "maChuCuaHang")
+    private ChuCuaHangEntity chuCuaHang;
 
+    @OneToMany(mappedBy = "nhanVien")
+    private List<DonHangEntity> donHangs = new ArrayList<>();
 }

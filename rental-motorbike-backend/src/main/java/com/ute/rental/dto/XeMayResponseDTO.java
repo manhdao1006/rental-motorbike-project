@@ -13,6 +13,6 @@ public class XeMayResponseDTO {
     private XeMayDTO xeMay;
     private DanhMucXeDTO danhMucXe;
     private ChuCuaHangDTO chuCuaHang;
+    private NguoiDungDTO nguoiDung;
     private List<AnhXeMayDTO> anhXeMays;
-    private List<AnhCaVetXeDTO> anhCaVets;
 }

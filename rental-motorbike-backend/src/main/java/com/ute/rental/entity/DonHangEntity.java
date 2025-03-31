@@ -33,26 +33,26 @@ public class DonHangEntity {
     @Column(name = "ngayGiaoXe")
     private LocalDateTime ngayGiaoXe;
 
-    @Column(name = "ngayTraXe")
-    private LocalDateTime ngayTraXe;
-
-    @Column(name = "ngayThanhToan")
-    private LocalDateTime ngayThanhToan;
-
-    @Column(name = "hoTenNguoiGiaoHang")
-    private String hoTenNguoiGiaoHang;
-
-    @Column(name = "soDienThoaiGiaoHang")
-    private String soDienThoaiGiaoHang;
+    @Column(name = "diaChiGiaoXe")
+    private String diaChiGiaoXe;
 
     @Column(name = "trangThaiDonHang")
     private String trangThaiDonHang;
 
+    @Column(name = "ngayThanhToan")
+    private LocalDateTime ngayThanhToan;
+
     @Column(name = "phuongThucThanhToan")
     private String phuongThucThanhToan;
 
+    @Column(name = "ngayTraXe")
+    private LocalDateTime ngayTraXe;
+
     @Column(name = "lyDoHuy")
     private String lyDoHuy;
+
+    @Column(name = "tepDinhKem")
+    private String tepDinhKem;
 
     @Column(name = "trangThaiXoa", nullable = false)
     private String trangThaiXoa = "1";
@@ -62,10 +62,13 @@ public class DonHangEntity {
     private KhachHangEntity khachHang;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "maChuCuaHang")
-    private ChuCuaHangEntity chuCuaHang;
+    @JoinColumn(name = "maNhanVien")
+    private NhanVienEntity nhanVien;
 
     @OneToMany(mappedBy = "donHang")
     private List<ChiTietDonHangEntity> chiTietDonHangs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "donHang")
+    private List<KhieuNaiEntity> khieuNais = new ArrayList<>();
 
 }

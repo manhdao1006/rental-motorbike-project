@@ -1,6 +1,7 @@
 package com.ute.rental.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -26,10 +27,11 @@ public class NguoiDungDTO {
     private String anhDaiDien;
     private LocalDate ngaySinh;
     private String gioiTinh;
+    private LocalDateTime ngayDangKy;
     private String trangThaiXoa;
     private List<VaiTroDTO> vaiTros;
     private String maKhachHang;
-    private String maNhanVien;
     private String maChuCuaHang;
+    private String maNhanVien;
 
 }

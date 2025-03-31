@@ -17,16 +17,17 @@ public class DonHangDTO {
     private String maDonHang;
     private LocalDateTime ngayTao;
     private LocalDateTime ngayGiaoXe;
-    private LocalDateTime ngayTraXe;
-    private LocalDateTime ngayThanhToan;
-    private String hoTenNguoiGiaoHang;
-    private String soDienThoaiGiaoHang;
+    private String diaChiGiaoXe;
     private String trangThaiDonHang;
+    private LocalDateTime ngayThanhToan;
     private String phuongThucThanhToan;
+    private LocalDateTime ngayTraXe;
     private String lyDoHuy;
+    private String tepDinhKem;
     private String trangThaiXoa;
     private String maKhachHang;
-    private String maChuCuaHang;
+    private String maNhanVien;
     private List<ChiTietDonHangDTO> chiTietDonHangs;
+    private List<KhieuNaiDTO> khieuNais;
 
 }

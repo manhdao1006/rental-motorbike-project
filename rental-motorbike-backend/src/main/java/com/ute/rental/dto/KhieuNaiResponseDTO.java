@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class KhieuNaiResponseDTO {
     private KhieuNaiDTO khieuNai;
     private LoaiKhieuNaiDTO loaiKhieuNai;
-    private ChiTietDonHangDTO chiTietDonHang;
+    private DonHangDTO donHang;
 }

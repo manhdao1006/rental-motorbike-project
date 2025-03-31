@@ -1,6 +1,5 @@
 package com.ute.rental.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -18,11 +17,11 @@ public class ChuCuaHangDTO {
     private String tenCuaHang;
     private String diaChiCuaHang;
     private String soDienThoaiCuaHang;
-    private LocalDateTime ngayDangKy;
+    private String lyDoTuChoi;
     private String trangThaiXoa;
     private String maNguoiDung;
     private String maPhuongXa;
     private List<XeMayDTO> xeMays;
-    private List<HopDongDTO> hopDongs;
+    private List<NhanVienDTO> nhanViens;
 
 }

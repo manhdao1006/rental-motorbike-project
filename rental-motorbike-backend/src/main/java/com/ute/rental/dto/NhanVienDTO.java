@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 public class NhanVienDTO {
 
     private String maNhanVien;
-    private String chucVu;
     private String trangThaiXoa;
     private String maNguoiDung;
-    private List<XuLyKhieuNaiDTO> xuLyKhieuNais;
+    private String maChuCuaHang;
+    private List<DonHangDTO> donHangs;
 
 }

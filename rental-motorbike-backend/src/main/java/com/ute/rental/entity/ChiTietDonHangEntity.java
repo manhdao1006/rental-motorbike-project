@@ -2,16 +2,15 @@ package com.ute.rental.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.ute.rental.entity.impl.MaChiTietDonHang;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,12 +23,18 @@ import lombok.NoArgsConstructor;
 @Table(name = "CHITIETDONHANG")
 public class ChiTietDonHangEntity {
 
-    @Id
-    @Column(name = "maChiTietDonHang")
-    private String maChiTietDonHang;
+    @EmbeddedId
+    private MaChiTietDonHang maChiTietDonHang;
 
-    @Column(name = "soLuongThue")
-    private BigDecimal soLuongThue;
+    @ManyToOne
+    @MapsId("maDonHang")
+    @JoinColumn(name = "maDonHang")
+    private DonHangEntity donHang;
+
+    @ManyToOne
+    @MapsId("maXeMay")
+    @JoinColumn(name = "maXeMay")
+    private XeMayEntity xeMay;
 
     @Column(name = "giaThue")
     private BigDecimal giaThue;
@@ -40,18 +45,19 @@ public class ChiTietDonHangEntity {
     @Column(name = "denNgay")
     private LocalDateTime denNgay;
 
+    @Column(name = "tinhTrangTruocThue")
+    private String tinhTrangTruocThue;
+
+    @Column(name = "hinhAnhTruocThue")
+    private String hinhAnhTruocThue;
+
+    @Column(name = "tinhTrangSauThue")
+    private String tinhTrangSauThue;
+
+    @Column(name = "hinhAnhSauThue")
+    private String hinhAnhSauThue;
+
     @Column(name = "trangThaiXoa", nullable = false)
     private String trangThaiXoa = "1";
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "maDonHang")
-    private DonHangEntity donHang;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "maXeMay")
-    private XeMayEntity xeMay;
-
-    @OneToMany(mappedBy = "chiTietDonHang")
-    private List<KhieuNaiEntity> khieuNais = new ArrayList<>();
 
 }

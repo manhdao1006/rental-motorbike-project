@@ -28,14 +28,14 @@ public class XeMayEntity {
     @Column(name = "maXeMay")
     private String maXeMay;
 
-    @Column(name = "bienSoXeMay")
-    private String bienSoXeMay;
+    @Column(name = "bienSoXe")
+    private String bienSoXe;
 
-    @Column(name = "tenXeMay")
-    private String tenXeMay;
+    @Column(name = "tenXe")
+    private String tenXe;
 
-    @Column(name = "mauXeMay")
-    private String mauXeMay;
+    @Column(name = "mauXe")
+    private String mauXe;
 
     @Column(name = "giaThue")
     private BigDecimal giaThue;
@@ -46,11 +46,8 @@ public class XeMayEntity {
     @Column(name = "soMay")
     private String soMay;
 
-    @Column(name = "loaiXeMay")
-    private String loaiXeMay;
-
-    @Column(name = "lyDoTuChoi")
-    private String lyDoTuChoi;
+    @Column(name = "loaiXe")
+    private String loaiXe;
 
     @Column(name = " trangThaiHoatDong")
     private String trangThaiHoatDong;
@@ -68,9 +65,6 @@ public class XeMayEntity {
 
     @OneToMany(mappedBy = "xeMay", cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
     private List<AnhXeMayEntity> anhXeMays = new ArrayList<>();
-
-    @OneToMany(mappedBy = "xeMay", cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
-    private List<AnhCaVetXeEntity> anhCaVetXes = new ArrayList<>();
 
     @OneToMany(mappedBy = "xeMay")
     private List<ChiTietDonHangEntity> chiTietDonHangs = new ArrayList<>();
