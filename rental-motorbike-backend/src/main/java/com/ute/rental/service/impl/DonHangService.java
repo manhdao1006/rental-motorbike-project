@@ -7,20 +7,26 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.ute.rental.converter.ChiTietDonHangConverter;
 import com.ute.rental.converter.ChuCuaHangConverter;
 import com.ute.rental.converter.DonHangConverter;
 import com.ute.rental.converter.KhachHangConverter;
+import com.ute.rental.converter.NhanVienConverter;
+import com.ute.rental.dto.ChiTietDonHangDTO;
 import com.ute.rental.dto.ChuCuaHangDTO;
 import com.ute.rental.dto.DonHangDTO;
 import com.ute.rental.dto.DonHangResponseDTO;
 import com.ute.rental.dto.KhachHangDTO;
+import com.ute.rental.dto.NhanVienDTO;
+import com.ute.rental.entity.ChiTietDonHangEntity;
 import com.ute.rental.entity.ChuCuaHangEntity;
 import com.ute.rental.entity.DonHangEntity;
 import com.ute.rental.entity.KhachHangEntity;
+import com.ute.rental.entity.NhanVienEntity;
 import com.ute.rental.exception.ResourceNotFoundException;
-import com.ute.rental.repository.ChuCuaHangRepository;
 import com.ute.rental.repository.DonHangRepository;
 import com.ute.rental.repository.KhachHangRepository;
+import com.ute.rental.repository.NhanVienRepository;
 import com.ute.rental.service.IDonHangService;
 
 import jakarta.transaction.Transactional;
@@ -31,27 +37,36 @@ import lombok.RequiredArgsConstructor;
 public class DonHangService implements IDonHangService {
 
     private final DonHangRepository donHangRepository;
-    private final ChuCuaHangRepository chuCuaHangRepository;
     private final KhachHangRepository khachHangRepository;
+    private final NhanVienRepository nhanVienRepository;
     private final DonHangConverter donHangConverter;
     private final ChuCuaHangConverter chuCuaHangConverter;
     private final KhachHangConverter khachHangConverter;
+    private final ChiTietDonHangConverter chiTietDonHangConverter;
+    private final NhanVienConverter nhanVienConverter;
 
     @Override
-    public List<DonHangResponseDTO> getDonHangsByMaChuCuaHang(String maChuCuaHang) {
+    public List<DonHangResponseDTO> getDonHangsByMaNhanVien(String maNhanVien) {
         List<DonHangEntity> entities = donHangRepository
-                .findDonHangsByChuCuaHang_MaChuCuaHangAndTrangThaiXoa(maChuCuaHang, "1");
+                .findDonHangsByNhanVien_MaNhanVienAndTrangThaiXoa(maNhanVien, "1");
         List<DonHangResponseDTO> responseList = new ArrayList<>();
         for (DonHangEntity donHangEntity : entities) {
             DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-            ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getChuCuaHang();
+            ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getNhanVien().getChuCuaHang();
             ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
 
             KhachHangEntity khachHangEntity = donHangEntity.getKhachHang();
             KhachHangDTO khachHangDTO = khachHangConverter.toDTO(khachHangEntity);
 
-            responseList.add(new DonHangResponseDTO(donHangDTO, khachHangDTO, chuCuaHangDTO));
+            NhanVienEntity nhanVienEntity = donHangEntity.getNhanVien();
+            NhanVienDTO nhanVienDTO = nhanVienConverter.toDTO(nhanVienEntity);
+
+            List<ChiTietDonHangEntity> chiTietDonHangEntities = donHangEntity.getChiTietDonHangs();
+            List<ChiTietDonHangDTO> chiTietDonHangDTOs = chiTietDonHangConverter.toDTOs(chiTietDonHangEntities);
+
+            responseList.add(
+                    new DonHangResponseDTO(donHangDTO, khachHangDTO, nhanVienDTO, chuCuaHangDTO, chiTietDonHangDTOs));
         }
 
         return responseList;
@@ -65,13 +80,20 @@ public class DonHangService implements IDonHangService {
         for (DonHangEntity donHangEntity : entities) {
             DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-            ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getChuCuaHang();
+            ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getNhanVien().getChuCuaHang();
             ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
 
             KhachHangEntity khachHangEntity = donHangEntity.getKhachHang();
             KhachHangDTO khachHangDTO = khachHangConverter.toDTO(khachHangEntity);
 
-            responseList.add(new DonHangResponseDTO(donHangDTO, khachHangDTO, chuCuaHangDTO));
+            NhanVienEntity nhanVienEntity = donHangEntity.getNhanVien();
+            NhanVienDTO nhanVienDTO = nhanVienConverter.toDTO(nhanVienEntity);
+
+            List<ChiTietDonHangEntity> chiTietDonHangEntities = donHangEntity.getChiTietDonHangs();
+            List<ChiTietDonHangDTO> chiTietDonHangDTOs = chiTietDonHangConverter.toDTOs(chiTietDonHangEntities);
+
+            responseList.add(
+                    new DonHangResponseDTO(donHangDTO, khachHangDTO, nhanVienDTO, chuCuaHangDTO, chiTietDonHangDTOs));
         }
 
         return responseList;
@@ -84,13 +106,20 @@ public class DonHangService implements IDonHangService {
         for (DonHangEntity donHangEntity : entities) {
             DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-            ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getChuCuaHang();
+            ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getNhanVien().getChuCuaHang();
             ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
 
             KhachHangEntity khachHangEntity = donHangEntity.getKhachHang();
             KhachHangDTO khachHangDTO = khachHangConverter.toDTO(khachHangEntity);
 
-            responseList.add(new DonHangResponseDTO(donHangDTO, khachHangDTO, chuCuaHangDTO));
+            NhanVienEntity nhanVienEntity = donHangEntity.getNhanVien();
+            NhanVienDTO nhanVienDTO = nhanVienConverter.toDTO(nhanVienEntity);
+
+            List<ChiTietDonHangEntity> chiTietDonHangEntities = donHangEntity.getChiTietDonHangs();
+            List<ChiTietDonHangDTO> chiTietDonHangDTOs = chiTietDonHangConverter.toDTOs(chiTietDonHangEntities);
+
+            responseList.add(
+                    new DonHangResponseDTO(donHangDTO, khachHangDTO, nhanVienDTO, chuCuaHangDTO, chiTietDonHangDTOs));
         }
 
         return responseList;
@@ -99,17 +128,17 @@ public class DonHangService implements IDonHangService {
     @Transactional
     @Override
     public DonHangDTO addDonHang(DonHangDTO donHangDTO) {
-        ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository.findOneByMaChuCuaHang(donHangDTO.getMaChuCuaHang())
+        NhanVienEntity nhanVienEntity = nhanVienRepository.findOneByMaNhanVien(donHangDTO.getMaNhanVien())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy chủ cửa hàng nào với mã chủ cửa hàng là: "
-                                + donHangDTO.getMaChuCuaHang()));
+                        "Không tìm thấy nhân viên nào với mã nhân viên là: "
+                                + donHangDTO.getMaNhanVien()));
         KhachHangEntity khachHangEntity = khachHangRepository.findOneByMaKhachHang(donHangDTO.getMaKhachHang())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Không tìm thấy khách hàng nào với mã khách hàng là: "
                                 + donHangDTO.getMaKhachHang()));
         DonHangEntity donHangEntity = donHangConverter.toEntity(donHangDTO);
         donHangEntity.setMaDonHang(generateMaDonHang());
-        donHangEntity.setChuCuaHang(chuCuaHangEntity);
+        donHangEntity.setNhanVien(nhanVienEntity);
         donHangEntity.setKhachHang(khachHangEntity);
         donHangEntity = donHangRepository.save(donHangEntity);
 
@@ -124,12 +153,12 @@ public class DonHangService implements IDonHangService {
                         "Không tìm thấy đơn hàng nào với mã đơn hàng là: "
                                 + maDonHang));
 
-        if (donHangDTO.getMaChuCuaHang() != null) {
-            ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository.findOneByMaChuCuaHang(donHangDTO.getMaChuCuaHang())
+        if (donHangDTO.getMaNhanVien() != null) {
+            NhanVienEntity nhanVienEntity = nhanVienRepository.findOneByMaNhanVien(donHangDTO.getMaNhanVien())
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            "Không tìm thấy chủ cửa hàng nào với mã chủ cửa hàng là: "
-                                    + donHangDTO.getMaChuCuaHang()));
-            donHangEntity.setChuCuaHang(chuCuaHangEntity);
+                            "Không tìm thấy nhân viên nào với mã nhân viên là: "
+                                    + donHangDTO.getMaNhanVien()));
+            donHangEntity.setNhanVien(nhanVienEntity);
         }
         if (donHangDTO.getMaKhachHang() != null) {
             KhachHangEntity khachHangEntity = khachHangRepository
@@ -159,17 +188,23 @@ public class DonHangService implements IDonHangService {
     public DonHangResponseDTO getDonHangByMaDonHang(String maDonHang) {
         DonHangEntity donHangEntity = donHangRepository.findOneByMaDonHang(maDonHang)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy sản phẩm nào với mã sản phẩm là: "
+                        "Không tìm thấy đơn hàng nào với mã đơn hàng là: "
                                 + maDonHang));
         DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-        ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getChuCuaHang();
+        ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getNhanVien().getChuCuaHang();
         ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
 
         KhachHangEntity khachHangEntity = donHangEntity.getKhachHang();
         KhachHangDTO khachHangDTO = khachHangConverter.toDTO(khachHangEntity);
 
-        return new DonHangResponseDTO(donHangDTO, khachHangDTO, chuCuaHangDTO);
+        NhanVienEntity nhanVienEntity = donHangEntity.getNhanVien();
+        NhanVienDTO nhanVienDTO = nhanVienConverter.toDTO(nhanVienEntity);
+
+        List<ChiTietDonHangEntity> chiTietDonHangEntities = donHangEntity.getChiTietDonHangs();
+        List<ChiTietDonHangDTO> chiTietDonHangDTOs = chiTietDonHangConverter.toDTOs(chiTietDonHangEntities);
+
+        return new DonHangResponseDTO(donHangDTO, khachHangDTO, nhanVienDTO, chuCuaHangDTO, chiTietDonHangDTOs);
     }
 
     private String generateMaDonHang() {

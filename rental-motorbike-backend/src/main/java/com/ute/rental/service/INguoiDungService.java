@@ -11,10 +11,6 @@ public interface INguoiDungService {
 
     NguoiDungDTO register(NguoiDungDTO userDTO);
 
-    NguoiDungDTO registerLessor(NguoiDungDTO userDTO);
-
-    NguoiDungDTO registerStaff(NguoiDungDTO userDTO);
-
     NguoiDungDTO registerAdmin(NguoiDungDTO userDTO);
 
     List<NguoiDungDTO> getNguoiDungsByMaVaiTro(String maVaiTro);

@@ -1,7 +1,5 @@
 package com.ute.rental.service.impl;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +87,6 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
                         "Không tìm thấy xe máy nào với mã xe máy là: "
                                 + chiTietDonHangDTO.getMaXeMay()));
         ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangConverter.toEntity(chiTietDonHangDTO);
-        chiTietDonHangEntity.setMaChiTietDonHang(generateMaChiTietDonHang());
         chiTietDonHangEntity.setDonHang(donHangEntity);
         chiTietDonHangEntity.setXeMay(xeMayEntity);
         chiTietDonHangEntity = chiTietDonHangRepository.save(chiTietDonHangEntity);
@@ -99,11 +96,13 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
 
     @Transactional
     @Override
-    public ChiTietDonHangDTO updateChiTietDonHang(String maChiTietDonHang, ChiTietDonHangDTO chiTietDonHangDTO) {
-        ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository.findOneByMaChiTietDonHang(maChiTietDonHang)
+    public ChiTietDonHangDTO updateChiTietDonHang(String maDonHang, String maXeMay,
+            ChiTietDonHangDTO chiTietDonHangDTO) {
+        ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository
+                .findOneByDonHang_MaDonHangAndXeMay_MaXeMay(maDonHang, maXeMay)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy đơn hàng nào với mã đơn hàng là: "
-                                + maChiTietDonHang));
+                        "Không tìm thấy chi tiết đơn hàng nào với mã đơn hàng là: " + maDonHang + " và mã xe máy là: "
+                                + maXeMay));
 
         if (chiTietDonHangDTO.getMaDonHang() != null) {
             DonHangEntity donHangEntity = donHangRepository
@@ -129,21 +128,23 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
 
     @Transactional
     @Override
-    public void deleteChiTietDonHang(String maChiTietDonHang) {
-        ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository.findOneByMaChiTietDonHang(maChiTietDonHang)
+    public void deleteChiTietDonHang(String maDonHang, String maXeMay) {
+        ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository
+                .findOneByDonHang_MaDonHangAndXeMay_MaXeMay(maDonHang, maXeMay)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy đơn hàng nào với mã đơn hàng là: "
-                                + maChiTietDonHang));
+                        "Không tìm thấy chi tiết đơn hàng nào với mã đơn hàng là: " + maDonHang + " và mã xe máy là: "
+                                + maXeMay));
         chiTietDonHangEntity.setTrangThaiXoa("0");
         chiTietDonHangRepository.save(chiTietDonHangEntity);
     }
 
     @Override
-    public ChiTietDonHangResponseDTO getChiTietDonHangByMaChiTietDonHang(String maChiTietDonHang) {
-        ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository.findOneByMaChiTietDonHang(maChiTietDonHang)
+    public ChiTietDonHangResponseDTO getChiTietDonHangByMaDonHangAndMaXeMay(String maDonHang, String maXeMay) {
+        ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository
+                .findOneByDonHang_MaDonHangAndXeMay_MaXeMay(maDonHang, maXeMay)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy sản phẩm nào với mã sản phẩm là: "
-                                + maChiTietDonHang));
+                        "Không tìm thấy chi tiết đơn hàng nào với mã đơn hàng là: " + maDonHang + " và mã xe máy là: "
+                                + maXeMay));
         ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
 
         DonHangEntity donHangEntity = chiTietDonHangEntity.getDonHang();
@@ -197,9 +198,9 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
     }
 
     @Override
-    public List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaChuCuaHang(String maNguoiDung) {
+    public List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaNhanVien(String maNguoiDung) {
         List<ChiTietDonHangEntity> entities = chiTietDonHangRepository
-                .findChiTietDonHangsByDonHang_ChuCuaHang_MaChuCuaHang(maNguoiDung);
+                .findChiTietDonHangsByDonHang_NhanVien_MaNhanVien(maNguoiDung);
         List<ChiTietDonHangResponseDTO> responseList = new ArrayList<>();
         for (ChiTietDonHangEntity chiTietDonHangEntity : entities) {
             ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
@@ -217,10 +218,10 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
     }
 
     @Override
-    public List<ChiTietDonHangResponseDTO> getByTrangThaiDonHangChuCuaHang(String maNguoiDung,
+    public List<ChiTietDonHangResponseDTO> getByTrangThaiDonHangNhanVien(String maNguoiDung,
             String trangThaiDonHang) {
         List<ChiTietDonHangEntity> entities = chiTietDonHangRepository
-                .findChiTietDonHangsByDonHang_ChuCuaHang_MaChuCuaHangAndDonHang_TrangThaiDonHang(maNguoiDung,
+                .findChiTietDonHangsByDonHang_NhanVien_MaNhanVienAndDonHang_TrangThaiDonHang(maNguoiDung,
                         trangThaiDonHang);
         List<ChiTietDonHangResponseDTO> responseList = new ArrayList<>();
         for (ChiTietDonHangEntity chiTietDonHangEntity : entities) {
@@ -236,18 +237,6 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
         }
 
         return responseList;
-    }
-
-    private String generateMaChiTietDonHang() {
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String datePart = today.format(formatter);
-
-        int count = chiTietDonHangRepository.countByMaChiTietDonHangStartingWith("CTDH" + datePart) + 1;
-
-        String stt = String.valueOf(count);
-
-        return "CTDH" + datePart + stt;
     }
 
 }

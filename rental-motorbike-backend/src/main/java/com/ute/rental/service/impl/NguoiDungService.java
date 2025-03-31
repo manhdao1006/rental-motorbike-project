@@ -16,14 +16,12 @@ import com.ute.rental.dto.VaiTroDTO;
 import com.ute.rental.entity.ChuCuaHangEntity;
 import com.ute.rental.entity.KhachHangEntity;
 import com.ute.rental.entity.NguoiDungEntity;
-import com.ute.rental.entity.NhanVienEntity;
 import com.ute.rental.entity.VaiTroEntity;
 import com.ute.rental.exception.ResourceExistedException;
 import com.ute.rental.exception.ResourceNotFoundException;
 import com.ute.rental.repository.ChuCuaHangRepository;
 import com.ute.rental.repository.KhachHangRepository;
 import com.ute.rental.repository.NguoiDungRepository;
-import com.ute.rental.repository.NhanVienRepository;
 import com.ute.rental.repository.VaiTroRepository;
 import com.ute.rental.service.INguoiDungService;
 
@@ -37,7 +35,6 @@ public class NguoiDungService implements INguoiDungService {
     private final NguoiDungRepository nguoiDungRepository;
     private final VaiTroRepository vaiTroRepository;
     private final KhachHangRepository khachHangRepository;
-    private final NhanVienRepository nhanVienRepository;
     private final ChuCuaHangRepository chuCuaHangRepository;
     private final NguoiDungConverter nguoiDungConverter;
     private final VaiTroConverter vaiTroConverter;
@@ -47,7 +44,8 @@ public class NguoiDungService implements INguoiDungService {
     @Override
     public void forgotPassword(String email, String password) {
         NguoiDungEntity nguoiDungEntity = (nguoiDungRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email)));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Không tìm thấy người dùng nào với email là " + email)));
 
         nguoiDungEntity.setMatKhau(passwordEncoder.encode(password));
         nguoiDungRepository.save(nguoiDungEntity);
@@ -64,9 +62,10 @@ public class NguoiDungService implements INguoiDungService {
         nguoiDungEntity.setMaNguoiDung(generateMaNguoiDung());
         nguoiDungEntity.setEmail(nguoiDungDTO.getEmail());
         nguoiDungEntity.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
+        nguoiDungEntity.setTrangThaiHoatDong("Hoạt động");
 
         VaiTroEntity vaiTros = vaiTroRepository.findOneByTenVaiTro("ROLE_KHACHHANG")
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy vai trò!"));
         nguoiDungEntity.setVaiTros(Collections.singletonList(vaiTros));
 
         NguoiDungEntity savedUserEntity = nguoiDungRepository.save(nguoiDungEntity);
@@ -74,56 +73,6 @@ public class NguoiDungService implements INguoiDungService {
         KhachHangEntity khachHangEntity = new KhachHangEntity();
         khachHangEntity.setNguoiDung(savedUserEntity);
         khachHangRepository.save(khachHangEntity);
-
-        return nguoiDungConverter.toDTO(savedUserEntity);
-    }
-
-    @Transactional
-    @Override
-    public NguoiDungDTO registerLessor(NguoiDungDTO nguoiDungDTO) {
-        if (nguoiDungRepository.existsByEmail(nguoiDungDTO.getEmail())) {
-            throw new ResourceExistedException("Email đã tồn tại!");
-        }
-
-        NguoiDungEntity nguoiDungEntity = nguoiDungConverter.toEntity(nguoiDungDTO);
-        nguoiDungEntity.setMaNguoiDung(generateMaNguoiDung());
-        nguoiDungEntity.setEmail(nguoiDungDTO.getEmail());
-        nguoiDungEntity.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
-
-        VaiTroEntity vaiTros = vaiTroRepository.findOneByTenVaiTro("ROLE_CHUCUAHANG")
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found!"));
-        nguoiDungEntity.setVaiTros(Collections.singletonList(vaiTros));
-
-        NguoiDungEntity savedUserEntity = nguoiDungRepository.save(nguoiDungEntity);
-
-        ChuCuaHangEntity chuCuaHangEntity = new ChuCuaHangEntity();
-        chuCuaHangEntity.setNguoiDung(savedUserEntity);
-        chuCuaHangRepository.save(chuCuaHangEntity);
-
-        return nguoiDungConverter.toDTO(savedUserEntity);
-    }
-
-    @Transactional
-    @Override
-    public NguoiDungDTO registerStaff(NguoiDungDTO nguoiDungDTO) {
-        if (nguoiDungRepository.existsByEmail(nguoiDungDTO.getEmail())) {
-            throw new ResourceExistedException("Email đã tồn tại!");
-        }
-
-        NguoiDungEntity nguoiDungEntity = nguoiDungConverter.toEntity(nguoiDungDTO);
-        nguoiDungEntity.setMaNguoiDung(generateMaNguoiDung());
-        nguoiDungEntity.setEmail(nguoiDungDTO.getEmail());
-        nguoiDungEntity.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
-
-        VaiTroEntity vaiTros = vaiTroRepository.findOneByTenVaiTro("ROLE_NHANVIEN")
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found!"));
-        nguoiDungEntity.setVaiTros(Collections.singletonList(vaiTros));
-
-        NguoiDungEntity savedUserEntity = nguoiDungRepository.save(nguoiDungEntity);
-
-        NhanVienEntity nhanVienEntity = new NhanVienEntity();
-        nhanVienEntity.setNguoiDung(savedUserEntity);
-        nhanVienRepository.save(nhanVienEntity);
 
         return nguoiDungConverter.toDTO(savedUserEntity);
     }
@@ -139,16 +88,17 @@ public class NguoiDungService implements INguoiDungService {
         nguoiDungEntity.setMaNguoiDung(generateMaNguoiDung());
         nguoiDungEntity.setEmail(nguoiDungDTO.getEmail());
         nguoiDungEntity.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
+        nguoiDungEntity.setTrangThaiHoatDong("Hoạt động");
 
         VaiTroEntity vaiTros = vaiTroRepository.findOneByTenVaiTro("ROLE_QUANTRIVIEN")
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy vai trò!"));
         nguoiDungEntity.setVaiTros(Collections.singletonList(vaiTros));
 
         NguoiDungEntity savedUserEntity = nguoiDungRepository.save(nguoiDungEntity);
 
-        NhanVienEntity nhanVienEntity = new NhanVienEntity();
-        nhanVienEntity.setNguoiDung(savedUserEntity);
-        nhanVienRepository.save(nhanVienEntity);
+        ChuCuaHangEntity chuCuaHangEntity = new ChuCuaHangEntity();
+        chuCuaHangEntity.setNguoiDung(savedUserEntity);
+        chuCuaHangRepository.save(chuCuaHangEntity);
 
         return nguoiDungConverter.toDTO(savedUserEntity);
     }

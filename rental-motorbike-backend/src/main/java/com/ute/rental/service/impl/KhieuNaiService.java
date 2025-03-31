@@ -7,18 +7,18 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.ute.rental.converter.ChiTietDonHangConverter;
+import com.ute.rental.converter.DonHangConverter;
 import com.ute.rental.converter.KhieuNaiConverter;
 import com.ute.rental.converter.LoaiKhieuNaiConverter;
-import com.ute.rental.dto.ChiTietDonHangDTO;
+import com.ute.rental.dto.DonHangDTO;
 import com.ute.rental.dto.KhieuNaiDTO;
 import com.ute.rental.dto.KhieuNaiResponseDTO;
 import com.ute.rental.dto.LoaiKhieuNaiDTO;
-import com.ute.rental.entity.ChiTietDonHangEntity;
+import com.ute.rental.entity.DonHangEntity;
 import com.ute.rental.entity.KhieuNaiEntity;
 import com.ute.rental.entity.LoaiKhieuNaiEntity;
 import com.ute.rental.exception.ResourceNotFoundException;
-import com.ute.rental.repository.ChiTietDonHangRepository;
+import com.ute.rental.repository.DonHangRepository;
 import com.ute.rental.repository.KhieuNaiRepository;
 import com.ute.rental.repository.LoaiKhieuNaiRepository;
 import com.ute.rental.service.IKhieuNaiService;
@@ -31,11 +31,11 @@ import lombok.RequiredArgsConstructor;
 public class KhieuNaiService implements IKhieuNaiService {
 
     private final LoaiKhieuNaiRepository loaiKhieuNaiRepository;
-    private final ChiTietDonHangRepository chiTietDonHangRepository;
+    private final DonHangRepository donHangRepository;
     private final KhieuNaiRepository khieuNaiRepository;
     private final KhieuNaiConverter khieuNaiConverter;
     private final LoaiKhieuNaiConverter loaiKhieuNaiConverter;
-    private final ChiTietDonHangConverter chiTietDonHangConverter;
+    private final DonHangConverter donHangConverter;
 
     @Override
     public List<KhieuNaiResponseDTO> getKhieuNais() {
@@ -47,10 +47,10 @@ public class KhieuNaiService implements IKhieuNaiService {
             LoaiKhieuNaiEntity loaiKhieuNaiEntity = khieuNaiEntity.getLoaiKhieuNai();
             LoaiKhieuNaiDTO loaiKhieuNaiDTO = loaiKhieuNaiConverter.toDTO(loaiKhieuNaiEntity);
 
-            ChiTietDonHangEntity chiTietDonHangEntity = khieuNaiEntity.getChiTietDonHang();
-            ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
+            DonHangEntity donHangEntity = khieuNaiEntity.getDonHang();
+            DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-            responseList.add(new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, chiTietDonHangDTO));
+            responseList.add(new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, donHangDTO));
         }
 
         return responseList;
@@ -67,10 +67,10 @@ public class KhieuNaiService implements IKhieuNaiService {
             LoaiKhieuNaiEntity loaiKhieuNaiEntity = khieuNaiEntity.getLoaiKhieuNai();
             LoaiKhieuNaiDTO loaiKhieuNaiDTO = loaiKhieuNaiConverter.toDTO(loaiKhieuNaiEntity);
 
-            ChiTietDonHangEntity chiTietDonHangEntity = khieuNaiEntity.getChiTietDonHang();
-            ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
+            DonHangEntity donHangEntity = khieuNaiEntity.getDonHang();
+            DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-            responseList.add(new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, chiTietDonHangDTO));
+            responseList.add(new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, donHangDTO));
         }
 
         return responseList;
@@ -84,8 +84,8 @@ public class KhieuNaiService implements IKhieuNaiService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Không tìm thấy loại khiếu nại nào với mã loại khiếu nại là "
                                 + khieuNaiDTO.getMaLoaiKhieuNai()));
-        ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository
-                .findOneByMaChiTietDonHang(khieuNaiDTO.getMaChiTietDonHang())
+        DonHangEntity donHangEntity = donHangRepository
+                .findOneByMaDonHang(khieuNaiDTO.getMaDonHang())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Không tìm thấy chi tiết đơn hàng nào với mã chi tiết đơn hàng là "
                                 + khieuNaiDTO.getMaLoaiKhieuNai()));
@@ -93,7 +93,7 @@ public class KhieuNaiService implements IKhieuNaiService {
         KhieuNaiEntity khieuNaiEntity = khieuNaiConverter.toEntity(khieuNaiDTO);
         khieuNaiEntity.setMaKhieuNai(generateMaKhieuNai());
         khieuNaiEntity.setLoaiKhieuNai(loaiKhieuNaiEntity);
-        khieuNaiEntity.setChiTietDonHang(chiTietDonHangEntity);
+        khieuNaiEntity.setDonHang(donHangEntity);
         return khieuNaiConverter.toDTO(khieuNaiRepository.save(khieuNaiEntity));
     }
 
@@ -112,13 +112,13 @@ public class KhieuNaiService implements IKhieuNaiService {
                                     + updatedKhieuNai.getMaLoaiKhieuNai()));
             khieuNaiEntity.setLoaiKhieuNai(loaiKhieuNaiEntity);
         }
-        if (updatedKhieuNai.getMaChiTietDonHang() != null) {
-            ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository
-                    .findOneByMaChiTietDonHang(updatedKhieuNai.getMaChiTietDonHang())
+        if (updatedKhieuNai.getMaDonHang() != null) {
+            DonHangEntity donHangEntity = donHangRepository
+                    .findOneByMaDonHang(updatedKhieuNai.getMaDonHang())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Không tìm thấy chi tiết đơn hàng nào với mã chi tiết đơn hàng là "
                                     + updatedKhieuNai.getMaLoaiKhieuNai()));
-            khieuNaiEntity.setChiTietDonHang(chiTietDonHangEntity);
+            khieuNaiEntity.setDonHang(donHangEntity);
         }
 
         KhieuNaiEntity khieuNaiUpdated = khieuNaiConverter.toEntity(updatedKhieuNai, khieuNaiEntity);
@@ -145,10 +145,10 @@ public class KhieuNaiService implements IKhieuNaiService {
         LoaiKhieuNaiEntity loaiKhieuNaiEntity = khieuNaiEntity.getLoaiKhieuNai();
         LoaiKhieuNaiDTO loaiKhieuNaiDTO = loaiKhieuNaiConverter.toDTO(loaiKhieuNaiEntity);
 
-        ChiTietDonHangEntity chiTietDonHangEntity = khieuNaiEntity.getChiTietDonHang();
-        ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
+        DonHangEntity donHangEntity = khieuNaiEntity.getDonHang();
+        DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-        return new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, chiTietDonHangDTO);
+        return new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, donHangDTO);
     }
 
     private String generateMaKhieuNai() {
@@ -166,7 +166,7 @@ public class KhieuNaiService implements IKhieuNaiService {
     @Override
     public List<KhieuNaiResponseDTO> getKhieuNaisByMaKhachHang(String maKhachHang) {
         List<KhieuNaiEntity> entities = khieuNaiRepository
-                .findByTrangThaiXoaAndChiTietDonHang_DonHang_KhachHang_MaKhachHang("1", maKhachHang);
+                .findByTrangThaiXoaAndDonHang_KhachHang_MaKhachHang("1", maKhachHang);
         List<KhieuNaiResponseDTO> responseList = new ArrayList<>();
         for (KhieuNaiEntity khieuNaiEntity : entities) {
             KhieuNaiDTO khieuNaiDTO = khieuNaiConverter.toDTO(khieuNaiEntity);
@@ -174,10 +174,10 @@ public class KhieuNaiService implements IKhieuNaiService {
             LoaiKhieuNaiEntity loaiKhieuNaiEntity = khieuNaiEntity.getLoaiKhieuNai();
             LoaiKhieuNaiDTO loaiKhieuNaiDTO = loaiKhieuNaiConverter.toDTO(loaiKhieuNaiEntity);
 
-            ChiTietDonHangEntity chiTietDonHangEntity = khieuNaiEntity.getChiTietDonHang();
-            ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
+            DonHangEntity donHangEntity = khieuNaiEntity.getDonHang();
+            DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-            responseList.add(new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, chiTietDonHangDTO));
+            responseList.add(new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, donHangDTO));
         }
 
         return responseList;
@@ -186,7 +186,7 @@ public class KhieuNaiService implements IKhieuNaiService {
     @Override
     public List<KhieuNaiResponseDTO> getKhieuNaisByMaChuCuaHang(String maChuCuaHang) {
         List<KhieuNaiEntity> entities = khieuNaiRepository
-                .findByTrangThaiXoaAndChiTietDonHang_DonHang_ChuCuaHang_MaChuCuaHang("1", maChuCuaHang);
+                .findByTrangThaiXoaAndDonHang_NhanVien_ChuCuaHang_MaChuCuaHang("1", maChuCuaHang);
         List<KhieuNaiResponseDTO> responseList = new ArrayList<>();
         for (KhieuNaiEntity khieuNaiEntity : entities) {
             KhieuNaiDTO khieuNaiDTO = khieuNaiConverter.toDTO(khieuNaiEntity);
@@ -194,10 +194,10 @@ public class KhieuNaiService implements IKhieuNaiService {
             LoaiKhieuNaiEntity loaiKhieuNaiEntity = khieuNaiEntity.getLoaiKhieuNai();
             LoaiKhieuNaiDTO loaiKhieuNaiDTO = loaiKhieuNaiConverter.toDTO(loaiKhieuNaiEntity);
 
-            ChiTietDonHangEntity chiTietDonHangEntity = khieuNaiEntity.getChiTietDonHang();
-            ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
+            DonHangEntity donHangEntity = khieuNaiEntity.getDonHang();
+            DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-            responseList.add(new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, chiTietDonHangDTO));
+            responseList.add(new KhieuNaiResponseDTO(khieuNaiDTO, loaiKhieuNaiDTO, donHangDTO));
         }
 
         return responseList;

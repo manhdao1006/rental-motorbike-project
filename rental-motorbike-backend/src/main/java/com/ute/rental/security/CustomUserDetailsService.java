@@ -11,8 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import com.ute.rental.entity.VaiTroEntity;
 import com.ute.rental.entity.NguoiDungEntity;
+import com.ute.rental.entity.VaiTroEntity;
 import com.ute.rental.exception.ResourceNotFoundException;
 import com.ute.rental.repository.NguoiDungRepository;
 

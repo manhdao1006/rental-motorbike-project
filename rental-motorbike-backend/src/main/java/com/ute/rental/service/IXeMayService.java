@@ -14,17 +14,25 @@ public interface IXeMayService {
 
     List<XeMayResponseDTO> getXeMaysByMaChuCuaHang(String maChuCuaHang);
 
-    XeMayDTO addXeMay(XeMayDTO xeMayDTO, List<MultipartFile> anhXeMayList, List<MultipartFile> anhCaVetList)
-            throws IOException;
+    XeMayDTO addXeMay(XeMayDTO xeMayDTO, List<MultipartFile> anhXeMayList) throws IOException;
 
-    XeMayDTO updateXeMay(String maXeMay, XeMayDTO xeMayDTO, List<MultipartFile> anhXeMayList,
-            List<MultipartFile> anhCaVetList,
-            List<String> deletedAnhXeMays,
-            List<String> deletedAnhCaVets)
-            throws IOException;
+    XeMayDTO updateXeMay(String maXeMay, XeMayDTO xeMayDTO, List<MultipartFile> anhCaVetList,
+            List<String> deletedAnhXeMays) throws IOException;
 
     void deleteXeMay(String maXeMay);
 
     XeMayResponseDTO getXeMayByMaXeMay(String maXeMay);
+
+    List<XeMayResponseDTO> getXeMaysInQuanHaiChau();
+
+    List<XeMayResponseDTO> getXeMaysInQuanThanhKhe();
+
+    List<XeMayResponseDTO> getXeMaysInQuanSonTra();
+
+    List<XeMayResponseDTO> getXeMaysInQuanNguHanhSon();
+
+    List<XeMayResponseDTO> getXeMaysInQuanLienChieu();
+
+    List<XeMayResponseDTO> getXeMaysByQuanHuyen(String maQuanHuyen);
 
 }

@@ -20,11 +20,13 @@ import com.ute.rental.converter.NhanVienConverter;
 import com.ute.rental.dto.NguoiDungDTO;
 import com.ute.rental.dto.NhanVienDTO;
 import com.ute.rental.dto.NhanVienResponseDTO;
+import com.ute.rental.entity.ChuCuaHangEntity;
 import com.ute.rental.entity.NguoiDungEntity;
 import com.ute.rental.entity.NhanVienEntity;
 import com.ute.rental.entity.VaiTroEntity;
 import com.ute.rental.exception.ResourceNotFormatException;
 import com.ute.rental.exception.ResourceNotFoundException;
+import com.ute.rental.repository.ChuCuaHangRepository;
 import com.ute.rental.repository.NguoiDungRepository;
 import com.ute.rental.repository.NhanVienRepository;
 import com.ute.rental.repository.VaiTroRepository;
@@ -42,12 +44,12 @@ public class NhanVienService implements INhanVienService {
     private final NguoiDungConverter nguoiDungConverter;
     private final NguoiDungRepository nguoiDungRepository;
     private final VaiTroRepository vaiTroRepository;
+    private final ChuCuaHangRepository chuCuaHangRepository;
     private final PasswordEncoder passwordEncoder;
     private final Cloudinary cloudinary;
 
     @Override
     public List<NhanVienResponseDTO> getNhanViens() {
-
         List<NhanVienEntity> entities = nhanVienRepository.findNhanViensByTrangThaiXoa("1");
         List<NhanVienResponseDTO> responseList = new ArrayList<>();
         for (NhanVienEntity nhanVienEntity : entities) {
@@ -82,15 +84,20 @@ public class NhanVienService implements INhanVienService {
 
         NguoiDungEntity nguoiDungEntity = nguoiDungConverter.toEntity(nguoiDungDTO);
         nguoiDungEntity.setMaNguoiDung(generateMaNguoiDung());
+        nguoiDungEntity.setTrangThaiHoatDong("Hoạt động");
         nguoiDungEntity.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
         nguoiDungEntity.setAnhDaiDienId(avatarInfo.get("publicId"));
         nguoiDungEntity.setAnhDaiDien(avatarInfo.get("url"));
         VaiTroEntity vaiTros = vaiTroRepository.findOneByTenVaiTro("ROLE_NHANVIEN")
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy vai trò!"));
         nguoiDungEntity.setVaiTros(Collections.singletonList(vaiTros));
         nguoiDungEntity = nguoiDungRepository.save(nguoiDungEntity);
 
         NhanVienEntity nhanVienEntity = nhanVienConverter.toEntity(nhanVienDTO);
+        ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository.findOneByMaChuCuaHang(nhanVienDTO.getMaChuCuaHang())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không có chủ cửa hàng nào với mã chủ cửa hàng là " + nhanVienDTO.getMaChuCuaHang()));
+        nhanVienEntity.setChuCuaHang(chuCuaHangEntity);
         nhanVienEntity.setNguoiDung(nguoiDungEntity);
         nhanVienEntity = nhanVienRepository.save(nhanVienEntity);
 
@@ -128,6 +135,14 @@ public class NhanVienService implements INhanVienService {
 
         if (nguoiDungDTO.getMatKhau() != null && !nguoiDungDTO.getMatKhau().isEmpty()) {
             newNguoiDung.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
+        }
+
+        if (nhanVienDTO.getMaChuCuaHang() != null) {
+            ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository
+                    .findOneByMaChuCuaHang(nhanVienDTO.getMaChuCuaHang())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Không có chủ cửa hàng nào với mã chủ cửa hàng là " + nhanVienDTO.getMaChuCuaHang()));
+            newNhanVien.setChuCuaHang(chuCuaHangEntity);
         }
 
         newNguoiDung = nguoiDungRepository.save(newNguoiDung);
@@ -199,6 +214,23 @@ public class NhanVienService implements INhanVienService {
         String stt = String.valueOf(count);
 
         return "ND" + datePart + stt;
+    }
+
+    @Override
+    public List<NhanVienResponseDTO> getNhanViensByChuCuaHang(String maChuCuaHang) {
+        List<NhanVienEntity> entities = nhanVienRepository
+                .findNhanViensByChuCuaHang_MaChuCuaHangAndTrangThaiXoa(maChuCuaHang, "1");
+        List<NhanVienResponseDTO> responseList = new ArrayList<>();
+        for (NhanVienEntity nhanVienEntity : entities) {
+            NhanVienDTO nhanVienDTO = nhanVienConverter.toDTO(nhanVienEntity);
+
+            NguoiDungEntity nguoiDungEntity = nhanVienEntity.getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
+            responseList.add(new NhanVienResponseDTO(nguoiDungDTO, nhanVienDTO));
+        }
+
+        return responseList;
     }
 
 }

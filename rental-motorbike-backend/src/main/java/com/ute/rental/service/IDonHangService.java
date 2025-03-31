@@ -9,7 +9,7 @@ public interface IDonHangService {
 
     List<DonHangResponseDTO> getDonHangs();
 
-    List<DonHangResponseDTO> getDonHangsByMaChuCuaHang(String maChuCuaHang);
+    List<DonHangResponseDTO> getDonHangsByMaNhanVien(String maNhanVien);
 
     List<DonHangResponseDTO> getDonHangsByMaKhachHang(String maKhachHang);
 

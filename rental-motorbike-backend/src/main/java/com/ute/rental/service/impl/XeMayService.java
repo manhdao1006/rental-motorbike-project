@@ -13,25 +13,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.ute.rental.converter.AnhCaVetXeConverter;
 import com.ute.rental.converter.AnhXeMayConverter;
 import com.ute.rental.converter.ChuCuaHangConverter;
 import com.ute.rental.converter.DanhMucXeConverter;
+import com.ute.rental.converter.NguoiDungConverter;
 import com.ute.rental.converter.XeMayConverter;
-import com.ute.rental.dto.AnhCaVetXeDTO;
 import com.ute.rental.dto.AnhXeMayDTO;
 import com.ute.rental.dto.ChuCuaHangDTO;
 import com.ute.rental.dto.DanhMucXeDTO;
+import com.ute.rental.dto.NguoiDungDTO;
 import com.ute.rental.dto.XeMayDTO;
 import com.ute.rental.dto.XeMayResponseDTO;
-import com.ute.rental.entity.AnhCaVetXeEntity;
 import com.ute.rental.entity.AnhXeMayEntity;
 import com.ute.rental.entity.ChuCuaHangEntity;
 import com.ute.rental.entity.DanhMucXeEntity;
+import com.ute.rental.entity.NguoiDungEntity;
 import com.ute.rental.entity.XeMayEntity;
 import com.ute.rental.exception.ResourceNotFormatException;
 import com.ute.rental.exception.ResourceNotFoundException;
-import com.ute.rental.repository.AnhCaVetXeRepository;
 import com.ute.rental.repository.AnhXeMayRepository;
 import com.ute.rental.repository.ChuCuaHangRepository;
 import com.ute.rental.repository.DanhMucXeRepository;
@@ -49,12 +48,11 @@ public class XeMayService implements IXeMayService {
     private final ChuCuaHangRepository chuCuaHangRepository;
     private final DanhMucXeRepository danhMucXeRepository;
     private final AnhXeMayRepository anhXeMayRepository;
-    private final AnhCaVetXeRepository anhCaVetXeRepository;
     private final XeMayConverter xeMayConverter;
     private final ChuCuaHangConverter chuCuaHangConverter;
     private final DanhMucXeConverter danhMucXeConverter;
+    private final NguoiDungConverter nguoiDungConverter;
     private final AnhXeMayConverter anhXeMayConverter;
-    private final AnhCaVetXeConverter anhCaVetXeConverter;
     private final Cloudinary cloudinary;
 
     @Override
@@ -68,16 +66,16 @@ public class XeMayService implements IXeMayService {
             ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
             ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
 
+            NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
             DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
             DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
 
             List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
             List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
 
-            List<AnhCaVetXeEntity> anhCaVetXeEntities = xeMayEntity.getAnhCaVetXes();
-            List<AnhCaVetXeDTO> anhCaVetXeDTOs = anhCaVetXeConverter.toDTOs(anhCaVetXeEntities);
-
-            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, anhXeMayDTOs, anhCaVetXeDTOs));
+            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs));
         }
 
         return responseList;
@@ -93,24 +91,23 @@ public class XeMayService implements IXeMayService {
             ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
             ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
 
+            NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
             DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
             DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
 
             List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
             List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
 
-            List<AnhCaVetXeEntity> anhCaVetXeEntities = xeMayEntity.getAnhCaVetXes();
-            List<AnhCaVetXeDTO> anhCaVetXeDTOs = anhCaVetXeConverter.toDTOs(anhCaVetXeEntities);
-
-            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, anhXeMayDTOs, anhCaVetXeDTOs));
+            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs));
         }
         return responseList;
     }
 
     @Transactional
     @Override
-    public XeMayDTO addXeMay(XeMayDTO xeMayDTO, List<MultipartFile> anhXeMayList, List<MultipartFile> anhCaVetList)
-            throws IOException {
+    public XeMayDTO addXeMay(XeMayDTO xeMayDTO, List<MultipartFile> anhXeMayList) throws IOException {
         ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository.findOneByMaChuCuaHang(xeMayDTO.getMaChuCuaHang())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Không tìm thấy chủ cửa hàng nào với mã chủ cửa hàng là: "
@@ -132,35 +129,20 @@ public class XeMayService implements IXeMayService {
                 Map<String, String> anhXeMayInfo = uploadAnh(file, "xe-may");
                 AnhXeMayEntity anhXeMay = new AnhXeMayEntity();
                 anhXeMay.setMaAnhXeMay(generateMaAnhXeMay());
-                anhXeMay.setDuongDan(anhXeMayInfo.get("publicId"));
-                anhXeMay.setTenAnh(anhXeMayInfo.get("url"));
+                anhXeMay.setTenAnh(anhXeMayInfo.get("publicId"));
+                anhXeMay.setDuongDan(anhXeMayInfo.get("url"));
                 anhXeMay.setXeMay(xeMayEntity);
                 anhXeMayRepository.save(anhXeMay);
             }
         }
 
-        // Upload ảnh lên Cloudinary và lưu vào DB
-        if (anhCaVetList != null && !anhCaVetList.isEmpty()) {
-            for (MultipartFile file : anhCaVetList) {
-                Map<String, String> anhCaVetXeInfo = uploadAnh(file, "ca-vet");
-                AnhCaVetXeEntity anhCaVetXe = new AnhCaVetXeEntity();
-                anhCaVetXe.setMaAnhCaVet(generateMaAnhCaVet());
-                anhCaVetXe.setDuongDan(anhCaVetXeInfo.get("publicId"));
-                anhCaVetXe.setTenAnh(anhCaVetXeInfo.get("url"));
-                anhCaVetXe.setXeMay(xeMayEntity);
-                anhCaVetXeRepository.save(anhCaVetXe);
-            }
-        }
         return xeMayConverter.toDTO(xeMayEntity);
     }
 
     @Transactional
     @Override
     public XeMayDTO updateXeMay(String maXeMay, XeMayDTO xeMayDTO, List<MultipartFile> anhXeMayList,
-            List<MultipartFile> anhCaVetList,
-            List<String> deletedAnhXeMays,
-            List<String> deletedAnhCaVets)
-            throws IOException {
+            List<String> deletedAnhXeMays) throws IOException {
         XeMayEntity xeMayEntity = xeMayRepository.findOneByMaXeMay(maXeMay)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Không tìm thấy xe máy nào với mã xe máy là: "
@@ -198,32 +180,10 @@ public class XeMayService implements IXeMayService {
                 Map<String, String> anhXeMayInfo = uploadAnh(file, "xe-may");
                 AnhXeMayEntity anhXeMay = new AnhXeMayEntity();
                 anhXeMay.setMaAnhXeMay(generateMaAnhXeMay());
-                anhXeMay.setDuongDan(anhXeMayInfo.get("publicId"));
-                anhXeMay.setTenAnh(anhXeMayInfo.get("url"));
+                anhXeMay.setTenAnh(anhXeMayInfo.get("publicId"));
+                anhXeMay.setDuongDan(anhXeMayInfo.get("url"));
                 anhXeMay.setXeMay(xeMayEntity);
                 anhXeMayRepository.save(anhXeMay);
-            }
-        }
-
-        if (deletedAnhCaVets != null && !deletedAnhCaVets.isEmpty()) {
-            for (String imageName : deletedAnhCaVets) {
-                AnhCaVetXeEntity anhCaVetXe = anhCaVetXeRepository.findOneByTenAnh(imageName)
-                        .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ảnh: " + imageName));
-                cloudinary.uploader().destroy(anhCaVetXe.getDuongDan(), ObjectUtils.emptyMap());
-                xeMayEntity.getAnhCaVetXes().remove(anhCaVetXe);
-                anhCaVetXeRepository.delete(anhCaVetXe);
-            }
-        }
-
-        if (anhCaVetList != null && !anhCaVetList.isEmpty()) {
-            for (MultipartFile file : anhCaVetList) {
-                Map<String, String> anhCaVetXeInfo = uploadAnh(file, "ca-vet");
-                AnhCaVetXeEntity anhCaVetXe = new AnhCaVetXeEntity();
-                anhCaVetXe.setMaAnhCaVet(generateMaAnhCaVet());
-                anhCaVetXe.setDuongDan(anhCaVetXeInfo.get("publicId"));
-                anhCaVetXe.setTenAnh(anhCaVetXeInfo.get("url"));
-                anhCaVetXe.setXeMay(xeMayEntity);
-                anhCaVetXeRepository.save(anhCaVetXe);
             }
         }
 
@@ -280,16 +240,16 @@ public class XeMayService implements IXeMayService {
         ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
         ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
 
+        NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+        NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
         DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
         DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
 
         List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
         List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
 
-        List<AnhCaVetXeEntity> anhCaVetXeEntities = xeMayEntity.getAnhCaVetXes();
-        List<AnhCaVetXeDTO> anhCaVetXeDTOs = anhCaVetXeConverter.toDTOs(anhCaVetXeEntities);
-
-        return new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, anhXeMayDTOs, anhCaVetXeDTOs);
+        return new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs);
     }
 
     private String generateMaXeMay() {
@@ -316,16 +276,160 @@ public class XeMayService implements IXeMayService {
         return "AXM" + datePart + stt;
     }
 
-    private String generateMaAnhCaVet() {
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String datePart = today.format(formatter);
+    @Override
+    public List<XeMayResponseDTO> getXeMaysInQuanHaiChau() {
+        List<XeMayEntity> entities = xeMayRepository
+                .findFirst8ByChuCuaHang_PhuongXa_QuanHuyen_MaQuanHuyenAndTrangThaiXoaAndTrangThaiHoatDongOrderByGiaThueDesc(
+                        "QH01", "1", "Có sẵn");
+        List<XeMayResponseDTO> responseList = new ArrayList<>();
+        for (XeMayEntity xeMayEntity : entities) {
+            XeMayDTO xeMayDTO = xeMayConverter.toDTO(xeMayEntity);
 
-        int count = anhCaVetXeRepository.countByMaAnhCaVetStartingWith("ACV" + datePart) + 1;
+            ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
+            ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
 
-        String stt = String.valueOf(count);
+            NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
 
-        return "ACV" + datePart + stt;
+            DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
+            DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
+
+            List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
+            List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
+
+            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs));
+        }
+        return responseList;
+    }
+
+    @Override
+    public List<XeMayResponseDTO> getXeMaysInQuanThanhKhe() {
+        List<XeMayEntity> entities = xeMayRepository
+                .findFirst8ByChuCuaHang_PhuongXa_QuanHuyen_MaQuanHuyenAndTrangThaiXoaAndTrangThaiHoatDongOrderByGiaThueDesc(
+                        "QH02", "1", "Có sẵn");
+        List<XeMayResponseDTO> responseList = new ArrayList<>();
+        for (XeMayEntity xeMayEntity : entities) {
+            XeMayDTO xeMayDTO = xeMayConverter.toDTO(xeMayEntity);
+
+            ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
+            ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
+
+            NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
+            DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
+            DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
+
+            List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
+            List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
+
+            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs));
+        }
+        return responseList;
+    }
+
+    @Override
+    public List<XeMayResponseDTO> getXeMaysInQuanSonTra() {
+        List<XeMayEntity> entities = xeMayRepository
+                .findFirst8ByChuCuaHang_PhuongXa_QuanHuyen_MaQuanHuyenAndTrangThaiXoaAndTrangThaiHoatDongOrderByGiaThueDesc(
+                        "QH03", "1", "Có sẵn");
+        List<XeMayResponseDTO> responseList = new ArrayList<>();
+        for (XeMayEntity xeMayEntity : entities) {
+            XeMayDTO xeMayDTO = xeMayConverter.toDTO(xeMayEntity);
+
+            ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
+            ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
+
+            NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
+            DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
+            DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
+
+            List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
+            List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
+
+            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs));
+        }
+        return responseList;
+    }
+
+    @Override
+    public List<XeMayResponseDTO> getXeMaysInQuanNguHanhSon() {
+        List<XeMayEntity> entities = xeMayRepository
+                .findFirst8ByChuCuaHang_PhuongXa_QuanHuyen_MaQuanHuyenAndTrangThaiXoaAndTrangThaiHoatDongOrderByGiaThueDesc(
+                        "QH04", "1", "Có sẵn");
+        List<XeMayResponseDTO> responseList = new ArrayList<>();
+        for (XeMayEntity xeMayEntity : entities) {
+            XeMayDTO xeMayDTO = xeMayConverter.toDTO(xeMayEntity);
+
+            ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
+            ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
+
+            NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
+            DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
+            DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
+
+            List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
+            List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
+
+            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs));
+        }
+        return responseList;
+    }
+
+    @Override
+    public List<XeMayResponseDTO> getXeMaysInQuanLienChieu() {
+        List<XeMayEntity> entities = xeMayRepository
+                .findFirst8ByChuCuaHang_PhuongXa_QuanHuyen_MaQuanHuyenAndTrangThaiXoaAndTrangThaiHoatDongOrderByGiaThueDesc(
+                        "QH05", "1", "Có sẵn");
+        List<XeMayResponseDTO> responseList = new ArrayList<>();
+        for (XeMayEntity xeMayEntity : entities) {
+            XeMayDTO xeMayDTO = xeMayConverter.toDTO(xeMayEntity);
+
+            ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
+            ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
+
+            NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
+            DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
+            DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
+
+            List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
+            List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
+
+            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs));
+        }
+        return responseList;
+    }
+
+    @Override
+    public List<XeMayResponseDTO> getXeMaysByQuanHuyen(String maQuanHuyen) {
+        List<XeMayEntity> entities = xeMayRepository
+                .findXeMaysByChuCuaHang_PhuongXa_QuanHuyen_MaQuanHuyenAndTrangThaiXoaAndTrangThaiHoatDongOrderByMaXeMayDesc(
+                        maQuanHuyen, "1", "Có sẵn");
+        List<XeMayResponseDTO> responseList = new ArrayList<>();
+        for (XeMayEntity xeMayEntity : entities) {
+            XeMayDTO xeMayDTO = xeMayConverter.toDTO(xeMayEntity);
+
+            ChuCuaHangEntity chuCuaHangEntity = xeMayEntity.getChuCuaHang();
+            ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
+
+            NguoiDungEntity nguoiDungEntity = xeMayEntity.getChuCuaHang().getNguoiDung();
+            NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
+            DanhMucXeEntity danhMucXeEntity = xeMayEntity.getDanhMucXe();
+            DanhMucXeDTO danhMucXeDTO = danhMucXeConverter.toDTO(danhMucXeEntity);
+
+            List<AnhXeMayEntity> anhXeMayEntities = xeMayEntity.getAnhXeMays();
+            List<AnhXeMayDTO> anhXeMayDTOs = anhXeMayConverter.toDTOs(anhXeMayEntities);
+
+            responseList.add(new XeMayResponseDTO(xeMayDTO, danhMucXeDTO, chuCuaHangDTO, nguoiDungDTO, anhXeMayDTOs));
+        }
+        return responseList;
     }
 
 }

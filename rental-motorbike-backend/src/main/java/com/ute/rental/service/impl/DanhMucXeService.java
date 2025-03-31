@@ -43,7 +43,7 @@ public class DanhMucXeService implements IDanhMucXeService {
     public DanhMucXeDTO updateDanhMucXe(String maDanhMucXe, DanhMucXeDTO updatedDanhMucXe) {
         DanhMucXeEntity danhMucXeEntity = danhMucXeRepository.findOneByMaDanhMucXe(maDanhMucXe)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy danh mục nào với mã danh mục là " + maDanhMucXe));
+                        "Không tìm thấy danh mục xe nào với mã danh mục xe là " + maDanhMucXe));
         DanhMucXeEntity danhMucUpdated = danhMucXeConverter.toEntity(updatedDanhMucXe, danhMucXeEntity);
         return danhMucXeConverter.toDTO(danhMucXeRepository.save(danhMucUpdated));
     }
@@ -53,7 +53,7 @@ public class DanhMucXeService implements IDanhMucXeService {
     public void deleteDanhMucXe(String maDanhMucXe) {
         DanhMucXeEntity danhMucXeEntity = danhMucXeRepository.findOneByMaDanhMucXe(maDanhMucXe)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy danh mục nào với mã danh mục là " + maDanhMucXe));
+                        "Không tìm thấy danh mục xe nào với mã danh mục xe là " + maDanhMucXe));
         danhMucXeEntity.setTrangThaiXoa("0");
         danhMucXeRepository.save(danhMucXeEntity);
     }
@@ -62,7 +62,7 @@ public class DanhMucXeService implements IDanhMucXeService {
     public DanhMucXeDTO getDanhMucXeByMaDanhMucXe(String maDanhMucXe) {
         DanhMucXeEntity danhMucXeEntity = danhMucXeRepository.findOneByMaDanhMucXe(maDanhMucXe)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy danh mục nào với mã danh mục là " + maDanhMucXe));
+                        "Không tìm thấy danh mục xe nào với mã danh mục xe là " + maDanhMucXe));
         return danhMucXeConverter.toDTO(danhMucXeEntity);
     }
 

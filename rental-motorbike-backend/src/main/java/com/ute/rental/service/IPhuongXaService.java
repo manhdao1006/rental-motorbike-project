@@ -10,4 +10,6 @@ public interface IPhuongXaService {
 
     List<PhuongXaDTO> getPhuongXasByMaQuanHuyen(String maQuanHuyen);
 
+    PhuongXaDTO getPhuongXaByMaPhuongXa(String maPhuongXa);
+
 }

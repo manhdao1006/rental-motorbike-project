@@ -13,18 +13,18 @@ public interface IChiTietDonHangService {
 
     ChiTietDonHangDTO addChiTietDonHang(ChiTietDonHangDTO chiTietDonHangDTO);
 
-    ChiTietDonHangDTO updateChiTietDonHang(String maChiTietDonHang, ChiTietDonHangDTO chiTietDonHangDTO);
+    ChiTietDonHangDTO updateChiTietDonHang(String maDonHang, String maXeMay, ChiTietDonHangDTO chiTietDonHangDTO);
 
-    void deleteChiTietDonHang(String maChiTietDonHang);
+    void deleteChiTietDonHang(String maDonHang, String maXeMay);
 
-    ChiTietDonHangResponseDTO getChiTietDonHangByMaChiTietDonHang(String maChiTietDonHang);
+    ChiTietDonHangResponseDTO getChiTietDonHangByMaDonHangAndMaXeMay(String maDonHang, String maXeMay);
 
     List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaKhachHang(String maNguoiDung);
 
     List<ChiTietDonHangResponseDTO> getByTrangThaiDonHangKhachHang(String maNguoiDung, String trangThaiDonHang);
 
-    List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaChuCuaHang(String maNguoiDung);
+    List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaNhanVien(String maNguoiDung);
 
-    List<ChiTietDonHangResponseDTO> getByTrangThaiDonHangChuCuaHang(String maNguoiDung, String trangThaiDonHang);
+    List<ChiTietDonHangResponseDTO> getByTrangThaiDonHangNhanVien(String maNguoiDung, String trangThaiDonHang);
 
 }

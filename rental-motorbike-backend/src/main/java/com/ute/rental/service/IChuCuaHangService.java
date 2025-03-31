@@ -26,4 +26,7 @@ public interface IChuCuaHangService {
 
     void banChuCuaHang(String maNguoiDung);
 
+    ChuCuaHangResponseDTO dangKyChuCuaHang(NguoiDungDTO nguoiDungDTO, ChuCuaHangDTO chuCuaHangDTO,
+            MultipartFile avatar) throws IOException;
+
 }

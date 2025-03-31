@@ -65,7 +65,7 @@ public class KhachHangService implements IKhachHangService {
     public KhachHangResponseDTO getKhachHangByMaKhachHang(String maNguoiDung) {
         KhachHangEntity khachHangEntity = khachHangRepository.findOneByMaKhachHang(maNguoiDung)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không có người bán nào có mã người bán là " + maNguoiDung));
+                        "Không có khách hàng nào có mã khách hàng là " + maNguoiDung));
         KhachHangDTO khachHangDTO = khachHangConverter.toDTO(khachHangEntity);
         NguoiDungEntity nguoiDungEntity = khachHangEntity.getNguoiDung();
         NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
@@ -81,6 +81,7 @@ public class KhachHangService implements IKhachHangService {
 
         NguoiDungEntity nguoiDungEntity = nguoiDungConverter.toEntity(nguoiDungDTO);
         nguoiDungEntity.setMaNguoiDung(generateMaNguoiDung());
+        nguoiDungEntity.setTrangThaiHoatDong("Hoạt động");
         nguoiDungEntity.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
         nguoiDungEntity.setAnhDaiDienId(avatarInfo.get("publicId"));
         nguoiDungEntity.setAnhDaiDien(avatarInfo.get("url"));
@@ -107,7 +108,7 @@ public class KhachHangService implements IKhachHangService {
                         "Không tìm thấy người dùng nào với mã người dùng là " + maNguoiDung));
         KhachHangEntity oldKhachHang = khachHangRepository.findOneByMaKhachHang(maNguoiDung)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy người bán nào với mã người bán là " + maNguoiDung));
+                        "Không tìm thấy khách hàng nào với mã khách hàng là " + maNguoiDung));
         NguoiDungEntity newNguoiDung = nguoiDungConverter.toEntity(nguoiDungDTO, oldNguoiDung);
         KhachHangEntity newKhachHang = khachHangConverter.toEntity(khachHangDTO, oldKhachHang);
 
@@ -144,7 +145,7 @@ public class KhachHangService implements IKhachHangService {
                         "Không tìm thấy người dùng nào với mã người dùng là " + maNguoiDung));
         KhachHangEntity khachHangEntity = khachHangRepository.findOneByMaKhachHang(maNguoiDung)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy người bán nào với mã người bán là " + maNguoiDung));
+                        "Không tìm thấy khách hàng nào với mã khách hàng là " + maNguoiDung));
         nguoiDungEntity.setTrangThaiXoa("0");
         nguoiDungEntity.setEmail(null);
         khachHangEntity.setTrangThaiXoa("0");

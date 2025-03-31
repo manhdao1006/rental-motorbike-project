@@ -68,7 +68,7 @@ public class ChuCuaHangService implements IChuCuaHangService {
     public ChuCuaHangResponseDTO getChuCuaHangByMaChuCuaHang(String maNguoiDung) {
         ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository.findOneByMaChuCuaHang(maNguoiDung)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không có người bán nào có mã người bán là " + maNguoiDung));
+                        "Không có chủ cửa hàng nào có mã chủ cửa hàng là " + maNguoiDung));
         ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
         NguoiDungEntity nguoiDungEntity = chuCuaHangEntity.getNguoiDung();
         NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
@@ -85,11 +85,12 @@ public class ChuCuaHangService implements IChuCuaHangService {
 
         NguoiDungEntity nguoiDungEntity = nguoiDungConverter.toEntity(nguoiDungDTO);
         nguoiDungEntity.setMaNguoiDung(generateMaNguoiDung());
+        nguoiDungEntity.setTrangThaiHoatDong("Hoạt động");
         nguoiDungEntity.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
         nguoiDungEntity.setAnhDaiDienId(avatarInfo.get("publicId"));
         nguoiDungEntity.setAnhDaiDien(avatarInfo.get("url"));
         VaiTroEntity vaiTros = vaiTroRepository.findOneByTenVaiTro("ROLE_CHUCUAHANG")
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy!"));
         nguoiDungEntity.setVaiTros(Collections.singletonList(vaiTros));
         nguoiDungEntity = nguoiDungRepository.save(nguoiDungEntity);
 
@@ -115,7 +116,7 @@ public class ChuCuaHangService implements IChuCuaHangService {
                         "Không tìm thấy người dùng nào với mã người dùng là " + maNguoiDung));
         ChuCuaHangEntity oldChuCuaHang = chuCuaHangRepository.findOneByMaChuCuaHang(maNguoiDung)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy người bán nào với mã người bán là " + maNguoiDung));
+                        "Không tìm thấy chủ cửa hàng nào với mã chủ cửa hàng là " + maNguoiDung));
         NguoiDungEntity newNguoiDung = nguoiDungConverter.toEntity(nguoiDungDTO, oldNguoiDung);
         ChuCuaHangEntity newChuCuaHang = chuCuaHangConverter.toEntity(chuCuaHangDTO, oldChuCuaHang);
 
@@ -160,7 +161,7 @@ public class ChuCuaHangService implements IChuCuaHangService {
                         "Không tìm thấy người dùng nào với mã người dùng là " + maNguoiDung));
         ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository.findOneByMaChuCuaHang(maNguoiDung)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy người bán nào với mã người bán là " + maNguoiDung));
+                        "Không tìm thấy chủ cửa hàng nào với mã chủ cửa hàng là " + maNguoiDung));
         nguoiDungEntity.setTrangThaiXoa("0");
         nguoiDungEntity.setEmail(null);
         chuCuaHangEntity.setTrangThaiXoa("0");
@@ -215,6 +216,36 @@ public class ChuCuaHangService implements IChuCuaHangService {
         String stt = String.valueOf(count);
 
         return "ND" + datePart + stt;
+    }
+
+    @Transactional
+    @Override
+    public ChuCuaHangResponseDTO dangKyChuCuaHang(NguoiDungDTO nguoiDungDTO, ChuCuaHangDTO chuCuaHangDTO,
+            MultipartFile avatar)
+            throws IOException {
+        Map<String, String> avatarInfo = uploadAnhDaiDien(avatar);
+
+        NguoiDungEntity nguoiDungEntity = nguoiDungConverter.toEntity(nguoiDungDTO);
+        nguoiDungEntity.setMaNguoiDung(generateMaNguoiDung());
+        nguoiDungEntity.setTrangThaiHoatDong("Chờ duyệt");
+        nguoiDungEntity.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
+        nguoiDungEntity.setAnhDaiDienId(avatarInfo.get("publicId"));
+        nguoiDungEntity.setAnhDaiDien(avatarInfo.get("url"));
+        VaiTroEntity vaiTros = vaiTroRepository.findOneByTenVaiTro("ROLE_CHUCUAHANG")
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy!"));
+        nguoiDungEntity.setVaiTros(Collections.singletonList(vaiTros));
+        nguoiDungEntity = nguoiDungRepository.save(nguoiDungEntity);
+
+        ChuCuaHangEntity chuCuaHangEntity = chuCuaHangConverter.toEntity(chuCuaHangDTO);
+        PhuongXaEntity phuongXaEntity = phuongXaRepository.findOneByMaPhuongXa(chuCuaHangDTO.getMaPhuongXa())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không có phường xã nào với mã phường xã là " + chuCuaHangDTO.getMaPhuongXa()));
+        chuCuaHangEntity.setPhuongXa(phuongXaEntity);
+        chuCuaHangEntity.setNguoiDung(nguoiDungEntity);
+        chuCuaHangEntity = chuCuaHangRepository.save(chuCuaHangEntity);
+
+        return new ChuCuaHangResponseDTO(nguoiDungConverter.toDTO(nguoiDungEntity),
+                chuCuaHangConverter.toDTO(chuCuaHangEntity));
     }
 
 }

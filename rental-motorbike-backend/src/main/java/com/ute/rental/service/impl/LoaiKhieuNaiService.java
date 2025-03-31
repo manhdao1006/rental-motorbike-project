@@ -43,7 +43,7 @@ public class LoaiKhieuNaiService implements ILoaiKhieuNaiService {
     public LoaiKhieuNaiDTO updateLoaiKhieuNai(String maLoaiKhieuNai, LoaiKhieuNaiDTO updatedLoaiKhieuNai) {
         LoaiKhieuNaiEntity loaiKhieuNaiEntity = loaiKhieuNaiRepository.findOneByMaLoaiKhieuNai(maLoaiKhieuNai)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy danh mục nào với mã danh mục là " + maLoaiKhieuNai));
+                        "Không tìm thấy loại khiếu nại nào với mã loại khiếu nại là " + maLoaiKhieuNai));
         LoaiKhieuNaiEntity loaiKhieuNaiUpdated = loaiKhieuNaiConverter.toEntity(updatedLoaiKhieuNai,
                 loaiKhieuNaiEntity);
         return loaiKhieuNaiConverter.toDTO(loaiKhieuNaiRepository.save(loaiKhieuNaiUpdated));
@@ -54,7 +54,7 @@ public class LoaiKhieuNaiService implements ILoaiKhieuNaiService {
     public void deleteLoaiKhieuNai(String maLoaiKhieuNai) {
         LoaiKhieuNaiEntity loaiKhieuNaiEntity = loaiKhieuNaiRepository.findOneByMaLoaiKhieuNai(maLoaiKhieuNai)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy danh mục nào với mã danh mục là " + maLoaiKhieuNai));
+                        "Không tìm thấy loại khiếu nại nào với mã loại khiếu nại là " + maLoaiKhieuNai));
         loaiKhieuNaiEntity.setTrangThaiXoa("0");
         loaiKhieuNaiRepository.save(loaiKhieuNaiEntity);
     }
@@ -63,7 +63,7 @@ public class LoaiKhieuNaiService implements ILoaiKhieuNaiService {
     public LoaiKhieuNaiDTO getLoaiKhieuNaiByMaLoaiKhieuNai(String maLoaiKhieuNai) {
         LoaiKhieuNaiEntity loaiKhieuNaiEntity = loaiKhieuNaiRepository.findOneByMaLoaiKhieuNai(maLoaiKhieuNai)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy danh mục nào với mã danh mục là " + maLoaiKhieuNai));
+                        "Không tìm thấy loại khiếu nại nào với mã loại khiếu nại là " + maLoaiKhieuNai));
         return loaiKhieuNaiConverter.toDTO(loaiKhieuNaiEntity);
     }
 

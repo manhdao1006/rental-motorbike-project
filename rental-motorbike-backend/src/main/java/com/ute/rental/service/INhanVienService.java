@@ -25,4 +25,6 @@ public interface INhanVienService {
     void deleteNhanVien(String maNguoiDung);
 
     void banNhanVien(String maNguoiDung);
+
+    List<NhanVienResponseDTO> getNhanViensByChuCuaHang(String maChuCuaHang);
 }
