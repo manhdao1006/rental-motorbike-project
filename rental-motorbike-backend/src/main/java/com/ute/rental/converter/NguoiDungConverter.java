@@ -9,7 +9,8 @@ import org.mapstruct.factory.Mappers;
 import com.ute.rental.dto.NguoiDungDTO;
 import com.ute.rental.entity.NguoiDungEntity;
 
-@Mapper(componentModel = "spring", uses = { VaiTroConverter.class, NhanVienConverter.class,
+@Mapper(componentModel = "spring", uses = { VaiTroConverter.class,
+        NhanVienConverter.class,
         KhachHangConverter.class,
         ChuCuaHangConverter.class }, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface NguoiDungConverter {
@@ -23,7 +24,7 @@ public interface NguoiDungConverter {
     NguoiDungDTO toDTO(NguoiDungEntity entity);
 
     @Mapping(target = "trangThaiXoa", defaultValue = "1")
-    @Mapping(target = "trangThaiHoatDong", defaultValue = "Hoạt động")
+    @Mapping(target = "ngayDangKy", expression = "java(java.time.LocalDateTime.now())")
     NguoiDungEntity toEntity(NguoiDungDTO dto);
 
     @Mapping(target = "maNguoiDung", ignore = true)

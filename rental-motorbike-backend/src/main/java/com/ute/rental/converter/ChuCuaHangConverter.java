@@ -19,7 +19,6 @@ public interface ChuCuaHangConverter {
     ChuCuaHangDTO toDTO(ChuCuaHangEntity entity);
 
     @Mapping(target = "trangThaiXoa", defaultValue = "1")
-    @Mapping(target = "ngayDangKy", expression = "java(java.time.LocalDateTime.now())")
     ChuCuaHangEntity toEntity(ChuCuaHangDTO dto);
 
     @Mapping(target = "maChuCuaHang", ignore = true)

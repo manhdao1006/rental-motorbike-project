@@ -17,7 +17,6 @@ public interface KhachHangConverter {
     KhachHangDTO toDTO(KhachHangEntity entity);
 
     @Mapping(target = "trangThaiXoa", defaultValue = "1")
-    @Mapping(target = "ngayDangKy", expression = "java(java.time.LocalDateTime.now())")
     KhachHangEntity toEntity(KhachHangDTO dto);
 
     @Mapping(target = "maKhachHang", ignore = true)

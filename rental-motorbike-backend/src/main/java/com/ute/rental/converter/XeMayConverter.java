@@ -20,7 +20,7 @@ public interface XeMayConverter {
     XeMayDTO toDTO(XeMayEntity entity);
 
     @Mapping(target = "trangThaiXoa", defaultValue = "1")
-    @Mapping(target = "trangThaiHoatDong", defaultValue = "Chờ duyệt")
+    @Mapping(target = "trangThaiHoatDong", defaultValue = "Có sẵn")
     XeMayEntity toEntity(XeMayDTO dto);
 
     @Mapping(target = "maXeMay", ignore = true)

@@ -17,7 +17,7 @@ public interface DonHangRepository extends JpaRepository<DonHangEntity, String> 
 
     List<DonHangEntity> findDonHangsByKhachHang_MaKhachHangAndTrangThaiXoa(String maKhachHang, String trangThaiXoa);
 
-    List<DonHangEntity> findDonHangsByChuCuaHang_MaChuCuaHangAndTrangThaiXoa(String maChuCuaHang, String trangThaiXoa);
+    List<DonHangEntity> findDonHangsByNhanVien_MaNhanVienAndTrangThaiXoa(String maNhanVien, String trangThaiXoa);
 
     List<DonHangEntity> findDonHangsByTrangThaiXoa(String trangThaiXoa);
 

@@ -15,4 +15,7 @@ public interface NhanVienRepository extends JpaRepository<NhanVienEntity, String
 
     Optional<NhanVienEntity> findOneByMaNhanVien(String maNguoiDung);
 
+    List<NhanVienEntity> findNhanViensByChuCuaHang_MaChuCuaHangAndTrangThaiXoa(String maChuCuaHang,
+            String trangThaiXoa);
+
 }

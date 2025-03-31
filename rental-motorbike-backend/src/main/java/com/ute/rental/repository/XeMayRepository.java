@@ -22,4 +22,10 @@ public interface XeMayRepository extends JpaRepository<XeMayEntity, String> {
     @Query("SELECT COUNT(xm) FROM XeMayEntity xm WHERE xm.maXeMay LIKE :prefix%")
     int countByMaXeMayStartingWith(@Param("prefix") String prefix);
 
+    List<XeMayEntity> findFirst8ByChuCuaHang_PhuongXa_QuanHuyen_MaQuanHuyenAndTrangThaiXoaAndTrangThaiHoatDongOrderByGiaThueDesc(
+            String maQuanHuyen, String trangThaiXoa, String trangThaiHoatDong);
+
+    List<XeMayEntity> findXeMaysByChuCuaHang_PhuongXa_QuanHuyen_MaQuanHuyenAndTrangThaiXoaAndTrangThaiHoatDongOrderByMaXeMayDesc(
+            String maQuanHuyen, String trangThaiXoa, String trangThaiHoatDong);
+
 }

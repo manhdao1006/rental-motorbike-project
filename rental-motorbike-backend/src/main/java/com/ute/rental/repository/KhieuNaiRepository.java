@@ -23,10 +23,10 @@ public interface KhieuNaiRepository extends JpaRepository<KhieuNaiEntity, String
     @Query("SELECT COUNT(kn) FROM KhieuNaiEntity kn WHERE kn.maKhieuNai LIKE :prefix%")
     int countByMaKhieuNaiStartingWith(@Param("prefix") String prefix);
 
-    List<KhieuNaiEntity> findByTrangThaiXoaAndChiTietDonHang_DonHang_KhachHang_MaKhachHang(String trangThaiXoa,
+    List<KhieuNaiEntity> findByTrangThaiXoaAndDonHang_KhachHang_MaKhachHang(String trangThaiXoa,
             String maKhachHang);
 
-    List<KhieuNaiEntity> findByTrangThaiXoaAndChiTietDonHang_DonHang_ChuCuaHang_MaChuCuaHang(String trangThaiXoa,
+    List<KhieuNaiEntity> findByTrangThaiXoaAndDonHang_NhanVien_ChuCuaHang_MaChuCuaHang(String trangThaiXoa,
             String maChuCuaHang);
 
 }

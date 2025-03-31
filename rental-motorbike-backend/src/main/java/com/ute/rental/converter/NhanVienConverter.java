@@ -9,11 +9,13 @@ import org.mapstruct.factory.Mappers;
 import com.ute.rental.dto.NhanVienDTO;
 import com.ute.rental.entity.NhanVienEntity;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring", uses = {
+        ChuCuaHangConverter.class }, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface NhanVienConverter {
 
     NhanVienConverter INSTANCE = Mappers.getMapper(NhanVienConverter.class);
 
+    @Mapping(target = "maChuCuaHang", source = "chuCuaHang.maChuCuaHang")
     NhanVienDTO toDTO(NhanVienEntity entity);
 
     @Mapping(target = "trangThaiXoa", defaultValue = "1")
