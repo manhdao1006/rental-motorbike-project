@@ -1,14 +1,21 @@
 package com.ute.rental.controller;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,20 +24,29 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ute.rental.dto.ApiResponse;
 import com.ute.rental.dto.AuthResponseDTO;
+import com.ute.rental.dto.ChuCuaHangDTO;
+import com.ute.rental.dto.ChuCuaHangResponseDTO;
+import com.ute.rental.dto.EmailRequest;
 import com.ute.rental.dto.NguoiDungDTO;
 import com.ute.rental.dto.NguoiDungResponseDTO;
 import com.ute.rental.dto.PhuongXaDTO;
 import com.ute.rental.dto.QuanHuyenDTO;
+import com.ute.rental.repository.NguoiDungRepository;
 import com.ute.rental.security.BlackList;
 import com.ute.rental.security.CustomUserDetailsService;
 import com.ute.rental.security.JWTGenerator;
+import com.ute.rental.service.IChuCuaHangService;
+import com.ute.rental.service.IEmailService;
 import com.ute.rental.service.INguoiDungService;
 import com.ute.rental.service.IPhuongXaService;
 import com.ute.rental.service.IQuanHuyenService;
+import com.ute.rental.service.impl.WordService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -45,6 +61,54 @@ public class AuthController {
     private final CustomUserDetailsService userDetailsService;
     private final IPhuongXaService phuongXaService;
     private final IQuanHuyenService quanHuyenService;
+    private final WordService wordService;
+    private final IChuCuaHangService chuCuaHangService;
+    private final NguoiDungRepository nguoiDungRepository;
+    private final IEmailService emailService;
+
+    @PostMapping("/send-email")
+    public ApiResponse<String> sendEmail(@RequestBody EmailRequest request) {
+        emailService.sendEmail(request.getEmail(), request.getNoiDung(), request.getTieuDe());
+        return ApiResponse.<String>builder().message("Gửi email thành công!").build();
+    }
+
+    @GetMapping("/login-google")
+    public ResponseEntity<AuthResponseDTO> googleLogin(OAuth2AuthenticationToken oAuth2AuthenticationToken) {
+        if (oAuth2AuthenticationToken == null || oAuth2AuthenticationToken.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        OAuth2User oAuth2User = oAuth2AuthenticationToken.getPrincipal();
+        String email = oAuth2User.getAttribute("email");
+
+        nguoiDungRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Người dùng không tồn tại"));
+
+        // Load lại UserDetails và tạo token mới
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        String accessToken = jwtGenerator.generateToken(userDetails);
+        String refreshToken = jwtGenerator.generateRefreshToken(userDetails.getUsername());
+
+        return ResponseEntity.ok(new AuthResponseDTO(accessToken, refreshToken));
+    }
+
+    @PostMapping("/dangKyChuCuaHang")
+    public ApiResponse<ChuCuaHangResponseDTO> dangKyChuCuaHang(
+            @ModelAttribute NguoiDungDTO nguoiDungDTO,
+            @ModelAttribute ChuCuaHangDTO chuCuaHangDTO,
+            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+        return ApiResponse.<ChuCuaHangResponseDTO>builder()
+                .code(200)
+                .message("Thêm mới thành công")
+                .result(chuCuaHangService.dangKyChuCuaHang(nguoiDungDTO, chuCuaHangDTO, file))
+                .build();
+    }
+
+    @PostMapping("/upload-word")
+    public ResponseEntity<String> uploadWord(@RequestBody Map<String, Object> formData) {
+        String wordUrl = wordService.generateAndUploadWord(formData);
+        return ResponseEntity.ok(wordUrl);
+    }
 
     @GetMapping("/quan-huyen")
     public ApiResponse<List<QuanHuyenDTO>> getQuanHuyens() {
@@ -70,6 +134,15 @@ public class AuthController {
                 .code(200)
                 .message("Danh sách phường xã")
                 .result(phuongXaService.getPhuongXasByMaQuanHuyen(maQuanHuyen))
+                .build();
+    }
+
+    @GetMapping("/phuong-xa/maPhuongXa={maPhuongXa}")
+    public ApiResponse<PhuongXaDTO> getPhuongXaByMaPhuongXa(@PathVariable("maPhuongXa") String maPhuongXa) {
+        return ApiResponse.<PhuongXaDTO>builder()
+                .code(200)
+                .message("Phường xã với mã là: " + maPhuongXa)
+                .result(phuongXaService.getPhuongXaByMaPhuongXa(maPhuongXa))
                 .build();
     }
 
@@ -116,24 +189,6 @@ public class AuthController {
                 .build();
     }
 
-    @PostMapping("/register-lessor")
-    public ApiResponse<NguoiDungDTO> registerLessor(@RequestBody NguoiDungDTO nguoiDungDTO) {
-        return ApiResponse.<NguoiDungDTO>builder()
-                .code(200)
-                .message("Đăng ký thành công")
-                .result(nguoiDungService.registerLessor(nguoiDungDTO))
-                .build();
-    }
-
-    @PostMapping("/register-staff")
-    public ApiResponse<NguoiDungDTO> registerStaff(@RequestBody NguoiDungDTO nguoiDungDTO) {
-        return ApiResponse.<NguoiDungDTO>builder()
-                .code(200)
-                .message("Đăng ký thành công")
-                .result(nguoiDungService.registerStaff(nguoiDungDTO))
-                .build();
-    }
-
     @PostMapping("/register-admin")
     public ApiResponse<NguoiDungDTO> registerAdmin(@RequestBody NguoiDungDTO nguoiDungDTO) {
         return ApiResponse.<NguoiDungDTO>builder()
@@ -161,7 +216,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ApiResponse<String> logout(@RequestHeader("Authorization") String token) {
+    public ApiResponse<String> logout(@RequestHeader("Authorization") String token, HttpServletRequest request) {
         String jwtToken = token.substring(7);
         if (!jwtGenerator.validateToken(jwtToken)) {
             return ApiResponse.<String>builder()
@@ -171,6 +226,7 @@ public class AuthController {
         }
         blackList.addToBlackListToken(jwtToken);
 
+        request.getSession().invalidate();
         SecurityContextHolder.clearContext();
         return ApiResponse.<String>builder()
                 .code(200)

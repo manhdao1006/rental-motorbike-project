@@ -50,13 +50,12 @@ public class XeMayController {
 
     @PostMapping("/add")
     public ApiResponse<XeMayDTO> addXeMay(@ModelAttribute XeMayDTO xeMayDTO,
-            @RequestParam(value = "anhXeMayList", required = false) List<MultipartFile> anhXeMayList,
-            @RequestParam(value = "anhCaVetList", required = false) List<MultipartFile> anhCaVetList)
+            @RequestParam(value = "anhXeMayList", required = false) List<MultipartFile> anhXeMayList)
             throws IOException {
         return ApiResponse.<XeMayDTO>builder()
                 .code(200)
                 .message("Thêm mới thành công")
-                .result(xeMayService.addXeMay(xeMayDTO, anhXeMayList, anhCaVetList))
+                .result(xeMayService.addXeMay(xeMayDTO, anhXeMayList))
                 .build();
     }
 
@@ -64,15 +63,12 @@ public class XeMayController {
     public ApiResponse<XeMayDTO> updateXeMay(@PathVariable("maXeMay") String maXeMay,
             @ModelAttribute XeMayDTO xeMayDTO,
             @RequestParam(value = "anhXeMayList", required = false) List<MultipartFile> anhXeMayList,
-            @RequestParam(value = "anhCaVetList", required = false) List<MultipartFile> anhCaVetList,
-            @RequestParam(value = "deletedAnhXeMays", required = false) List<String> deletedAnhXeMays,
-            @RequestParam(value = "deletedAnhCaVets", required = false) List<String> deletedAnhCaVets)
+            @RequestParam(value = "deletedAnhXeMays", required = false) List<String> deletedAnhXeMays)
             throws IOException {
         return ApiResponse.<XeMayDTO>builder()
                 .code(200)
                 .message("Cập nhật thành công")
-                .result(xeMayService.updateXeMay(maXeMay, xeMayDTO, anhXeMayList, anhCaVetList, deletedAnhXeMays,
-                        deletedAnhCaVets))
+                .result(xeMayService.updateXeMay(maXeMay, xeMayDTO, anhXeMayList, deletedAnhXeMays))
                 .build();
     }
 

@@ -16,66 +16,66 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ute.rental.constant.ApiName;
 import com.ute.rental.constant.ApiUrl;
 import com.ute.rental.dto.ApiResponse;
-import com.ute.rental.dto.KhachHangDTO;
-import com.ute.rental.dto.KhachHangResponseDTO;
+import com.ute.rental.dto.ChuCuaHangDTO;
+import com.ute.rental.dto.ChuCuaHangResponseDTO;
 import com.ute.rental.dto.NguoiDungDTO;
-import com.ute.rental.service.IKhachHangService;
+import com.ute.rental.service.IChuCuaHangService;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController(value = "khachHang" + ApiName.API)
-@RequestMapping(ApiUrl.API_CHUCUAHANG + "/khach-hang")
-public class KhachHangController {
+@RestController(value = "chuCuaHang" + ApiName.API)
+@RequestMapping(ApiUrl.API_CHUCUAHANG + "/chu-cua-hang")
+public class ChuCuaHangController {
 
-    private final IKhachHangService khachHangService;
+    private final IChuCuaHangService chuCuaHangService;
 
     @GetMapping("/list")
-    public ApiResponse<List<KhachHangResponseDTO>> getKhachHangs() {
-        return ApiResponse.<List<KhachHangResponseDTO>>builder()
+    public ApiResponse<List<ChuCuaHangResponseDTO>> getChuCuaHangs() {
+        return ApiResponse.<List<ChuCuaHangResponseDTO>>builder()
                 .code(200)
-                .message("Danh sách người mua")
-                .result(khachHangService.getKhachHangs())
+                .message("Danh sách chủ cửa hàng")
+                .result(chuCuaHangService.getChuCuaHangs())
                 .build();
     }
 
     @GetMapping("/{maNguoiDung}")
-    public ApiResponse<KhachHangResponseDTO> getKhachHangByMaKhachHang(
+    public ApiResponse<ChuCuaHangResponseDTO> getChuCuaHangByMaChuCuaHang(
             @PathVariable("maNguoiDung") String maNguoiDung) {
-        return ApiResponse.<KhachHangResponseDTO>builder()
+        return ApiResponse.<ChuCuaHangResponseDTO>builder()
                 .code(200)
-                .message("Người mua với mã người mua là " + maNguoiDung)
-                .result(khachHangService.getKhachHangByMaKhachHang(maNguoiDung))
+                .message("Chủ cửa hàng với mã chủ cửa hàng là " + maNguoiDung)
+                .result(chuCuaHangService.getChuCuaHangByMaChuCuaHang(maNguoiDung))
                 .build();
     }
 
     @PostMapping("/add")
-    public ApiResponse<KhachHangResponseDTO> addKhachHang(
+    public ApiResponse<ChuCuaHangResponseDTO> addChuCuaHang(
             @ModelAttribute NguoiDungDTO nguoiDungDTO,
-            @ModelAttribute KhachHangDTO khachHangDTO,
+            @ModelAttribute ChuCuaHangDTO chuCuaHangDTO,
             @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
-        return ApiResponse.<KhachHangResponseDTO>builder()
+        return ApiResponse.<ChuCuaHangResponseDTO>builder()
                 .code(200)
                 .message("Thêm mới thành công")
-                .result(khachHangService.addKhachHang(nguoiDungDTO, khachHangDTO, file))
+                .result(chuCuaHangService.addChuCuaHang(nguoiDungDTO, chuCuaHangDTO, file))
                 .build();
     }
 
     @PutMapping("/edit/{maNguoiDung}")
-    public ApiResponse<KhachHangResponseDTO> updateKhachHang(@PathVariable("maNguoiDung") String maNguoiDung,
+    public ApiResponse<ChuCuaHangResponseDTO> updateChuCuaHang(@PathVariable("maNguoiDung") String maNguoiDung,
             @ModelAttribute NguoiDungDTO nguoiDungDTO,
-            @ModelAttribute KhachHangDTO khachHangDTO,
+            @ModelAttribute ChuCuaHangDTO chuCuaHangDTO,
             @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
-        return ApiResponse.<KhachHangResponseDTO>builder()
+        return ApiResponse.<ChuCuaHangResponseDTO>builder()
                 .code(200)
                 .message("Cập nhật thành công")
-                .result(khachHangService.updateKhachHang(maNguoiDung, nguoiDungDTO, khachHangDTO, file))
+                .result(chuCuaHangService.updateChuCuaHang(maNguoiDung, nguoiDungDTO, chuCuaHangDTO, file))
                 .build();
     }
 
     @PutMapping("delete/{maNguoiDung}")
-    public ApiResponse<String> deleteKhachHang(@PathVariable("maNguoiDung") String maNguoiDung) {
-        khachHangService.deleteKhachHang(maNguoiDung);
+    public ApiResponse<String> deleteChuCuaHang(@PathVariable("maNguoiDung") String maNguoiDung) {
+        chuCuaHangService.deleteChuCuaHang(maNguoiDung);
         return ApiResponse.<String>builder()
                 .code(200)
                 .message("Xóa thành công!")
@@ -83,8 +83,8 @@ public class KhachHangController {
     }
 
     @PutMapping("ban/{maNguoiDung}")
-    public ApiResponse<String> banKhachHang(@PathVariable("maNguoiDung") String maNguoiDung) {
-        khachHangService.banKhachHang(maNguoiDung);
+    public ApiResponse<String> banChuCuaHang(@PathVariable("maNguoiDung") String maNguoiDung) {
+        chuCuaHangService.banChuCuaHang(maNguoiDung);
         return ApiResponse.<String>builder()
                 .code(200)
                 .message("Cấm thành công!")

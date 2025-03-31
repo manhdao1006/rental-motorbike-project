@@ -26,24 +26,35 @@ public class ChiTietDonHangController {
 
     private final IChiTietDonHangService chiTietDonHangService;
 
+    @GetMapping("/maChiTietDonHang={maChiTietDonHang}")
+    public ApiResponse<ChiTietDonHangResponseDTO> getChiTietDonHangByMaDonHangAndMaXeMay(
+            @PathVariable("maDonHang") String maDonHang,
+            @PathVariable("maXeMay") String maXeMay) {
+        return ApiResponse.<ChiTietDonHangResponseDTO>builder()
+                .code(200)
+                .message("Danh sách chi tiết đơn hàng có mã đơn hàng là " + maDonHang + " và mã xe máy là " + maXeMay)
+                .result(chiTietDonHangService.getChiTietDonHangByMaDonHangAndMaXeMay(maDonHang, maXeMay))
+                .build();
+    }
+
     @GetMapping("/list/{maNguoiDung}")
-    public ApiResponse<List<ChiTietDonHangResponseDTO>> getChiTietDonHangsByMaChuCuaHang(
+    public ApiResponse<List<ChiTietDonHangResponseDTO>> getChiTietDonHangsByMaNhanVien(
             @PathVariable("maNguoiDung") String maNguoiDung) {
         return ApiResponse.<List<ChiTietDonHangResponseDTO>>builder()
                 .code(200)
                 .message("Danh sách chi tiết đơn hàng của chủ cửa hàng có mã là " + maNguoiDung)
-                .result(chiTietDonHangService.getChiTietDonHangsByMaChuCuaHang(maNguoiDung))
+                .result(chiTietDonHangService.getChiTietDonHangsByMaNhanVien(maNguoiDung))
                 .build();
     }
 
     @GetMapping("/list/{maNguoiDung}/{trangThaiDonHang}")
-    public ApiResponse<List<ChiTietDonHangResponseDTO>> getByTrangThaiDonHangChuCuaHang(
+    public ApiResponse<List<ChiTietDonHangResponseDTO>> getByTrangThaiDonHangNhanVien(
             @PathVariable("maNguoiDung") String maNguoiDung,
             @PathVariable("trangThaiDonHang") String trangThaiDonHang) {
         return ApiResponse.<List<ChiTietDonHangResponseDTO>>builder()
                 .code(200)
                 .message("Danh sách chi tiết đơn hàng của chủ cửa hàng có mã là " + maNguoiDung)
-                .result(chiTietDonHangService.getByTrangThaiDonHangChuCuaHang(maNguoiDung, trangThaiDonHang))
+                .result(chiTietDonHangService.getByTrangThaiDonHangNhanVien(maNguoiDung, trangThaiDonHang))
                 .build();
     }
 
@@ -56,14 +67,15 @@ public class ChiTietDonHangController {
                 .build();
     }
 
-    @PutMapping("/edit/{maChiTietDonHang}")
+    @PutMapping("/edit/{maDonHang}/{maXeMay}")
     public ApiResponse<ChiTietDonHangDTO> updateChiTietDonHang(
-            @PathVariable String maChiTietDonHang,
+            @PathVariable("maDonHang") String maDonHang,
+            @PathVariable("maXeMay") String maXeMay,
             @RequestBody ChiTietDonHangDTO chiTietDonHangDTO) {
         return ApiResponse.<ChiTietDonHangDTO>builder()
                 .code(200)
                 .message("Cập nhật thành công")
-                .result(chiTietDonHangService.updateChiTietDonHang(maChiTietDonHang, chiTietDonHangDTO))
+                .result(chiTietDonHangService.updateChiTietDonHang(maDonHang, maXeMay, chiTietDonHangDTO))
                 .build();
     }
 
