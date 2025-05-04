@@ -33,10 +33,10 @@
 
                 <div class="row justify-content-evenly">
                     <div class="card-header col-xl-6">
-                        <h5 class="card-title mb-0">Danh sách vai trò</h5>
+                        <h5 class="card-title mb-0">Danh sách danh mục xe</h5>
                     </div>
                     <div class="card-header col-xl-6 text-end">
-                        <router-link class="text-success" :to="{ name: 'ThemMoiVaiTroView' }">
+                        <router-link class="text-success" :to="{ name: 'ThemMoiDanhMucXeView' }">
                             <i class="fas fa-plus-circle"></i>
                             <span class="ps-1">Thêm mới</span>
                         </router-link>
@@ -46,41 +46,52 @@
                     <thead>
                         <tr>
                             <th>STT</th>
-                            <th>Mã vai trò</th>
-                            <th>Tên vai trò</th>
+                            <th>Mã danh mục xe</th>
+                            <th>Tên danh mục xe</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-if="paginatedVaiTros.length === 0">
+                        <tr v-if="paginatedDanhMucXes.length === 0">
                             <td colspan="6" class="text-center text-muted fst-italic">
-                                Không có vai trò nào
+                                Không có danh mục xe nào
                             </td>
                         </tr>
                         <tr
-                            v-for="(vaiTro, index) in paginatedVaiTros"
-                            :key="typeof vaiTro.maVaiTro === 'string' ? vaiTro.maVaiTro : undefined"
+                            v-for="(danhMucXe, index) in paginatedDanhMucXes"
+                            :key="
+                                typeof danhMucXe.maDanhMucXe === 'string'
+                                    ? danhMucXe.maDanhMucXe
+                                    : undefined
+                            "
                         >
                             <td>
                                 {{ index + 1 }}
                             </td>
                             <td>
-                                {{ vaiTro.maVaiTro }}
+                                {{ danhMucXe.maDanhMucXe }}
                             </td>
                             <td>
-                                {{ vaiTro.tenVaiTro }}
+                                {{ danhMucXe.tenDanhMucXe }}
                             </td>
                             <td>
                                 <router-link
                                     :to="{
-                                        name: 'CapNhatVaiTroView',
+                                        name: 'CapNhatDanhMucXeView',
                                         params: {
-                                            maVaiTro: String(vaiTro.maVaiTro)
+                                            maDanhMucXe: String(danhMucXe.maDanhMucXe)
                                         }
                                     }"
                                 >
                                     <i class="far fa-edit text-success" title="Cập nhật"></i
                                 ></router-link>
+                                |
+                                <button
+                                    @click="showConfirmPopup(String(danhMucXe.maDanhMucXe))"
+                                    class="border-0 p-0 bg-transparent"
+                                >
+                                    <i class="fas fa-trash-alt text-danger" title="Xóa"></i>
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -96,64 +107,92 @@
             :pageSize="pageSize"
             @pageChanged="onChangePage"
         />
+
+        <PopupDelete
+            :showPopup="showDeletePopup"
+            @update:showPopup="showDeletePopup = $event"
+            :onDelete="confirmDelete"
+        />
     </div>
 </template>
 
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
+    import PopupDelete from '@/components/dungchung/PopupDelete.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
-    import { getVaiTros } from '@/services/vaiTroService'
+    import { deleteDanhMucXe, getDanhMucXes } from '@/services/danhMucXeService'
     import { computed, defineComponent, onMounted, ref, Ref, watch } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
 
     export default defineComponent({
-        name: 'DanhSacVaiTro',
+        name: 'DanhSacDanhMucXe',
         components: {
             SearchComponent,
-            PaginationComponent
+            PaginationComponent,
+            PopupDelete
         },
         setup() {
-            const totalPages = computed(() => Math.ceil(vaiTros.value.length / pageSize.value))
+            const totalPages = computed(() => Math.ceil(danhMucXes.value.length / pageSize.value))
             const route = useRoute()
             const router = useRouter()
             const currentPage = ref(Number(route.query.page) || 1) as Ref<number>
-            const vaiTros: Ref<Record<string, unknown>[]> = ref([])
+            const danhMucXes: Ref<Record<string, unknown>[]> = ref([])
             const totalElements = ref() as Ref<number>
             const pageSize = ref(10) as Ref<number>
             const showDeletePopup = ref(false) as Ref<boolean>
+            const danhMucXeToDelete = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
 
-            const fetcVaiTros = async () => {
-                const result = await getVaiTros()
-                vaiTros.value = result
+            const fetcDanhMucXes = async () => {
+                const result = await getDanhMucXes()
+                danhMucXes.value = result
             }
 
-            const paginatedVaiTros = computed(() => {
+            const paginatedDanhMucXes = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return vaiTros.value.slice(start, start + pageSize.value)
+                return danhMucXes.value.slice(start, start + pageSize.value)
             })
 
             watch(currentPage, (newPage) => {
                 router.replace({ query: { ...route.query, page: newPage.toString() } })
-                fetcVaiTros()
+                fetcDanhMucXes()
             })
 
             const onChangePage = (page: number) => {
                 currentPage.value = page
             }
 
+            const showConfirmPopup = (maDanhMucXe: unknown) => {
+                if (typeof maDanhMucXe === 'string') {
+                    danhMucXeToDelete.value = maDanhMucXe
+                    showDeletePopup.value = true
+                } else {
+                    console.error('Lỗi: ', maDanhMucXe)
+                }
+            }
+
+            const confirmDelete = async () => {
+                if (danhMucXeToDelete.value) {
+                    await deleteDanhMucXe(danhMucXeToDelete.value)
+                    fetcDanhMucXes()
+                }
+            }
+
             onMounted(() => {
-                fetcVaiTros()
+                fetcDanhMucXes()
             })
 
             return {
-                paginatedVaiTros,
+                paginatedDanhMucXes,
                 currentPage,
                 totalPages,
                 totalElements,
                 pageSize,
                 onChangePage,
                 showDeletePopup,
+                danhMucXeToDelete,
+                showConfirmPopup,
+                confirmDelete,
                 keyword
             }
         }

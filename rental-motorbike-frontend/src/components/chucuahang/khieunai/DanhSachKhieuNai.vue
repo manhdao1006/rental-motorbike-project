@@ -33,54 +33,71 @@
 
                 <div class="row justify-content-evenly">
                     <div class="card-header col-xl-6">
-                        <h5 class="card-title mb-0">Danh sách vai trò</h5>
+                        <h5 class="card-title mb-0">Danh sách khiếu nại</h5>
                     </div>
                     <div class="card-header col-xl-6 text-end">
-                        <router-link class="text-success" :to="{ name: 'ThemMoiVaiTroView' }">
+                        <!-- <router-link class="text-success" :to="{ name: 'ThemMoiKhieuNaiView' }">
                             <i class="fas fa-plus-circle"></i>
                             <span class="ps-1">Thêm mới</span>
-                        </router-link>
+                        </router-link> -->
                     </div>
                 </div>
                 <table class="table table-hover my-0">
                     <thead>
                         <tr>
                             <th>STT</th>
-                            <th>Mã vai trò</th>
-                            <th>Tên vai trò</th>
+                            <th>Mã khiếu nại</th>
+                            <th>Nội dung</th>
+                            <th>Loại khiếu nại</th>
+                            <th>Ngày khiếu nại</th>
+                            <th>Trạng thái xử lý</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-if="paginatedVaiTros.length === 0">
+                        <tr v-if="paginatedKhieuNais.length === 0">
                             <td colspan="6" class="text-center text-muted fst-italic">
-                                Không có vai trò nào
+                                Không có khiếu nại nào
                             </td>
                         </tr>
                         <tr
-                            v-for="(vaiTro, index) in paginatedVaiTros"
-                            :key="typeof vaiTro.maVaiTro === 'string' ? vaiTro.maVaiTro : undefined"
+                            v-for="(item, index) in paginatedKhieuNais"
+                            :key="(item as any).khieuNai.maKhieuNai"
                         >
                             <td>
                                 {{ index + 1 }}
                             </td>
                             <td>
-                                {{ vaiTro.maVaiTro }}
+                                {{ (item as any).khieuNai.maKhieuNai }}
                             </td>
                             <td>
-                                {{ vaiTro.tenVaiTro }}
+                                {{ (item as any).khieuNai.noiDung }}
                             </td>
+                            <td>
+                                {{
+                                    tenLoaiKhieuNais[
+                                        String((item as any).khieuNai.maLoaiKhieuNai)
+                                    ] || 'Đang tải...'
+                                }}
+                            </td>
+                            <td>
+                                {{
+                                    (item as any).khieuNai.ngayKhieuNai
+                                        ? formatDateTime(
+                                              String((item as any).khieuNai.ngayKhieuNai)
+                                          )
+                                        : null
+                                }}
+                            </td>
+                            <td>{{ (item as any).khieuNai.trangThaiXuLy }}</td>
                             <td>
                                 <router-link
                                     :to="{
-                                        name: 'CapNhatVaiTroView',
-                                        params: {
-                                            maVaiTro: String(vaiTro.maVaiTro)
-                                        }
+                                        params: { maKhieuNai: String((item as any).khieuNai.maKhieuNai) }
                                     }"
                                 >
-                                    <i class="far fa-edit text-success" title="Cập nhật"></i
-                                ></router-link>
+                                    <i class="fas fa-recycle text-warning" title="Xử lý"></i>
+                                </router-link>
                             </td>
                         </tr>
                     </tbody>
@@ -102,58 +119,80 @@
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
-    import { getVaiTros } from '@/services/vaiTroService'
+    import { useDateTime } from '@/composables/useDateTime'
+    import { getKhieuNais } from '@/services/khieuNaiService'
+    import { getLoaiKhieuNaiByMaLoaiKhieuNai } from '@/services/loaiKhieuNaiService'
+    import { getMaNguoiDung } from '@/services/localStorageService'
     import { computed, defineComponent, onMounted, ref, Ref, watch } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
 
     export default defineComponent({
-        name: 'DanhSacVaiTro',
+        name: 'DanhSachKhieuNai',
         components: {
             SearchComponent,
             PaginationComponent
         },
         setup() {
-            const totalPages = computed(() => Math.ceil(vaiTros.value.length / pageSize.value))
+            const totalPages = computed(() => Math.ceil(khieuNais.value.length / pageSize.value))
             const route = useRoute()
             const router = useRouter()
             const currentPage = ref(Number(route.query.page) || 1) as Ref<number>
-            const vaiTros: Ref<Record<string, unknown>[]> = ref([])
+            const khieuNais: Ref<Record<string, unknown>[]> = ref([])
+            const tenLoaiKhieuNais = ref<Record<string, string>>({})
             const totalElements = ref() as Ref<number>
             const pageSize = ref(10) as Ref<number>
             const showDeletePopup = ref(false) as Ref<boolean>
+            const khieuNaiToDelete = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
+            const formatDateTime = (dateTime: string) => {
+                return useDateTime(dateTime)
+            }
+            const paginatedKhieuNais = computed(() => {
+                const start = (currentPage.value - 1) * pageSize.value
+                return khieuNais.value.slice(start, start + pageSize.value)
+            })
 
-            const fetcVaiTros = async () => {
-                const result = await getVaiTros()
-                vaiTros.value = result
+            const fetchKhieuNais = async () => {
+                const result = await getKhieuNais(getMaNguoiDung())
+                khieuNais.value = result
+
+                for (const item of result) {
+                    getTenLoaiKhieuNai(String(item.khieuNai.maLoaiKhieuNai))
+                }
             }
 
-            const paginatedVaiTros = computed(() => {
-                const start = (currentPage.value - 1) * pageSize.value
-                return vaiTros.value.slice(start, start + pageSize.value)
-            })
+            onMounted(fetchKhieuNais)
+
+            const getTenLoaiKhieuNai = async (maLoaiKhieuNai: string) => {
+                if (!tenLoaiKhieuNais.value[maLoaiKhieuNai]) {
+                    const loaiKhieuNai = await getLoaiKhieuNaiByMaLoaiKhieuNai(maLoaiKhieuNai)
+                    tenLoaiKhieuNais.value[maLoaiKhieuNai] = loaiKhieuNai
+                        ? loaiKhieuNai.tenLoaiKhieuNai
+                        : 'Không xác định'
+                }
+                return tenLoaiKhieuNais.value[maLoaiKhieuNai]
+            }
 
             watch(currentPage, (newPage) => {
                 router.replace({ query: { ...route.query, page: newPage.toString() } })
-                fetcVaiTros()
+                fetchKhieuNais()
             })
 
             const onChangePage = (page: number) => {
                 currentPage.value = page
             }
 
-            onMounted(() => {
-                fetcVaiTros()
-            })
-
             return {
-                paginatedVaiTros,
+                formatDateTime,
+                paginatedKhieuNais,
                 currentPage,
                 totalPages,
                 totalElements,
                 pageSize,
                 onChangePage,
                 showDeletePopup,
+                khieuNaiToDelete,
+                tenLoaiKhieuNais,
                 keyword
             }
         }

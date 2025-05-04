@@ -2,10 +2,10 @@
     <div class="container-fluid">
         <div class="row justify-content-evenly m-0 mt-3 mb-3">
             <div class="card-header col-xl-6">
-                <h5 class="card-title mb-0">Thêm mới vai trò</h5>
+                <h5 class="card-title mb-0">Thêm mới loại khiếu nại</h5>
             </div>
             <div class="card-header col-xl-6 text-end">
-                <router-link class="text-success" :to="{ name: 'DanhSachVaiTroView' }">
+                <router-link class="text-success" :to="{ name: 'DanhSachLoaiKhieuNaiView' }">
                     <i class="fas fa-chevron-circle-left"></i>
                     <span class="ps-1">Quay lại danh sách</span>
                 </router-link>
@@ -17,14 +17,14 @@
             </div>
             <div class="col-xl-12">
                 <div class="mb-3">
-                    <label for="tenVaiTro" class="form-label"
-                        >Tên danh mục xe<span class="text-danger">*</span></label
+                    <label for="tenLoaiKhieuNai" class="form-label"
+                        >Tên loại khiếu nại<span class="text-danger">*</span></label
                     >
                     <input
-                        v-model="danhMuc.tenVaiTro"
+                        v-model="loaiKhieuNai.tenLoaiKhieuNai"
                         type="text"
                         class="form-control"
-                        id="tenVaiTro"
+                        id="tenLoaiKhieuNai"
                     />
                 </div>
             </div>
@@ -43,30 +43,30 @@
 </template>
 
 <script lang="ts">
-    import { addVaiTro, getVaiTros } from '@/services/vaiTroService'
+    import { addLoaiKhieuNai, getLoaiKhieuNais } from '@/services/loaiKhieuNaiService'
     import { defineComponent, onMounted, Ref, ref } from 'vue'
     import { useRouter } from 'vue-router'
 
     export default defineComponent({
-        name: 'ThemMoiVaiTro',
+        name: 'ThemMoiLoaiKhieuNai',
         setup() {
             const router = useRouter()
             const isError = ref(false)
             const messageError = ref<string>('')
-            const danhMuc: Ref<Record<string, string>> = ref({})
-            const danhMucs: Ref<Record<string, unknown>[]> = ref([])
+            const loaiKhieuNai: Ref<Record<string, string>> = ref({})
+            const loaiKhieuNais: Ref<Record<string, unknown>[]> = ref([])
 
-            const fetchVaiTros = async () => {
-                const response = await getVaiTros()
-                danhMucs.value = response
+            const fetchLoaiKhieuNais = async () => {
+                const response = await getLoaiKhieuNais()
+                loaiKhieuNais.value = response
             }
 
             onMounted(() => {
-                fetchVaiTros()
+                fetchLoaiKhieuNais()
             })
 
             const handleThemMoi = async () => {
-                if (!danhMuc.value.tenVaiTro) {
+                if (!loaiKhieuNai.value.tenLoaiKhieuNai) {
                     isError.value = true
                     messageError.value = 'Vui lòng nhập đầy đủ các trường dữ liệu!'
                     setTimeout(() => {
@@ -77,23 +77,23 @@
                 }
                 const formData = new FormData()
 
-                Object.entries(danhMuc.value).forEach(([key, value]) => {
+                Object.entries(loaiKhieuNai.value).forEach(([key, value]) => {
                     if (value !== undefined) {
                         formData.append(key, value || '')
                     }
                 })
 
-                const response = await addVaiTro(formData)
+                const response = await addLoaiKhieuNai(formData)
                 if (response.success) {
-                    await router.push({ name: 'DanhSachVaiTroView' })
+                    await router.push({ name: 'DanhSachLoaiKhieuNaiView' })
                 }
             }
 
             return {
                 isError,
                 messageError,
-                danhMuc,
-                danhMucs,
+                loaiKhieuNai,
+                loaiKhieuNais,
                 handleThemMoi
             }
         }

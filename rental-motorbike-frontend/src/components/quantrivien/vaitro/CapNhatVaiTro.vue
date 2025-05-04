@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-    import { getVaiTroByMaVaiTro, updateVaiTro } from '@/services/quantrivien/vaiTroService'
+    import { getVaiTroByMaVaiTro, updateVaiTro } from '@/services/vaiTroService'
     import { defineComponent, onMounted, Ref, ref } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
 

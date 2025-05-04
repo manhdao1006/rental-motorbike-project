@@ -2,10 +2,10 @@
     <div class="container-fluid">
         <div class="row justify-content-evenly m-0 mt-3 mb-3">
             <div class="card-header col-xl-6">
-                <h5 class="card-title mb-0">Thêm mới vai trò</h5>
+                <h5 class="card-title mb-0">Cập nhật danh mục xe</h5>
             </div>
             <div class="card-header col-xl-6 text-end">
-                <router-link class="text-success" :to="{ name: 'DanhSachVaiTroView' }">
+                <router-link class="text-success" :to="{ name: 'DanhSachDanhMucXeView' }">
                     <i class="fas fa-chevron-circle-left"></i>
                     <span class="ps-1">Quay lại danh sách</span>
                 </router-link>
@@ -17,14 +17,14 @@
             </div>
             <div class="col-xl-12">
                 <div class="mb-3">
-                    <label for="tenVaiTro" class="form-label"
+                    <label for="tenDanhMucXe" class="form-label"
                         >Tên danh mục xe<span class="text-danger">*</span></label
                     >
                     <input
-                        v-model="danhMuc.tenVaiTro"
+                        v-model="danhMuc.tenDanhMucXe"
                         type="text"
                         class="form-control"
-                        id="tenVaiTro"
+                        id="tenDanhMucXe"
                     />
                 </div>
             </div>
@@ -32,10 +32,10 @@
                 <button
                     type="button"
                     class="btn btn-success"
-                    title="Thêm mới"
-                    @click.prevent="handleThemMoi"
+                    title="Cập nhật"
+                    @click.prevent="handleCapNhat"
                 >
-                    Thêm mới
+                    Cập nhật
                 </button>
             </div>
         </div>
@@ -43,30 +43,30 @@
 </template>
 
 <script lang="ts">
-    import { addVaiTro, getVaiTros } from '@/services/vaiTroService'
+    import { getDanhMucXeByMaDanhMucXe, updateDanhMucXe } from '@/services/danhMucXeService'
     import { defineComponent, onMounted, Ref, ref } from 'vue'
-    import { useRouter } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router'
 
     export default defineComponent({
-        name: 'ThemMoiVaiTro',
+        name: 'CapNhatDanhMucXe',
         setup() {
+            const route = useRoute()
             const router = useRouter()
             const isError = ref(false)
             const messageError = ref<string>('')
             const danhMuc: Ref<Record<string, string>> = ref({})
-            const danhMucs: Ref<Record<string, unknown>[]> = ref([])
 
-            const fetchVaiTros = async () => {
-                const response = await getVaiTros()
-                danhMucs.value = response
+            const fetchDanhMucXe = async () => {
+                const response = await getDanhMucXeByMaDanhMucXe(String(route.params.maDanhMucXe))
+                danhMuc.value = response
             }
 
             onMounted(() => {
-                fetchVaiTros()
+                fetchDanhMucXe()
             })
 
-            const handleThemMoi = async () => {
-                if (!danhMuc.value.tenVaiTro) {
+            const handleCapNhat = async () => {
+                if (!danhMuc.value.tenDanhMucXe) {
                     isError.value = true
                     messageError.value = 'Vui lòng nhập đầy đủ các trường dữ liệu!'
                     setTimeout(() => {
@@ -76,16 +76,15 @@
                     return
                 }
                 const formData = new FormData()
-
                 Object.entries(danhMuc.value).forEach(([key, value]) => {
-                    if (value !== undefined) {
+                    if (key !== 'xeMays' && value !== undefined) {
                         formData.append(key, value || '')
                     }
                 })
 
-                const response = await addVaiTro(formData)
+                const response = await updateDanhMucXe(String(danhMuc.value.maDanhMucXe), formData)
                 if (response.success) {
-                    await router.push({ name: 'DanhSachVaiTroView' })
+                    await router.push({ name: 'DanhSachDanhMucXeView' })
                 }
             }
 
@@ -93,8 +92,7 @@
                 isError,
                 messageError,
                 danhMuc,
-                danhMucs,
-                handleThemMoi
+                handleCapNhat
             }
         }
     })
