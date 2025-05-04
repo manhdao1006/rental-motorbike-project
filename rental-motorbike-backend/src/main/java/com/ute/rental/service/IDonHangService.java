@@ -9,9 +9,11 @@ public interface IDonHangService {
 
     List<DonHangResponseDTO> getDonHangs();
 
-    List<DonHangResponseDTO> getDonHangsByMaNhanVien(String maNhanVien);
+    List<DonHangResponseDTO> getDonHangsByChuCuaHang(String maChuCuaHang, String trangThaiDonHang);
 
-    List<DonHangResponseDTO> getDonHangsByMaKhachHang(String maKhachHang);
+    List<DonHangResponseDTO> getDonHangsByNhanVien(String maNhanVien, String trangThaiDonHang);
+
+    List<DonHangResponseDTO> getDonHangsByKhachHang(String maKhachHang);
 
     DonHangDTO addDonHang(DonHangDTO donHangDTO);
 

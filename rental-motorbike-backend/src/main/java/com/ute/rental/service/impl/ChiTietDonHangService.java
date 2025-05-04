@@ -1,10 +1,16 @@
 package com.ute.rental.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ute.rental.converter.ChiTietDonHangConverter;
 import com.ute.rental.converter.DonHangConverter;
 import com.ute.rental.converter.XeMayConverter;
@@ -15,6 +21,8 @@ import com.ute.rental.dto.XeMayDTO;
 import com.ute.rental.entity.ChiTietDonHangEntity;
 import com.ute.rental.entity.DonHangEntity;
 import com.ute.rental.entity.XeMayEntity;
+import com.ute.rental.entity.impl.MaChiTietDonHang;
+import com.ute.rental.exception.ResourceNotFormatException;
 import com.ute.rental.exception.ResourceNotFoundException;
 import com.ute.rental.repository.ChiTietDonHangRepository;
 import com.ute.rental.repository.DonHangRepository;
@@ -34,6 +42,7 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
     private final ChiTietDonHangConverter chiTietDonHangConverter;
     private final DonHangConverter donHangConverter;
     private final XeMayConverter xeMayConverter;
+    private final Cloudinary cloudinary;
 
     @Override
     public List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaDonHang(String maDonHang) {
@@ -87,6 +96,8 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
                         "Không tìm thấy xe máy nào với mã xe máy là: "
                                 + chiTietDonHangDTO.getMaXeMay()));
         ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangConverter.toEntity(chiTietDonHangDTO);
+        chiTietDonHangEntity
+                .setMaChiTietDonHang(new MaChiTietDonHang(donHangEntity.getMaDonHang(), xeMayEntity.getMaXeMay()));
         chiTietDonHangEntity.setDonHang(donHangEntity);
         chiTietDonHangEntity.setXeMay(xeMayEntity);
         chiTietDonHangEntity = chiTietDonHangRepository.save(chiTietDonHangEntity);
@@ -97,7 +108,8 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
     @Transactional
     @Override
     public ChiTietDonHangDTO updateChiTietDonHang(String maDonHang, String maXeMay,
-            ChiTietDonHangDTO chiTietDonHangDTO) {
+            ChiTietDonHangDTO chiTietDonHangDTO, MultipartFile hinhAnhTruocThue, MultipartFile hinhAnhSauThue)
+            throws IOException {
         ChiTietDonHangEntity chiTietDonHangEntity = chiTietDonHangRepository
                 .findOneByDonHang_MaDonHangAndXeMay_MaXeMay(maDonHang, maXeMay)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -119,6 +131,16 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
                             "Không tìm thấy xe máy nào với mã xe máy là: "
                                     + chiTietDonHangDTO.getMaXeMay()));
             chiTietDonHangEntity.setXeMay(xeMayEntity);
+        }
+
+        if (hinhAnhTruocThue != null && !hinhAnhTruocThue.isEmpty()) {
+            Map<String, String> hinhAnhInfo = uploadAnh(hinhAnhTruocThue, "tinh-trang-xe-may");
+            chiTietDonHangEntity.setHinhAnhTruocThue(hinhAnhInfo.get("url"));
+        }
+
+        if (hinhAnhSauThue != null && !hinhAnhSauThue.isEmpty()) {
+            Map<String, String> hinhAnhInfo = uploadAnh(hinhAnhSauThue, "tinh-trang-xe-may");
+            chiTietDonHangEntity.setHinhAnhSauThue(hinhAnhInfo.get("url"));
         }
 
         ChiTietDonHangEntity chiTietDonHangUpdated = chiTietDonHangConverter.toEntity(chiTietDonHangDTO,
@@ -157,9 +179,11 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
     }
 
     @Override
-    public List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaKhachHang(String maNguoiDung) {
+    public List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaKhachHang(String maKhachHang,
+            String trangThaiDonHang) {
         List<ChiTietDonHangEntity> entities = chiTietDonHangRepository
-                .findChiTietDonHangsByDonHang_KhachHang_MaKhachHang(maNguoiDung);
+                .findChiTietDonHangsByDonHang_KhachHang_MaKhachHangAndDonHang_TrangThaiDonHangAndTrangThaiXoa(
+                        maKhachHang, trangThaiDonHang, "1");
         List<ChiTietDonHangResponseDTO> responseList = new ArrayList<>();
         for (ChiTietDonHangEntity chiTietDonHangEntity : entities) {
             ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
@@ -198,9 +222,10 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
     }
 
     @Override
-    public List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaNhanVien(String maNguoiDung) {
+    public List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaNhanVien(String maNhanVien, String trangThaiDonHang) {
         List<ChiTietDonHangEntity> entities = chiTietDonHangRepository
-                .findChiTietDonHangsByDonHang_NhanVien_MaNhanVien(maNguoiDung);
+                .findChiTietDonHangsByDonHang_NhanVien_MaNhanVienAndDonHang_TrangThaiDonHangAndTrangThaiXoa(maNhanVien,
+                        trangThaiDonHang, "1");
         List<ChiTietDonHangResponseDTO> responseList = new ArrayList<>();
         for (ChiTietDonHangEntity chiTietDonHangEntity : entities) {
             ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
@@ -237,6 +262,55 @@ public class ChiTietDonHangService implements IChiTietDonHangService {
         }
 
         return responseList;
+    }
+
+    @Override
+    public List<ChiTietDonHangResponseDTO> getChiTietDonHangsByMaChuCuaHang(String maChuCuaHang,
+            String trangThaiDonHang) {
+        List<ChiTietDonHangEntity> entities = chiTietDonHangRepository
+                .findChiTietDonHangsByXeMay_ChuCuaHang_MaChuCuaHangAndDonHang_TrangThaiDonHangAndTrangThaiXoa(
+                        maChuCuaHang, trangThaiDonHang, "1");
+        List<ChiTietDonHangResponseDTO> responseList = new ArrayList<>();
+        for (ChiTietDonHangEntity chiTietDonHangEntity : entities) {
+            ChiTietDonHangDTO chiTietDonHangDTO = chiTietDonHangConverter.toDTO(chiTietDonHangEntity);
+
+            DonHangEntity donHangEntity = chiTietDonHangEntity.getDonHang();
+            DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
+
+            XeMayEntity xeMayEntity = chiTietDonHangEntity.getXeMay();
+            XeMayDTO xeMayDTO = xeMayConverter.toDTO(xeMayEntity);
+
+            responseList.add(new ChiTietDonHangResponseDTO(chiTietDonHangDTO, donHangDTO, xeMayDTO));
+        }
+
+        return responseList;
+    }
+
+    @SuppressWarnings({ "null", "unchecked" })
+    private Map<String, String> uploadAnh(MultipartFile file, String folderName) throws IOException {
+        Map<String, String> fileInfo = new HashMap<>();
+
+        // check valid image
+        if (file == null || file.isEmpty()) {
+            fileInfo.put("publicId", null);
+            fileInfo.put("url", null);
+        } else {
+            if (!file.getContentType().startsWith("image/")) {
+                throw new ResourceNotFormatException("Phải là file ảnh!");
+            }
+            // upload image
+            Map<String, Object> result = cloudinary.uploader().upload(file.getBytes(),
+                    ObjectUtils.asMap("folder", folderName));
+
+            // get info from cloudinary
+            String publicId = (String) result.get("public_id");
+            String url = (String) result.get("url");
+
+            fileInfo.put("publicId", publicId);
+            fileInfo.put("url", url);
+        }
+
+        return fileInfo;
     }
 
 }

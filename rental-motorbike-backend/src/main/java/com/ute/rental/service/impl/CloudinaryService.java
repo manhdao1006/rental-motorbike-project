@@ -21,7 +21,7 @@ public class CloudinaryService {
     public String uploadFile(byte[] fileData) {
         try {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String fileName = "hop-dong-" + timestamp + ".docx";
+            String fileName = "hop-dong-thue-xe-" + timestamp + ".docx";
 
             Map<?, ?> uploadResult = cloudinary.uploader().upload(fileData, ObjectUtils.asMap(
                     "resource_type", "raw",

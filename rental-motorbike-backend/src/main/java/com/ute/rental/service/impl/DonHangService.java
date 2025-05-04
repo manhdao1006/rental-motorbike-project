@@ -46,9 +46,9 @@ public class DonHangService implements IDonHangService {
     private final NhanVienConverter nhanVienConverter;
 
     @Override
-    public List<DonHangResponseDTO> getDonHangsByMaNhanVien(String maNhanVien) {
+    public List<DonHangResponseDTO> getDonHangsByNhanVien(String maNhanVien, String trangThaiDonHang) {
         List<DonHangEntity> entities = donHangRepository
-                .findDonHangsByNhanVien_MaNhanVienAndTrangThaiXoa(maNhanVien, "1");
+                .findDonHangsByNhanVien_MaNhanVienAndTrangThaiDonHangAndTrangThaiXoa(maNhanVien, trangThaiDonHang, "1");
         List<DonHangResponseDTO> responseList = new ArrayList<>();
         for (DonHangEntity donHangEntity : entities) {
             DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
@@ -73,7 +73,7 @@ public class DonHangService implements IDonHangService {
     }
 
     @Override
-    public List<DonHangResponseDTO> getDonHangsByMaKhachHang(String maKhachHang) {
+    public List<DonHangResponseDTO> getDonHangsByKhachHang(String maKhachHang) {
         List<DonHangEntity> entities = donHangRepository
                 .findDonHangsByKhachHang_MaKhachHangAndTrangThaiXoa(maKhachHang, "1");
         List<DonHangResponseDTO> responseList = new ArrayList<>();
@@ -128,10 +128,11 @@ public class DonHangService implements IDonHangService {
     @Transactional
     @Override
     public DonHangDTO addDonHang(DonHangDTO donHangDTO) {
-        NhanVienEntity nhanVienEntity = nhanVienRepository.findOneByMaNhanVien(donHangDTO.getMaNhanVien())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không tìm thấy nhân viên nào với mã nhân viên là: "
-                                + donHangDTO.getMaNhanVien()));
+        NhanVienEntity nhanVienEntity = null;
+        if (donHangDTO.getMaNhanVien() != null) {
+            nhanVienEntity = nhanVienRepository.findOneByMaNhanVien(donHangDTO.getMaNhanVien())
+                    .orElse(null);
+        }
         KhachHangEntity khachHangEntity = khachHangRepository.findOneByMaKhachHang(donHangDTO.getMaKhachHang())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Không tìm thấy khách hàng nào với mã khách hàng là: "
@@ -192,14 +193,16 @@ public class DonHangService implements IDonHangService {
                                 + maDonHang));
         DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
 
-        ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getNhanVien().getChuCuaHang();
-        ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
+        NhanVienEntity nhanVienEntity = donHangEntity.getNhanVien();
+        NhanVienDTO nhanVienDTO = (nhanVienEntity != null) ? nhanVienConverter.toDTO(nhanVienEntity) : null;
+
+        ChuCuaHangDTO chuCuaHangDTO = null;
+        if (nhanVienEntity != null && nhanVienEntity.getChuCuaHang() != null) {
+            chuCuaHangDTO = chuCuaHangConverter.toDTO(nhanVienEntity.getChuCuaHang());
+        }
 
         KhachHangEntity khachHangEntity = donHangEntity.getKhachHang();
         KhachHangDTO khachHangDTO = khachHangConverter.toDTO(khachHangEntity);
-
-        NhanVienEntity nhanVienEntity = donHangEntity.getNhanVien();
-        NhanVienDTO nhanVienDTO = nhanVienConverter.toDTO(nhanVienEntity);
 
         List<ChiTietDonHangEntity> chiTietDonHangEntities = donHangEntity.getChiTietDonHangs();
         List<ChiTietDonHangDTO> chiTietDonHangDTOs = chiTietDonHangConverter.toDTOs(chiTietDonHangEntities);
@@ -217,6 +220,34 @@ public class DonHangService implements IDonHangService {
         String stt = String.valueOf(count);
 
         return "DH" + datePart + stt;
+    }
+
+    @Override
+    public List<DonHangResponseDTO> getDonHangsByChuCuaHang(String maChuCuaHang, String trangThaiDonHang) {
+        List<DonHangEntity> entities = donHangRepository
+                .findDonHangsByNhanVien_ChuCuaHang_MaChuCuaHangAndTrangThaiDonHangAndTrangThaiXoa(maChuCuaHang,
+                        trangThaiDonHang, "1");
+        List<DonHangResponseDTO> responseList = new ArrayList<>();
+        for (DonHangEntity donHangEntity : entities) {
+            DonHangDTO donHangDTO = donHangConverter.toDTO(donHangEntity);
+
+            ChuCuaHangEntity chuCuaHangEntity = donHangEntity.getNhanVien().getChuCuaHang();
+            ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
+
+            KhachHangEntity khachHangEntity = donHangEntity.getKhachHang();
+            KhachHangDTO khachHangDTO = khachHangConverter.toDTO(khachHangEntity);
+
+            NhanVienEntity nhanVienEntity = donHangEntity.getNhanVien();
+            NhanVienDTO nhanVienDTO = nhanVienConverter.toDTO(nhanVienEntity);
+
+            List<ChiTietDonHangEntity> chiTietDonHangEntities = donHangEntity.getChiTietDonHangs();
+            List<ChiTietDonHangDTO> chiTietDonHangDTOs = chiTietDonHangConverter.toDTOs(chiTietDonHangEntities);
+
+            responseList.add(
+                    new DonHangResponseDTO(donHangDTO, khachHangDTO, nhanVienDTO, chuCuaHangDTO, chiTietDonHangDTOs));
+        }
+
+        return responseList;
     }
 
 }

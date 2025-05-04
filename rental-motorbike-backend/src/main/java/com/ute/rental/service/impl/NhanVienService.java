@@ -66,9 +66,10 @@ public class NhanVienService implements INhanVienService {
 
     @Override
     public NhanVienResponseDTO getNhanVienByMaNhanVien(String maNguoiDung) {
-        NhanVienEntity nhanVienEntity = nhanVienRepository.findOneByMaNhanVien(maNguoiDung)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Không có nhân viên nào có mã nhân viên là " + maNguoiDung));
+        NhanVienEntity nhanVienEntity = nhanVienRepository.findOneByMaNhanVien(maNguoiDung).orElse(null);
+        if (nhanVienEntity == null) {
+            return null;
+        }
         NhanVienDTO nhanVienDTO = nhanVienConverter.toDTO(nhanVienEntity);
         NguoiDungEntity nguoiDungEntity = nhanVienEntity.getNguoiDung();
         NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
@@ -137,13 +138,14 @@ public class NhanVienService implements INhanVienService {
             newNguoiDung.setMatKhau(passwordEncoder.encode(nguoiDungDTO.getMatKhau()));
         }
 
-        if (nhanVienDTO.getMaChuCuaHang() != null) {
-            ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository
-                    .findOneByMaChuCuaHang(nhanVienDTO.getMaChuCuaHang())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Không có chủ cửa hàng nào với mã chủ cửa hàng là " + nhanVienDTO.getMaChuCuaHang()));
-            newNhanVien.setChuCuaHang(chuCuaHangEntity);
-        }
+        // if (nhanVienDTO.getMaChuCuaHang() != null) {
+        // ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository
+        // .findOneByMaChuCuaHang(nhanVienDTO.getMaChuCuaHang())
+        // .orElseThrow(() -> new ResourceNotFoundException(
+        // "Không có chủ cửa hàng nào với mã chủ cửa hàng là " +
+        // nhanVienDTO.getMaChuCuaHang()));
+        // newNhanVien.setChuCuaHang(chuCuaHangEntity);
+        // }
 
         newNguoiDung = nguoiDungRepository.save(newNguoiDung);
         newNhanVien = nhanVienRepository.save(newNhanVien);

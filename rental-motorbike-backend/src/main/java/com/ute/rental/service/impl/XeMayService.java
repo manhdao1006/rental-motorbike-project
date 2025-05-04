@@ -83,7 +83,7 @@ public class XeMayService implements IXeMayService {
 
     @Override
     public List<XeMayResponseDTO> getXeMays() {
-        List<XeMayEntity> entities = xeMayRepository.findXeMaysByTrangThaiXoa("1");
+        List<XeMayEntity> entities = xeMayRepository.findXeMaysByTrangThaiHoatDongAndTrangThaiXoa("Có sẵn", "1");
         List<XeMayResponseDTO> responseList = new ArrayList<>();
         for (XeMayEntity xeMayEntity : entities) {
             XeMayDTO xeMayDTO = xeMayConverter.toDTO(xeMayEntity);

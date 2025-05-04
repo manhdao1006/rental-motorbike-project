@@ -48,9 +48,6 @@ public class WordService {
 
             List<Map<String, String>> danhSachXe = (List<Map<String, String>>) formData.get("danhSachXe");
             int tongSoLuongThue = danhSachXe.size();
-            double tongGiaThue = danhSachXe.stream()
-                    .mapToDouble(x -> Double.parseDouble(x.getOrDefault("giaThue", "0")))
-                    .sum();
 
             for (XWPFParagraph paragraph : document.getParagraphs()) {
                 replaceText(paragraph, "{ngayHienTai}", ngayHienTai);
@@ -84,7 +81,7 @@ public class WordService {
 
                 replaceText(paragraph, "{tongSoLuongThue}", tongSoLuongThue + "");
                 replaceText(paragraph, "{lyDoThueXe}", formData.getOrDefault("lyDoThueXe", "").toString());
-                replaceText(paragraph, "{tongGiaThue}", tongGiaThue + "");
+                replaceText(paragraph, "{tongGiaThue}", formData.getOrDefault("tongGiaThue", "").toString());
                 replaceText(paragraph, "{phuongThucThanhToan}",
                         formData.getOrDefault("phuongThucThanhToan", "").toString());
             }
@@ -93,7 +90,7 @@ public class WordService {
                 fillTable(table, danhSachXe);
             }
 
-            tempFilePath = Files.createTempFile("hop-dong-", ".docx");
+            tempFilePath = Files.createTempFile("hop-dong-thue-xe-", ".docx");
             try (FileOutputStream fileOutputStream = new FileOutputStream(tempFilePath.toFile())) {
                 document.write(fileOutputStream);
             }
@@ -156,11 +153,12 @@ public class WordService {
 
                 setCellText(newRow.getCell(0), String.valueOf(i + 1));
                 setCellText(newRow.getCell(1),
-                        "Xe " + xe.get("loaiXe") + " " + xe.get("danhMucXe") + " " + xe.get("mauXeMay"));
-                setCellText(newRow.getCell(2), xe.get("bienSoXeMay"));
+                        xe.get("loaiXe") + " " + xe.get("tenXe") + " " + xe.get("danhMucXe") + " Màu "
+                                + xe.get("mauXe"));
+                setCellText(newRow.getCell(2), xe.get("bienSoXe"));
                 setCellText(newRow.getCell(3), xe.get("soMay"));
                 setCellText(newRow.getCell(4), xe.get("soKhung"));
-                setCellText(newRow.getCell(5), xe.get("giaThue"));
+                setCellText(newRow.getCell(5), String.valueOf(xe.get("giaThue")));
                 setCellText(newRow.getCell(6), xe.get("tuNgay"));
                 setCellText(newRow.getCell(7), xe.get("denNgay"));
             }
@@ -175,4 +173,5 @@ public class WordService {
         run.setFontFamily("Times New Roman");
         run.setFontSize(12);
     }
+
 }
