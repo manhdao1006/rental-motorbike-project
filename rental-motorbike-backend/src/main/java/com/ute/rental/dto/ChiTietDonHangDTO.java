@@ -1,7 +1,7 @@
 package com.ute.rental.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +17,8 @@ public class ChiTietDonHangDTO {
     private String maDonHang;
     private String maXeMay;
     private BigDecimal giaThue;
-    private LocalDateTime tuNgay;
-    private LocalDateTime denNgay;
+    private LocalDate tuNgay;
+    private LocalDate denNgay;
     private String trangThaiXoa;
     private String tinhTrangTruocThue;
     private String hinhAnhTruocThue;

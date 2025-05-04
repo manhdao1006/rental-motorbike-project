@@ -21,7 +21,8 @@ public interface DonHangConverter {
 
     @Mapping(target = "trangThaiXoa", defaultValue = "1")
     @Mapping(target = "ngayTao", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "trangThaiDonHang", defaultValue = "Đang chờ xử lý")
+    @Mapping(target = "trangThaiDonHang", defaultValue = "Chờ xử lý")
+    @Mapping(target = "trangThaiThanhToan", defaultValue = "Chưa thanh toán")
     DonHangEntity toEntity(DonHangDTO dto);
 
     @Mapping(target = "maDonHang", ignore = true)

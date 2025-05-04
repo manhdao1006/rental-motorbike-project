@@ -19,9 +19,11 @@ public class DonHangDTO {
     private LocalDateTime ngayGiaoXe;
     private String diaChiGiaoXe;
     private String trangThaiDonHang;
+    private String trangThaiThanhToan;
     private LocalDateTime ngayThanhToan;
     private String phuongThucThanhToan;
     private LocalDateTime ngayTraXe;
+    private String lyDoThueXe;
     private String lyDoHuy;
     private String tepDinhKem;
     private String trangThaiXoa;

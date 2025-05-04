@@ -39,6 +39,9 @@ public class DonHangEntity {
     @Column(name = "trangThaiDonHang")
     private String trangThaiDonHang;
 
+    @Column(name = "trangThaiThanhToan")
+    private String trangThaiThanhToan;
+
     @Column(name = "ngayThanhToan")
     private LocalDateTime ngayThanhToan;
 
@@ -47,6 +50,9 @@ public class DonHangEntity {
 
     @Column(name = "ngayTraXe")
     private LocalDateTime ngayTraXe;
+
+    @Column(name = "lyDoThueXe")
+    private String lyDoThueXe;
 
     @Column(name = "lyDoHuy")
     private String lyDoHuy;

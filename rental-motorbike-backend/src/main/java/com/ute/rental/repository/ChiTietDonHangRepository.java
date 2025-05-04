@@ -19,14 +19,19 @@ public interface ChiTietDonHangRepository extends JpaRepository<ChiTietDonHangEn
 
     List<ChiTietDonHangEntity> findChiTietDonHangsByTrangThaiXoa(String trangThaiXoa);
 
-    List<ChiTietDonHangEntity> findChiTietDonHangsByDonHang_KhachHang_MaKhachHang(String maKhachHang);
+    List<ChiTietDonHangEntity> findChiTietDonHangsByDonHang_KhachHang_MaKhachHangAndDonHang_TrangThaiDonHangAndTrangThaiXoa(
+            String maKhachHang, String trangThaiDonHang, String trangThaiXoa);
 
     List<ChiTietDonHangEntity> findChiTietDonHangsByDonHang_KhachHang_MaKhachHangAndDonHang_TrangThaiDonHang(
             String maKhachHang, String trangThaiDonHang);
 
-    List<ChiTietDonHangEntity> findChiTietDonHangsByDonHang_NhanVien_MaNhanVien(String maNhanVien);
+    List<ChiTietDonHangEntity> findChiTietDonHangsByDonHang_NhanVien_MaNhanVienAndDonHang_TrangThaiDonHangAndTrangThaiXoa(
+            String maNhanVien, String trangThaiDonHang, String trangThaiXoa);
 
     List<ChiTietDonHangEntity> findChiTietDonHangsByDonHang_NhanVien_MaNhanVienAndDonHang_TrangThaiDonHang(
             String maNhanVien, String trangThaiDonHang);
+
+    List<ChiTietDonHangEntity> findChiTietDonHangsByXeMay_ChuCuaHang_MaChuCuaHangAndDonHang_TrangThaiDonHangAndTrangThaiXoa(
+            String maChuCuaHang, String trangThaiDonHang, String trangThaiXoa);
 
 }

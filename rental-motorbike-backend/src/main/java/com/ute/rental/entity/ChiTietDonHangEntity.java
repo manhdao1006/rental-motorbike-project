@@ -1,7 +1,7 @@
 package com.ute.rental.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import com.ute.rental.entity.impl.MaChiTietDonHang;
 
@@ -40,10 +40,10 @@ public class ChiTietDonHangEntity {
     private BigDecimal giaThue;
 
     @Column(name = "tuNgay")
-    private LocalDateTime tuNgay;
+    private LocalDate tuNgay;
 
     @Column(name = "denNgay")
-    private LocalDateTime denNgay;
+    private LocalDate denNgay;
 
     @Column(name = "tinhTrangTruocThue")
     private String tinhTrangTruocThue;

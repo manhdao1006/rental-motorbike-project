@@ -41,9 +41,10 @@ public class WebSecurityConfig {
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers("/api/auth/**", "/api/trang-chu/**", "/login/oauth2/code/google").permitAll()
-                        .requestMatchers("/quan-tri-vien/**").hasRole("QUANTRIVIEN")
-                        .requestMatchers("/chu-cua-hang/**").hasAnyRole("CHUCUAHANG", "QUANTRIVIEN")
-                        .requestMatchers("/khach-hang/**").hasAnyRole("KHACHHANG", "QUANTRIVIEN")
+                        .requestMatchers("/quan-tri-vien/**").permitAll()
+                        .requestMatchers("/chu-cua-hang/**").permitAll()
+                        .requestMatchers("/nhan-vien/**").permitAll()
+                        .requestMatchers("/khach-hang/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/trang-chu", true)

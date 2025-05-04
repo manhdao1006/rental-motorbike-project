@@ -25,6 +25,7 @@ public interface NguoiDungConverter {
 
     @Mapping(target = "trangThaiXoa", defaultValue = "1")
     @Mapping(target = "ngayDangKy", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "gioiTinh", defaultValue = "Nam")
     NguoiDungEntity toEntity(NguoiDungDTO dto);
 
     @Mapping(target = "maNguoiDung", ignore = true)

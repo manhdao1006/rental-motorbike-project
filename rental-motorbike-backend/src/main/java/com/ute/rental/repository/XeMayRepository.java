@@ -15,7 +15,7 @@ public interface XeMayRepository extends JpaRepository<XeMayEntity, String> {
 
     List<XeMayEntity> findXeMaysByChuCuaHang_MaChuCuaHangAndTrangThaiXoa(String maChuCuaHang, String trangThaiXoa);
 
-    List<XeMayEntity> findXeMaysByTrangThaiXoa(String trangThaiXoa);
+    List<XeMayEntity> findXeMaysByTrangThaiHoatDongAndTrangThaiXoa(String trangThaiHoatDong, String trangThaiXoa);
 
     Optional<XeMayEntity> findOneByMaXeMay(String maXeMay);
 
