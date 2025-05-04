@@ -10,6 +10,50 @@ import {
     setToken
 } from './localStorageService'
 
+export const uploadWord = async (formData: Record<string, unknown>) => {
+    try {
+        const response = await axios.post(API_ENDPOINTS.AUTH.UPLOAD_WORD, formData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        return response.data
+    } catch (error) {
+        console.error('Lỗi gửi upload:', error)
+    }
+}
+
+export const sendEmail = async (emailData: { email: string; noiDung: string; tieuDe: string }) => {
+    try {
+        await axios.post(API_ENDPOINTS.AUTH.SEND_EMAIL, emailData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+    } catch (error) {
+        console.error('Lỗi gửi email:', error)
+    }
+}
+
+export const dangKyChuCuaHang = async (formData: FormData) => {
+    try {
+        const response = await axios.post(API_ENDPOINTS.AUTH.DANGKY_CHUCUAHANG, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+
+        if (response.data.code === 200) {
+            return { success: true, message: 'Thêm mới thành công' }
+        } else {
+            return { success: false, message: 'Thêm mới thất bại' }
+        }
+    } catch (error) {
+        console.error('Error adding user:', error)
+        return { success: false, message: 'Có lỗi khi thêm mới' }
+    }
+}
+
 export const getNguoiDungByMaNguoiDung = async (maNguoiDung: string) => {
     const response = await apiClient.get(API_ENDPOINTS.NGUOIDUNG.GET_BY_MANGUOIDUNG(maNguoiDung), {
         headers: {
@@ -86,6 +130,12 @@ export const getQuanHuyenByMaPhuongXa = async (maPhuongXa: string) => {
 
 export const getPhuongXasByMaQuanHuyen = async (maQuanHuyen: string) => {
     const response = await axios.get(API_ENDPOINTS.AUTH.GET_PHUONGXAS_BY_MAQUANHUYEN(maQuanHuyen))
+
+    return response.data.result
+}
+
+export const getPhuongXaByMaPhuongXa = async (maPhuongXa: string) => {
+    const response = await axios.get(API_ENDPOINTS.AUTH.GET_PHUONGXA_BY_MAPHUONGXA(maPhuongXa))
 
     return response.data.result
 }

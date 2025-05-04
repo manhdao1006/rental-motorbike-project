@@ -1,6 +1,7 @@
 import {
     getRefreshToken,
-    getToken,
+    removeRefreshToken,
+    removeToken,
     setRefreshToken,
     setToken
 } from '@/services/localStorageService'
@@ -29,9 +30,12 @@ const refreshToken = async () => {
         if (response.data.code === 200) {
             setToken(response.data.result.accessToken)
             setRefreshToken(response.data.result.refreshToken)
+            return response.data.result.accessToken
         }
     } catch (error) {
         console.log('Unable to refresh token', error)
+        removeToken()
+        removeRefreshToken()
     }
 }
 
@@ -39,10 +43,14 @@ apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config
+
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true
-            await refreshToken()
-            originalRequest.headers['Authorization'] = `Bearer ${getToken()}`
+
+            const newAccessToken = await refreshToken()
+            if (!newAccessToken) return Promise.reject(error)
+
+            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
             return apiClient(originalRequest)
         }
         return Promise.reject(error)
