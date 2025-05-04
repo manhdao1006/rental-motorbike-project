@@ -1,8 +1,5 @@
 package com.ute.rental.controller.quantrivien;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,25 +21,6 @@ import lombok.RequiredArgsConstructor;
 public class LoaiKhieuNaiController {
 
     private final ILoaiKhieuNaiService loaiKhieuNaiService;
-
-    @GetMapping("/list")
-    public ApiResponse<List<LoaiKhieuNaiDTO>> getLoaiKhieuNais() {
-        return ApiResponse.<List<LoaiKhieuNaiDTO>>builder()
-                .code(200)
-                .message("Danh sách loại khiếu nại")
-                .result(loaiKhieuNaiService.getLoaiKhieuNais())
-                .build();
-    }
-
-    @GetMapping("/maLoaiKhieuNai={maLoaiKhieuNai}")
-    public ApiResponse<LoaiKhieuNaiDTO> getLoaiKhieuNaiByMaLoaiKhieuNai(
-            @PathVariable("maLoaiKhieuNai") String maLoaiKhieuNai) {
-        return ApiResponse.<LoaiKhieuNaiDTO>builder()
-                .code(200)
-                .message("Loại khiếu nại với mã loại khiếu nại là " + maLoaiKhieuNai)
-                .result(loaiKhieuNaiService.getLoaiKhieuNaiByMaLoaiKhieuNai(maLoaiKhieuNai))
-                .build();
-    }
 
     @PostMapping("/add")
     public ApiResponse<LoaiKhieuNaiDTO> addLoaiKhieuNai(@RequestBody LoaiKhieuNaiDTO loaiKhieuNaiDTO) {

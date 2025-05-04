@@ -30,7 +30,10 @@ import com.ute.rental.dto.ApiResponse;
 import com.ute.rental.dto.AuthResponseDTO;
 import com.ute.rental.dto.ChuCuaHangDTO;
 import com.ute.rental.dto.ChuCuaHangResponseDTO;
+import com.ute.rental.dto.DanhMucXeDTO;
+import com.ute.rental.dto.DonHangResponseDTO;
 import com.ute.rental.dto.EmailRequest;
+import com.ute.rental.dto.LoaiKhieuNaiDTO;
 import com.ute.rental.dto.NguoiDungDTO;
 import com.ute.rental.dto.NguoiDungResponseDTO;
 import com.ute.rental.dto.PhuongXaDTO;
@@ -40,7 +43,10 @@ import com.ute.rental.security.BlackList;
 import com.ute.rental.security.CustomUserDetailsService;
 import com.ute.rental.security.JWTGenerator;
 import com.ute.rental.service.IChuCuaHangService;
+import com.ute.rental.service.IDanhMucXeService;
+import com.ute.rental.service.IDonHangService;
 import com.ute.rental.service.IEmailService;
+import com.ute.rental.service.ILoaiKhieuNaiService;
 import com.ute.rental.service.INguoiDungService;
 import com.ute.rental.service.IPhuongXaService;
 import com.ute.rental.service.IQuanHuyenService;
@@ -65,6 +71,56 @@ public class AuthController {
     private final IChuCuaHangService chuCuaHangService;
     private final NguoiDungRepository nguoiDungRepository;
     private final IEmailService emailService;
+    private final IDanhMucXeService danhMucXeService;
+    private final ILoaiKhieuNaiService loaiKhieuNaiService;
+    private final IDonHangService donHangService;
+
+    @GetMapping("/maDonHang/{maDonHang}")
+    public ApiResponse<DonHangResponseDTO> getDonHangByMaDonHang(
+            @PathVariable("maDonHang") String maDonHang) {
+        return ApiResponse.<DonHangResponseDTO>builder()
+                .code(200)
+                .message("Danh sách đơn hàng")
+                .result(donHangService.getDonHangByMaDonHang(maDonHang))
+                .build();
+    }
+
+    @GetMapping("/loai-khieu-nai/list")
+    public ApiResponse<List<LoaiKhieuNaiDTO>> getLoaiKhieuNais() {
+        return ApiResponse.<List<LoaiKhieuNaiDTO>>builder()
+                .code(200)
+                .message("Danh sách loại khiếu nại")
+                .result(loaiKhieuNaiService.getLoaiKhieuNais())
+                .build();
+    }
+
+    @GetMapping("/maLoaiKhieuNai/{maLoaiKhieuNai}")
+    public ApiResponse<LoaiKhieuNaiDTO> getLoaiKhieuNaiByMaLoaiKhieuNai(
+            @PathVariable("maLoaiKhieuNai") String maLoaiKhieuNai) {
+        return ApiResponse.<LoaiKhieuNaiDTO>builder()
+                .code(200)
+                .message("Loại khiếu nại với mã loại khiếu nại là " + maLoaiKhieuNai)
+                .result(loaiKhieuNaiService.getLoaiKhieuNaiByMaLoaiKhieuNai(maLoaiKhieuNai))
+                .build();
+    }
+
+    @GetMapping("/danh-muc-xe/list")
+    public ApiResponse<List<DanhMucXeDTO>> getDanhMucXes() {
+        return ApiResponse.<List<DanhMucXeDTO>>builder()
+                .code(200)
+                .message("Danh sách danh mục xe")
+                .result(danhMucXeService.getDanhMucXes())
+                .build();
+    }
+
+    @GetMapping("/maDanhMucXe/{maDanhMucXe}")
+    public ApiResponse<DanhMucXeDTO> getDanhMucXeByMaDanhMucXe(@PathVariable("maDanhMucXe") String maDanhMucXe) {
+        return ApiResponse.<DanhMucXeDTO>builder()
+                .code(200)
+                .message("Danh mục xe với mã danh mục xe là " + maDanhMucXe)
+                .result(danhMucXeService.getDanhMucXeByMaDanhMucXe(maDanhMucXe))
+                .build();
+    }
 
     @PostMapping("/send-email")
     public ApiResponse<String> sendEmail(@RequestBody EmailRequest request) {
@@ -119,7 +175,7 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/quan-huyen/maPhuongXa={maPhuongXa}")
+    @GetMapping("/quan-huyen/maPhuongXa/{maPhuongXa}")
     public ApiResponse<QuanHuyenDTO> getQuanHuyenByMaPhuongXa(@PathVariable("maPhuongXa") String maPhuongXa) {
         return ApiResponse.<QuanHuyenDTO>builder()
                 .code(200)
@@ -128,7 +184,7 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/phuong-xa/maQuanHuyen={maQuanHuyen}")
+    @GetMapping("/phuong-xa/maQuanHuyen/{maQuanHuyen}")
     public ApiResponse<List<PhuongXaDTO>> getPhuongXasByMaQuanHuyen(@PathVariable("maQuanHuyen") String maQuanHuyen) {
         return ApiResponse.<List<PhuongXaDTO>>builder()
                 .code(200)
@@ -137,7 +193,7 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/phuong-xa/maPhuongXa={maPhuongXa}")
+    @GetMapping("/phuong-xa/maPhuongXa/{maPhuongXa}")
     public ApiResponse<PhuongXaDTO> getPhuongXaByMaPhuongXa(@PathVariable("maPhuongXa") String maPhuongXa) {
         return ApiResponse.<PhuongXaDTO>builder()
                 .code(200)

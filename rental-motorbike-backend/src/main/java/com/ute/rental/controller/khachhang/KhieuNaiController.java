@@ -20,7 +20,7 @@ import com.ute.rental.service.IKhieuNaiService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController(value = "khieuNaiKhachHang" + ApiName.WEB)
+@RestController(value = "khieuNai" + ApiName.WEB)
 @RequestMapping(ApiUrl.API_KHACHHANG + "/khieu-nai")
 public class KhieuNaiController {
 
@@ -36,7 +36,7 @@ public class KhieuNaiController {
                 .build();
     }
 
-    @GetMapping("/maKhieuNai={maKhieuNai}")
+    @GetMapping("/maKhieuNai/{maKhieuNai}")
     public ApiResponse<KhieuNaiResponseDTO> getKhieuNaiByMaKhieuNai(@PathVariable("maKhieuNai") String maKhieuNai) {
         return ApiResponse.<KhieuNaiResponseDTO>builder()
                 .code(200)

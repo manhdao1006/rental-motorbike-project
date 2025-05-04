@@ -29,7 +29,7 @@ public class TrangChuController {
                 .build();
     }
 
-    @GetMapping("/maXeMay={maXeMay}")
+    @GetMapping("/maXeMay/{maXeMay}")
     public ApiResponse<XeMayResponseDTO> getXeMayByMaXeMay(@PathVariable("maXeMay") String maXeMay) {
         return ApiResponse.<XeMayResponseDTO>builder()
                 .code(200)

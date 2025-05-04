@@ -34,7 +34,7 @@ public class VaiTroController {
                 .build();
     }
 
-    @GetMapping("/maVaiTro={maVaiTro}")
+    @GetMapping("/maVaiTro/{maVaiTro}")
     public ApiResponse<VaiTroDTO> getVaiTroByMaVaiTro(@PathVariable("maVaiTro") String maVaiTro) {
         return ApiResponse.<VaiTroDTO>builder()
                 .code(200)

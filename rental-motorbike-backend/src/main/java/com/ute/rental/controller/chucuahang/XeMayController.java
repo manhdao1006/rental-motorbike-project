@@ -23,7 +23,7 @@ import com.ute.rental.service.IXeMayService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController(value = "xeMay" + ApiName.WEB)
+@RestController(value = "xeMay" + ApiName.API)
 @RequestMapping(ApiUrl.API_CHUCUAHANG + "/xe-may")
 public class XeMayController {
 
@@ -39,7 +39,7 @@ public class XeMayController {
                 .build();
     }
 
-    @GetMapping("/maXeMay={maXeMay}")
+    @GetMapping("/maXeMay/{maXeMay}")
     public ApiResponse<XeMayResponseDTO> getXeMayByMaXeMay(@PathVariable("maXeMay") String maXeMay) {
         return ApiResponse.<XeMayResponseDTO>builder()
                 .code(200)

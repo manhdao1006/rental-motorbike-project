@@ -16,7 +16,7 @@ import com.ute.rental.service.IKhieuNaiService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController(value = "khieuNaiChuCuaHang" + ApiName.WEB)
+@RestController(value = "khieuNai" + ApiName.API)
 @RequestMapping(ApiUrl.API_CHUCUAHANG + "/khieu-nai")
 public class KhieuNaiController {
 

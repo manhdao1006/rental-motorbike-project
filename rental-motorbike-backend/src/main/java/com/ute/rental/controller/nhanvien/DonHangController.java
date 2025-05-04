@@ -1,4 +1,4 @@
-package com.ute.rental.controller.chucuahang;
+package com.ute.rental.controller.nhanvien;
 
 import java.util.List;
 
@@ -19,20 +19,20 @@ import com.ute.rental.service.IDonHangService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController(value = "donHang" + ApiName.API)
-@RequestMapping(ApiUrl.API_CHUCUAHANG + "/don-hang")
+@RestController(value = "donHangNhanVien" + ApiName.API)
+@RequestMapping(ApiUrl.API_NHANVIEN + "/don-hang")
 public class DonHangController {
 
     private final IDonHangService donHangService;
 
-    @GetMapping("/maChuCuaHang/{maChuCuaHang}/{trangThaiDonHang}")
-    public ApiResponse<List<DonHangResponseDTO>> getDonHangsByChuCuaHang(
-            @PathVariable("maChuCuaHang") String maChuCuaHang,
+    @GetMapping("/maNhanVien/{maNhanVien}/{trangThaiDonHang}")
+    public ApiResponse<List<DonHangResponseDTO>> getDonHangsByNhanVien(
+            @PathVariable("maNhanVien") String maNhanVien,
             @PathVariable("trangThaiDonHang") String trangThaiDonHang) {
         return ApiResponse.<List<DonHangResponseDTO>>builder()
                 .code(200)
-                .message("Danh sách đơn hàng có mã chủ cửa hàng là " + maChuCuaHang)
-                .result(donHangService.getDonHangsByChuCuaHang(maChuCuaHang, trangThaiDonHang))
+                .message("Danh sách đơn hàng")
+                .result(donHangService.getDonHangsByNhanVien(maNhanVien, trangThaiDonHang))
                 .build();
     }
 

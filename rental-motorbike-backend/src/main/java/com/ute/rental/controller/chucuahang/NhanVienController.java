@@ -24,13 +24,13 @@ import com.ute.rental.service.INhanVienService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController(value = "nhanVien" + ApiName.WEB)
+@RestController(value = "nhanVien" + ApiName.API)
 @RequestMapping(ApiUrl.API_CHUCUAHANG + "/nhan-vien")
 public class NhanVienController {
 
     private final INhanVienService nhanVienService;
 
-    @GetMapping("/{maChuCuaHang}")
+    @GetMapping("/maChuCuaHang/{maChuCuaHang}")
     public ApiResponse<List<NhanVienResponseDTO>> getNhanViensByChuCuaHang(
             @PathVariable("maChuCuaHang") String maChuCuaHang) {
         return ApiResponse.<List<NhanVienResponseDTO>>builder()
@@ -49,7 +49,7 @@ public class NhanVienController {
                 .build();
     }
 
-    @GetMapping("/{maNguoiDung}")
+    @GetMapping("/maNhanVien/{maNguoiDung}")
     public ApiResponse<NhanVienResponseDTO> getNhanVienByMaNhanVien(@PathVariable("maNguoiDung") String maNguoiDung) {
         return ApiResponse.<NhanVienResponseDTO>builder()
                 .code(200)

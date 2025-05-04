@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController(value = "khachHang" + ApiName.WEB)
-@RequestMapping(ApiUrl.API_KHACHHANG + "/nguoi-mua")
+@RequestMapping(ApiUrl.API_KHACHHANG + "/khach-hang")
 public class KhachHangController {
 
     private final IKhachHangService khachHangService;

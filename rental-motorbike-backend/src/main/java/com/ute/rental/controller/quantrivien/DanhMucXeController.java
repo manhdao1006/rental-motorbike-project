@@ -1,8 +1,5 @@
 package com.ute.rental.controller.quantrivien;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,24 +21,6 @@ import lombok.RequiredArgsConstructor;
 public class DanhMucXeController {
 
     private final IDanhMucXeService danhMucXeService;
-
-    @GetMapping("/list")
-    public ApiResponse<List<DanhMucXeDTO>> getDanhMucXes() {
-        return ApiResponse.<List<DanhMucXeDTO>>builder()
-                .code(200)
-                .message("Danh sách danh mục xe")
-                .result(danhMucXeService.getDanhMucXes())
-                .build();
-    }
-
-    @GetMapping("/maDanhMucXe={maDanhMucXe}")
-    public ApiResponse<DanhMucXeDTO> getDanhMucXeByMaDanhMucXe(@PathVariable("maDanhMucXe") String maDanhMucXe) {
-        return ApiResponse.<DanhMucXeDTO>builder()
-                .code(200)
-                .message("Danh mục xe với mã danh mục xe là " + maDanhMucXe)
-                .result(danhMucXeService.getDanhMucXeByMaDanhMucXe(maDanhMucXe))
-                .build();
-    }
 
     @PostMapping("/add")
     public ApiResponse<DanhMucXeDTO> addDanhMucXe(@RequestBody DanhMucXeDTO danhMucXeDTO) {
