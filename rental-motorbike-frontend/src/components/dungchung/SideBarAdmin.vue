@@ -6,22 +6,15 @@
                     class=""
                     src="https://res.cloudinary.com/springboot-cloud/image/upload/v1740745486/DN-MOTORBIKE-REMOVE_qhw1ec.png"
                     alt="logo-BSR"
-                    width="150px"
-                    height="150px"
+                    width="130px"
+                    height="130px"
                 />
             </a>
 
             <ul class="sidebar-nav">
                 <li class="sidebar-header">Quản lý</li>
 
-                <li class="sidebar-item">
-                    <router-link class="sidebar-link" :to="{ name: 'DashBoardView' }">
-                        <i class="fa-solid fa-gauge-high"></i>
-                        <span class="align-middle">Dashboard</span>
-                    </router-link>
-                </li>
-
-                <li class="sidebar-item">
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_QUANTRIVIEN'">
                     <router-link
                         class="sidebar-link"
                         :to="{ name: 'DanhSachNguoiDungView', params: { maVaiTro: 'VT2' } }"
@@ -31,53 +24,72 @@
                     </router-link>
                 </li>
 
-                <li class="sidebar-item">
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_QUANTRIVIEN'">
                     <router-link class="sidebar-link" :to="{ name: 'DanhSachVaiTroView' }">
                         <i class="fa-solid fa-network-wired"></i>
                         <span class="align-middle">Vai trò</span>
                     </router-link>
                 </li>
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_QUANTRIVIEN'">
+                    <router-link class="sidebar-link" :to="{ name: 'DanhSachCuaHangView' }">
+                        <i class="fa-solid fa-store"></i>
+                        <span class="align-middle">Cửa hàng</span>
+                    </router-link>
+                </li>
 
-                <li class="sidebar-item">
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_QUANTRIVIEN'">
                     <router-link class="sidebar-link" :to="{ name: 'DanhSachDanhMucXeView' }">
                         <i class="fa-solid fa-layer-group"></i>
                         <span class="align-middle">Danh mục xe</span>
                     </router-link>
                 </li>
 
-                <li class="sidebar-item">
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_QUANTRIVIEN'">
                     <router-link class="sidebar-link" :to="{ name: 'DanhSachLoaiKhieuNaiView' }">
                         <i class="fa-solid fa-compress"></i>
                         <span class="align-middle">Loại khiếu nại</span>
                     </router-link>
                 </li>
 
-                <li class="sidebar-item">
-                    <router-link class="sidebar-link" :to="{ name: 'DanhSachHopDongView' }">
-                        <i class="fa-solid fa-file-signature"></i>
-                        <span class="align-middle">Hợp đồng</span>
-                    </router-link>
-                </li>
-
-                <li class="sidebar-item">
-                    <router-link class="sidebar-link" :to="{ name: 'DanhSachKhieuNaiView' }">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                        <span class="align-middle">Khiếu nại</span>
-                    </router-link>
-                </li>
-
-                <li class="sidebar-item">
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_CHUCUAHANG'">
                     <router-link class="sidebar-link" :to="{ name: 'DanhSachXeMayView' }">
                         <i class="fa-solid fa-motorcycle"></i>
                         <span class="align-middle">Xe máy</span>
                     </router-link>
                 </li>
 
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="/admin/dashboard">
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_CHUCUAHANG'">
+                    <router-link class="sidebar-link" :to="{ name: 'DanhSachNhanVienCuaHangView' }">
+                        <i class="fas fa-users"></i>
+                        <span class="align-middle">Nhân viên</span>
+                    </router-link>
+                </li>
+
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_CHUCUAHANG'">
+                    <router-link
+                        class="sidebar-link"
+                        :to="{
+                            name: 'DanhSachDonHangView',
+                            params: { trangThaiDonHang: 'Chờ xử lý' }
+                        }"
+                    >
                         <i class="fa-solid fa-clipboard-list"></i>
-                        <span class="align-middle">Lịch sử đơn hàng</span>
-                    </a>
+                        <span class="align-middle">Đơn hàng</span>
+                    </router-link>
+                </li>
+
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_CHUCUAHANG'">
+                    <router-link class="sidebar-link" :to="{ name: 'DanhSachKhieuNaiView' }">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span class="align-middle">Khiếu nại</span>
+                    </router-link>
+                </li>
+
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_NHANVIEN'">
+                    <router-link class="sidebar-link" :to="{ name: 'DanhSachKhieuNaiView' }">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span class="align-middle">Đơn hàng</span>
+                    </router-link>
                 </li>
 
                 <li class="sidebar-header">Cài đặt</li>
@@ -93,7 +105,6 @@
                     <a class="sidebar-link" href="#!">
                         <i class="fas fa-globe"></i>
                         <span class="align-middle">Ngôn ngữ</span>
-                        <i class="fas fa-chevron-down"></i>
                     </a>
                 </li>
             </ul>
@@ -102,10 +113,25 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue'
+    import { getNguoiDungByMaNguoiDung } from '@/services/authService'
+    import { getMaNguoiDung } from '@/services/localStorageService'
+    import { defineComponent, onMounted, ref } from 'vue'
 
     export default defineComponent({
-        name: 'SideBarAdmin'
+        name: 'SideBarAdmin',
+        setup() {
+            const tenVaiTro = ref<string | null>(null)
+
+            onMounted(async () => {
+                const maNguoiDung = getMaNguoiDung()
+                if (maNguoiDung) {
+                    const nguoiDung = await getNguoiDungByMaNguoiDung(maNguoiDung)
+                    tenVaiTro.value = nguoiDung.vaiTro.tenVaiTro
+                }
+            })
+
+            return { tenVaiTro }
+        }
     })
 </script>
 
@@ -129,8 +155,8 @@
     }
     .sidebar {
         direction: ltr;
-        max-width: 200px;
-        min-width: 200px;
+        max-width: 165px;
+        min-width: 165px;
     }
     .sidebar-brand {
         color: #000000;

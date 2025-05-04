@@ -1,7 +1,7 @@
 <template>
     <div class="col-md-3">
-        <a :href="link">
-            <div class="card shadow-sm border-0">
+        <router-link :to="link">
+            <div class="card shadow-sm border-0 pt-3">
                 <div class="ps-4 pe-4">
                     <img
                         :src="source"
@@ -11,20 +11,16 @@
                     />
                 </div>
                 <div class="card-body">
-                    <div
-                        class="card-title card-heading limited-width-slide"
-                        :title="tenPhienDauGia"
-                    >
-                        {{ tenPhienDauGia }}
+                    <div class="card-title card-heading limited-width-slide" :title="tenXe">
+                        {{ tenXe }}
                     </div>
-                    <div class="card-date">{{ ngayBatDau }}</div>
-                    <div class="card-text card-content limited-width-slide" :title="tenSanPham">
-                        {{ tenSanPham }}
+                    <div class="card-text card-content limited-width-slide" :title="loaiXe">
+                        {{ loaiXe }} - {{ tenDanhMucXe }}
                     </div>
-                    <div class="card-text card-price">{{ giaKhoiDiem }} VNĐ</div>
+                    <div class="card-text card-price">{{ formattedGiaThue }} VNĐ/Ngày</div>
                 </div>
             </div>
-        </a>
+        </router-link>
     </div>
 </template>
 
@@ -34,12 +30,22 @@
     export default defineComponent({
         name: 'SlideItem',
         props: {
-            link: String,
+            link: {
+                type: [String, Object],
+                required: true
+            },
             source: String,
-            tenPhienDauGia: String,
-            ngayBatDau: String,
-            tenSanPham: String,
-            giaKhoiDiem: String
+            loaiXe: String,
+            tenXe: String,
+            tenDanhMucXe: String,
+            giaThue: String
+        },
+        computed: {
+            formattedGiaThue(): string {
+                if (!this.giaThue) return '0'
+                const numberGiaThue = Number(this.giaThue)
+                return numberGiaThue.toLocaleString('vi-VN')
+            }
         }
     })
 </script>
@@ -50,7 +56,6 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        display: inline-block;
         vertical-align: middle;
     }
     a {
@@ -58,31 +63,23 @@
     }
     .card-heading {
         color: #23689b;
-        font-family: 'Montserrat';
+        font-family: 'Arial';
         font-size: 16px;
         font-weight: 700;
         line-height: 18px;
         text-transform: capitalize;
     }
-    .card-date {
-        color: #333333;
-        font-family: 'Montserrat';
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 18px;
-        font-style: italic;
-    }
     .card-content {
         color: #000000;
-        font-family: 'Montserrat';
-        font-size: 16px;
+        font-family: 'Arial';
+        font-size: 14px;
         font-weight: 500;
         line-height: 19.5px;
         text-transform: capitalize;
     }
     .card-price {
         color: #dc7916;
-        font-family: 'Montserrat';
+        font-family: 'Arial';
         font-size: 18px;
         font-weight: 600;
         line-height: 19.5px;

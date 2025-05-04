@@ -27,7 +27,7 @@
                             class="avatar img-fluid rounded me-1"
                             alt=""
                         />
-                        <span class="text-dark">{{ nguoiDung?.hoVaTen }}</span>
+                        <span class="text-dark">{{ nguoiDung?.email }}</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item" href="#!">Thông tin cá nhân</a>
