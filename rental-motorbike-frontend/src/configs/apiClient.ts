@@ -1,11 +1,8 @@
-import {
-    getRefreshToken,
-    removeRefreshToken,
-    removeToken,
-    setRefreshToken,
-    setToken
-} from '@/services/localStorageService'
+import router from '@/router'
+import { dangXuat } from '@/services/authService'
+import { getRefreshToken, setRefreshToken, setToken } from '@/services/localStorageService'
 import axios from 'axios'
+import { inject, ref } from 'vue'
 import { API_ENDPOINTS, BASE_URL } from './apiConfig'
 
 export const apiClient = axios.create({
@@ -16,6 +13,7 @@ export const apiClient = axios.create({
 })
 
 const refreshToken = async () => {
+    const isLoggedIn = inject('isLoggedIn', ref(false))
     const refreshToken = getRefreshToken()
     if (!refreshToken) return
 
@@ -34,8 +32,14 @@ const refreshToken = async () => {
         }
     } catch (error) {
         console.log('Unable to refresh token', error)
-        removeToken()
-        removeRefreshToken()
+    } finally {
+        if (isLoggedIn) {
+            isLoggedIn.value = false
+        }
+        localStorage.removeItem('isLoggedIn')
+        localStorage.removeItem('maNguoiDung')
+        dangXuat()
+        router.push('/trang-chu')
     }
 }
 
