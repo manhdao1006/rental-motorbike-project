@@ -40,30 +40,26 @@
             </div>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
 </template>
 
 <script lang="ts">
-    import { addDanhMucXe, getDanhMucXes } from '@/services/danhMucXeService'
-    import { defineComponent, onMounted, Ref, ref } from 'vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
+    import { addDanhMucXe } from '@/services/danhMucXeService'
+    import { defineComponent, Ref, ref } from 'vue'
     import { useRouter } from 'vue-router'
 
     export default defineComponent({
         name: 'ThemMoiDanhMucXe',
+        components: {
+            PopupLoading
+        },
         setup() {
             const router = useRouter()
             const isError = ref(false)
             const messageError = ref<string>('')
             const danhMucXe: Ref<Record<string, string>> = ref({})
-            const danhMucXes: Ref<Record<string, unknown>[]> = ref([])
-
-            const fetchDanhMucXes = async () => {
-                const response = await getDanhMucXes()
-                danhMucXes.value = response
-            }
-
-            onMounted(() => {
-                fetchDanhMucXes()
-            })
+            const isLoading = ref(false)
 
             const handleThemMoi = async () => {
                 if (!danhMucXe.value.tenDanhMucXe) {
@@ -75,25 +71,32 @@
                     }, 3000)
                     return
                 }
-                const formData = new FormData()
 
-                Object.entries(danhMucXe.value).forEach(([key, value]) => {
-                    if (value !== undefined) {
-                        formData.append(key, value || '')
+                isLoading.value = true
+                try {
+                    const formData = new FormData()
+                    Object.entries(danhMucXe.value).forEach(([key, value]) => {
+                        if (value !== undefined) {
+                            formData.append(key, value || '')
+                        }
+                    })
+
+                    const response = await addDanhMucXe(formData)
+                    if (response.success) {
+                        await router.push({ name: 'DanhSachDanhMucXeView' })
                     }
-                })
-
-                const response = await addDanhMucXe(formData)
-                if (response.success) {
-                    await router.push({ name: 'DanhSachDanhMucXeView' })
+                } catch (error) {
+                    console.error('Lỗi khi thêm mới: ', error)
+                } finally {
+                    isLoading.value = false
                 }
             }
 
             return {
+                isLoading,
                 isError,
                 messageError,
                 danhMucXe,
-                danhMucXes,
                 handleThemMoi
             }
         }

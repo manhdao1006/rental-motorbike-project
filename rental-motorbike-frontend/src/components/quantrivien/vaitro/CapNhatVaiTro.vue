@@ -21,7 +21,7 @@
                         >Tên vai trò<span class="text-danger">*</span></label
                     >
                     <input
-                        v-model="danhMuc.tenVaiTro"
+                        v-model="vaiTro.tenVaiTro"
                         type="text"
                         class="form-control"
                         id="tenVaiTro"
@@ -40,33 +40,42 @@
             </div>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import { getVaiTroByMaVaiTro, updateVaiTro } from '@/services/vaiTroService'
     import { defineComponent, onMounted, Ref, ref } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
 
     export default defineComponent({
         name: 'CapNhatVaiTro',
+        components: {
+            PopupLoading
+        },
         setup() {
             const route = useRoute()
             const router = useRouter()
             const isError = ref(false)
             const messageError = ref<string>('')
-            const danhMuc: Ref<Record<string, string>> = ref({})
+            const vaiTro: Ref<Record<string, string>> = ref({})
+            const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const fetchVaiTro = async () => {
                 const response = await getVaiTroByMaVaiTro(String(route.params.maVaiTro))
-                danhMuc.value = response
+                vaiTro.value = response
             }
 
-            onMounted(() => {
-                fetchVaiTro()
+            onMounted(async () => {
+                await Promise.all([fetchVaiTro()])
+                isLoadingPage.value = false
             })
 
             const handleCapNhat = async () => {
-                if (!danhMuc.value.tenVaiTro) {
+                if (!vaiTro.value.tenVaiTro) {
                     isError.value = true
                     messageError.value = 'Vui lòng nhập đầy đủ các trường dữ liệu!'
                     setTimeout(() => {
@@ -75,23 +84,33 @@
                     }, 3000)
                     return
                 }
-                const formData = new FormData()
-                Object.entries(danhMuc.value).forEach(([key, value]) => {
-                    if (key !== 'nguoiDungs' && value !== undefined) {
-                        formData.append(key, value || '')
-                    }
-                })
 
-                const response = await updateVaiTro(String(danhMuc.value.maVaiTro), formData)
-                if (response.success) {
-                    await router.push({ name: 'DanhSachVaiTroView' })
+                isLoading.value = true
+                try {
+                    const formData = new FormData()
+                    Object.entries(vaiTro.value).forEach(([key, value]) => {
+                        if (key !== 'nguoiDungs' && value !== undefined) {
+                            formData.append(key, value || '')
+                        }
+                    })
+
+                    const response = await updateVaiTro(String(vaiTro.value.maVaiTro), formData)
+                    if (response.success) {
+                        await router.push({ name: 'DanhSachVaiTroView' })
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi cập nhật: ', error)
+                } finally {
+                    isLoading.value = false
                 }
             }
 
             return {
+                isLoading,
+                isLoadingPage,
                 isError,
                 messageError,
-                danhMuc,
+                vaiTro,
                 handleCapNhat
             }
         }

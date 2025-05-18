@@ -143,14 +143,18 @@
                     class="btn btn-success"
                     title="Thêm mới"
                     @click.prevent="handleThemMoi"
+                    :disabled="isLoading"
                 >
                     Thêm mới
                 </button>
             </div>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
 </template>
+
 <script lang="ts">
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import { getMaNguoiDung } from '@/services/localStorageService'
     import { addNhanVien } from '@/services/nhanVienService'
     import { validateEmail, validateSoCCCD, validateSoDienThoai } from '@/utils/validation'
@@ -159,6 +163,9 @@
 
     export default defineComponent({
         name: 'ThemMoiNhanVienCuaHang',
+        components: {
+            PopupLoading
+        },
         setup() {
             const router = useRouter()
             const fileInput = ref<HTMLInputElement | null>(null)
@@ -175,6 +182,7 @@
             const isErrorAnh = ref(false)
             const messageAnh = ref<string>('')
             const previewImage = ref<string | null>(null)
+            const isLoading = ref(false)
 
             const handleFileChange = (event: Event) => {
                 const target = event.target as HTMLInputElement
@@ -252,28 +260,36 @@
                     return
                 }
 
-                const formData = new FormData()
-                Object.entries(nguoiDung.value).forEach(([key, value]) => {
-                    if (value !== undefined) {
-                        formData.append(key, value || '')
-                    }
-                })
+                isLoading.value = true
+                try {
+                    const formData = new FormData()
+                    Object.entries(nguoiDung.value).forEach(([key, value]) => {
+                        if (value !== undefined) {
+                            formData.append(key, value || '')
+                        }
+                    })
 
-                nhanVien.value.maChuCuaHang = getMaNguoiDung()
-                Object.entries(nhanVien.value).forEach(([key, value]) => {
-                    if (value !== undefined) {
-                        formData.append(key, value || '')
-                    }
-                })
-                formData.append('file', file)
+                    nhanVien.value.maChuCuaHang = getMaNguoiDung()
+                    Object.entries(nhanVien.value).forEach(([key, value]) => {
+                        if (value !== undefined) {
+                            formData.append(key, value || '')
+                        }
+                    })
+                    formData.append('file', file)
 
-                const response = await addNhanVien(formData)
-                if (response.success) {
-                    await router.push({ name: 'DanhSachNhanVienCuaHangView' })
+                    const response = await addNhanVien(formData)
+                    if (response.success) {
+                        await router.push({ name: 'DanhSachNhanVienCuaHangView' })
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi thêm mới: ', error)
+                } finally {
+                    isLoading.value = false
                 }
             }
 
             return {
+                isLoading,
                 isErrorSoCCCD,
                 messageSoCCCD,
                 fileInput,

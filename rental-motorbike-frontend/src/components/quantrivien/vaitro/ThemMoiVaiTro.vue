@@ -21,7 +21,7 @@
                         >Tên danh mục xe<span class="text-danger">*</span></label
                     >
                     <input
-                        v-model="danhMuc.tenVaiTro"
+                        v-model="vaiTro.tenVaiTro"
                         type="text"
                         class="form-control"
                         id="tenVaiTro"
@@ -40,33 +40,29 @@
             </div>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
 </template>
 
 <script lang="ts">
-    import { addVaiTro, getVaiTros } from '@/services/vaiTroService'
-    import { defineComponent, onMounted, Ref, ref } from 'vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
+    import { addVaiTro } from '@/services/vaiTroService'
+    import { defineComponent, Ref, ref } from 'vue'
     import { useRouter } from 'vue-router'
 
     export default defineComponent({
         name: 'ThemMoiVaiTro',
+        components: {
+            PopupLoading
+        },
         setup() {
             const router = useRouter()
             const isError = ref(false)
             const messageError = ref<string>('')
-            const danhMuc: Ref<Record<string, string>> = ref({})
-            const danhMucs: Ref<Record<string, unknown>[]> = ref([])
-
-            const fetchVaiTros = async () => {
-                const response = await getVaiTros()
-                danhMucs.value = response
-            }
-
-            onMounted(() => {
-                fetchVaiTros()
-            })
+            const vaiTro: Ref<Record<string, string>> = ref({})
+            const isLoading = ref(false)
 
             const handleThemMoi = async () => {
-                if (!danhMuc.value.tenVaiTro) {
+                if (!vaiTro.value.tenVaiTro) {
                     isError.value = true
                     messageError.value = 'Vui lòng nhập đầy đủ các trường dữ liệu!'
                     setTimeout(() => {
@@ -75,25 +71,32 @@
                     }, 3000)
                     return
                 }
-                const formData = new FormData()
 
-                Object.entries(danhMuc.value).forEach(([key, value]) => {
-                    if (value !== undefined) {
-                        formData.append(key, value || '')
+                isLoading.value = true
+                try {
+                    const formData = new FormData()
+                    Object.entries(vaiTro.value).forEach(([key, value]) => {
+                        if (value !== undefined) {
+                            formData.append(key, value || '')
+                        }
+                    })
+
+                    const response = await addVaiTro(formData)
+                    if (response.success) {
+                        await router.push({ name: 'DanhSachVaiTroView' })
                     }
-                })
-
-                const response = await addVaiTro(formData)
-                if (response.success) {
-                    await router.push({ name: 'DanhSachVaiTroView' })
+                } catch (error) {
+                    console.error('Lỗi khi thêm mới: ', error)
+                } finally {
+                    isLoading.value = false
                 }
             }
 
             return {
                 isError,
                 messageError,
-                danhMuc,
-                danhMucs,
+                vaiTro,
+                isLoading,
                 handleThemMoi
             }
         }

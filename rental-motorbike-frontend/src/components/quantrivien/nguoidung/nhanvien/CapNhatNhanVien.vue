@@ -181,14 +181,20 @@
                     class="btn btn-success"
                     title="Cập nhật"
                     @click.prevent="handleCapNhat"
+                    :disabled="isLoading"
                 >
                     Cập nhật
                 </button>
             </div>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
+
 <script lang="ts">
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
+
     import { getNhanVienByMaNguoiDung, updateNhanVien } from '@/services/nhanVienService'
     import { validateEmail, validateSoCCCD, validateSoDienThoai } from '@/utils/validation'
     import { defineComponent, onMounted, ref } from 'vue'
@@ -196,6 +202,9 @@
 
     export default defineComponent({
         name: 'CapNhatNhanVien',
+        components: {
+            PopupLoading
+        },
         setup() {
             const route = useRoute()
             const router = useRouter()
@@ -214,6 +223,8 @@
             const isErrorAnh = ref(false)
             const messageAnh = ref<string>('')
             const previewImage = ref<string | null>(null)
+            const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const fetchNguoiDung = async () => {
                 const maNguoiDung = String(route.params.maNguoiDung)
@@ -225,8 +236,9 @@
                     'https://res.cloudinary.com/springboot-cloud/image/upload/v1739427632/user_vqmka8.png'
             }
 
-            onMounted(() => {
-                fetchNguoiDung()
+            onMounted(async () => {
+                await Promise.all([fetchNguoiDung()])
+                isLoadingPage.value = false
             })
 
             const handleFileChange = (event: Event) => {
@@ -298,36 +310,48 @@
                     return
                 }
 
-                const formData = new FormData()
-                Object.entries(nguoiDung.value).forEach(([key, value]) => {
-                    if (
-                        key !== 'trangThaiXoa' &&
-                        key !== 'vaiTros' &&
-                        key !== 'matKhau' &&
-                        value !== undefined
-                    ) {
-                        formData.append(key, value || '')
-                    }
-                })
-                Object.entries(nhanVien.value).forEach(([key, value]) => {
-                    if (key !== 'trangThaiXoa' && key !== 'donHangs' && value !== undefined) {
-                        formData.append(key, value || '')
-                    }
-                })
-                if (file) {
-                    formData.append('file', file)
-                }
-
-                const response = await updateNhanVien(String(nguoiDung.value.maNguoiDung), formData)
-                if (response.success) {
-                    await router.push({
-                        name: 'DanhSachNguoiDungView',
-                        params: { maVaiTro: maVaiTroPrams }
+                isLoading.value = true
+                try {
+                    const formData = new FormData()
+                    Object.entries(nguoiDung.value).forEach(([key, value]) => {
+                        if (
+                            key !== 'trangThaiXoa' &&
+                            key !== 'vaiTros' &&
+                            key !== 'matKhau' &&
+                            value !== undefined
+                        ) {
+                            formData.append(key, value || '')
+                        }
                     })
+                    Object.entries(nhanVien.value).forEach(([key, value]) => {
+                        if (key !== 'trangThaiXoa' && key !== 'donHangs' && value !== undefined) {
+                            formData.append(key, value || '')
+                        }
+                    })
+                    if (file) {
+                        formData.append('file', file)
+                    }
+
+                    const response = await updateNhanVien(
+                        String(nguoiDung.value.maNguoiDung),
+                        formData
+                    )
+                    if (response.success) {
+                        await router.push({
+                            name: 'DanhSachNguoiDungView',
+                            params: { maVaiTro: maVaiTroPrams }
+                        })
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi cập nhật: ', error)
+                } finally {
+                    isLoading.value = false
                 }
             }
 
             return {
+                isLoadingPage,
+                isLoading,
                 isErrorSoCCCD,
                 messageSoCCCD,
                 fileInput,

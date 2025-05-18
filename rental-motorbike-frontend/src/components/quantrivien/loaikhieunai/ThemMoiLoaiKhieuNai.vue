@@ -40,30 +40,27 @@
             </div>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
 </template>
 
 <script lang="ts">
-    import { addLoaiKhieuNai, getLoaiKhieuNais } from '@/services/loaiKhieuNaiService'
-    import { defineComponent, onMounted, Ref, ref } from 'vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
+
+    import { addLoaiKhieuNai } from '@/services/loaiKhieuNaiService'
+    import { defineComponent, Ref, ref } from 'vue'
     import { useRouter } from 'vue-router'
 
     export default defineComponent({
         name: 'ThemMoiLoaiKhieuNai',
+        components: {
+            PopupLoading
+        },
         setup() {
             const router = useRouter()
             const isError = ref(false)
             const messageError = ref<string>('')
             const loaiKhieuNai: Ref<Record<string, string>> = ref({})
-            const loaiKhieuNais: Ref<Record<string, unknown>[]> = ref([])
-
-            const fetchLoaiKhieuNais = async () => {
-                const response = await getLoaiKhieuNais()
-                loaiKhieuNais.value = response
-            }
-
-            onMounted(() => {
-                fetchLoaiKhieuNais()
-            })
+            const isLoading = ref(false)
 
             const handleThemMoi = async () => {
                 if (!loaiKhieuNai.value.tenLoaiKhieuNai) {
@@ -75,25 +72,32 @@
                     }, 3000)
                     return
                 }
-                const formData = new FormData()
 
-                Object.entries(loaiKhieuNai.value).forEach(([key, value]) => {
-                    if (value !== undefined) {
-                        formData.append(key, value || '')
+                isLoading.value = true
+                try {
+                    const formData = new FormData()
+                    Object.entries(loaiKhieuNai.value).forEach(([key, value]) => {
+                        if (value !== undefined) {
+                            formData.append(key, value || '')
+                        }
+                    })
+
+                    const response = await addLoaiKhieuNai(formData)
+                    if (response.success) {
+                        await router.push({ name: 'DanhSachLoaiKhieuNaiView' })
                     }
-                })
-
-                const response = await addLoaiKhieuNai(formData)
-                if (response.success) {
-                    await router.push({ name: 'DanhSachLoaiKhieuNaiView' })
+                } catch (error) {
+                    console.error('Lỗi khi thêm mới: ', error)
+                } finally {
+                    isLoading.value = false
                 }
             }
 
             return {
+                isLoading,
                 isError,
                 messageError,
                 loaiKhieuNai,
-                loaiKhieuNais,
                 handleThemMoi
             }
         }

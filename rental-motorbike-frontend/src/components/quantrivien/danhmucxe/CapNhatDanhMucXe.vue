@@ -40,29 +40,38 @@
             </div>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import { getDanhMucXeByMaDanhMucXe, updateDanhMucXe } from '@/services/danhMucXeService'
     import { defineComponent, onMounted, Ref, ref } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
 
     export default defineComponent({
         name: 'CapNhatDanhMucXe',
+        components: {
+            PopupLoading
+        },
         setup() {
             const route = useRoute()
             const router = useRouter()
             const isError = ref(false)
             const messageError = ref<string>('')
             const danhMuc: Ref<Record<string, string>> = ref({})
+            const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const fetchDanhMucXe = async () => {
                 const response = await getDanhMucXeByMaDanhMucXe(String(route.params.maDanhMucXe))
                 danhMuc.value = response
             }
 
-            onMounted(() => {
-                fetchDanhMucXe()
+            onMounted(async () => {
+                await Promise.all([fetchDanhMucXe()])
+                isLoadingPage.value = false
             })
 
             const handleCapNhat = async () => {
@@ -75,20 +84,33 @@
                     }, 3000)
                     return
                 }
-                const formData = new FormData()
-                Object.entries(danhMuc.value).forEach(([key, value]) => {
-                    if (key !== 'xeMays' && value !== undefined) {
-                        formData.append(key, value || '')
-                    }
-                })
 
-                const response = await updateDanhMucXe(String(danhMuc.value.maDanhMucXe), formData)
-                if (response.success) {
-                    await router.push({ name: 'DanhSachDanhMucXeView' })
+                isLoading.value = true
+                try {
+                    const formData = new FormData()
+                    Object.entries(danhMuc.value).forEach(([key, value]) => {
+                        if (key !== 'xeMays' && value !== undefined) {
+                            formData.append(key, value || '')
+                        }
+                    })
+
+                    const response = await updateDanhMucXe(
+                        String(danhMuc.value.maDanhMucXe),
+                        formData
+                    )
+                    if (response.success) {
+                        await router.push({ name: 'DanhSachDanhMucXeView' })
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi cập nhật: ', error)
+                } finally {
+                    isLoading.value = false
                 }
             }
 
             return {
+                isLoadingPage,
+                isLoading,
                 isError,
                 messageError,
                 danhMuc,
