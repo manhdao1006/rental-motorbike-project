@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  rental-backend:
+    container_name: rental_backend_container
+    build:
+      context: ./rental-motorbike-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/THUEXEMAY
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=manhdao1006
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+    networks:
+      - rental-network
+
+  rental-frontend:
+    container_name: rental_frontend_container
+    build:
+      context: ./rental-motorbike-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    networks:
+      - rental-network
+
+networks:
+  rental-network:
+    driver: bridge
