@@ -76,6 +76,11 @@
                     </router-link>
                 </div>
             </div>
+            <div class="row" v-if="trangThaiDonHangParams === 'Đang giao xe'">
+                <div ref="mapRef" style="height: 300px; width: 100%"></div>
+                <p v-if="loading">Đang xử lý...</p>
+                <p v-else-if="error">Lỗi: {{ error }}</p>
+            </div>
             <div class="row m-0">
                 <div v-if="isError" class="alert alert-danger">
                     {{ messageError }}
@@ -83,6 +88,7 @@
                 <div
                     class="row"
                     v-if="
+                        trangThaiDonHangParams !== 'Đang giao xe' &&
                         trangThaiDonHangParams !== 'Đã giao xe' &&
                         trangThaiDonHangParams !== 'Đã trả xe'
                     "
@@ -398,6 +404,7 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
@@ -407,7 +414,10 @@
     import { getNhanVienByMaNguoiDung, getNhanViensByChuCuaHang } from '@/services/nhanVienService'
     import { createPayment } from '@/services/thanhToanService'
     import { getXeMayByMaXeMay, updateXeMay } from '@/services/xeMayService'
-    import { computed, defineComponent, onMounted, ref } from 'vue'
+    import L from 'leaflet'
+    import 'leaflet-routing-machine'
+    import 'leaflet/dist/leaflet.css'
+    import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
     import ThongTinKhachHang from '../dungchung/ThongTinKhachHang.vue'
 
@@ -433,7 +443,10 @@
             const daTienHanhThanhToan = ref(false)
             const trangThaiDonHangParams = String(route.params.trangThaiDonHang)
             const tenNhanViens = ref<Record<string, string>>({})
+            const isLoadingPage = ref(true)
             const selectedBankCode = ref<string>('')
+            const startAddress = ref<string>('')
+            const endAddress = ref<string>('')
             const banks = [
                 {
                     code: 'ACB',
@@ -501,6 +514,134 @@
                     logo: 'https://res.cloudinary.com/springboot-cloud/image/upload/v1745850346/vpbank_kv0we0.webp'
                 }
             ]
+
+            const mapRef = ref<HTMLElement | null>(null)
+            const loading = ref(false)
+            const error = ref('')
+            let map: L.Map
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            let routingControl: any
+
+            const startIcon = L.divIcon({
+                className: 'custom-icon',
+                html: '<i class="fas fa-map-marker-alt" style="font-size: 30px;"></i>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 30],
+                popupAnchor: [0, -30]
+            })
+
+            const endIcon = L.divIcon({
+                className: 'custom-icon',
+                html: '<i class="fas fa-map-marker-alt" style="color:red; font-size: 30px;"></i>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 30],
+                popupAnchor: [0, -30]
+            })
+
+            const initMap = async () => {
+                await nextTick()
+
+                if (mapRef.value) {
+                    map = L.map(mapRef.value).setView([16.0674, 108.2222], 14)
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
+                }
+            }
+
+            onMounted(async () => {
+                await Promise.all([fetchDonHang(), fetchNhanViens()])
+                isLoadingPage.value = false
+
+                await nextTick()
+                await initMap()
+
+                if (trangThaiDonHangParams === 'Đang giao xe') {
+                    startAddress.value = String(chuCuaHang.value.diaChiCuaHang)
+                    endAddress.value = String(donHang.value.diaChiGiaoXe)
+
+                    loading.value = true
+                    error.value = ''
+
+                    try {
+                        const [start, end] = await Promise.all([
+                            geocode(startAddress.value),
+                            geocode(endAddress.value)
+                        ])
+
+                        L.marker([start.lat, start.lng], { icon: startIcon })
+                            .addTo(map)
+                            .bindTooltip('Cửa hàng', { permanent: true, direction: 'right' })
+
+                        L.marker([end.lat, end.lng], { icon: endIcon })
+                            .addTo(map)
+                            .bindTooltip('Vị trí của bạn', { permanent: true, direction: 'right' })
+
+                        if (routingControl) {
+                            routingControl.setWaypoints([
+                                L.latLng(start.lat, start.lng),
+                                L.latLng(end.lat, end.lng)
+                            ])
+                        } else {
+                            routingControl = L.Routing.control({
+                                waypoints: [
+                                    L.latLng(start.lat, start.lng),
+                                    L.latLng(end.lat, end.lng)
+                                ],
+                                createMarker: () => null,
+                                addWaypoints: false,
+                                draggableWaypoints: false,
+                                fitSelectedRoutes: true,
+                                showAlternatives: false,
+                                routeWhileDragging: false,
+                                lineOptions: {
+                                    styles: [{ color: 'blue', weight: 5 }],
+                                    extendToWaypoints: false,
+                                    missingRouteTolerance: 0
+                                },
+                                show: false
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            } as any)
+
+                            routingControl.addTo(map)
+
+                            routingControl.on('routesfound', () => {
+                                const container = document.querySelector(
+                                    '.leaflet-routing-container'
+                                )
+                                if (container) container.remove()
+                            })
+                        }
+
+                        map.setView([start.lat, start.lng], 14)
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    } catch (err: any) {
+                        error.value = err.message
+                    }
+
+                    loading.value = false
+                }
+            })
+
+            const geocode = async (address: string) => {
+                const fullAddress = address.includes('Đà Nẵng')
+                    ? address
+                    : `${address}, Đà Nẵng, Việt Nam`
+
+                // Giới hạn vùng tìm kiếm trong Đà Nẵng
+                const viewbox = '108.1,15.9,108.3,16.15'
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+                    fullAddress
+                )}&viewbox=${viewbox}&bounded=1`
+
+                const response = await fetch(url)
+                const data = await response.json()
+                if (!data.length)
+                    throw new Error(`Không tìm thấy địa chỉ trong khu vực Đà Nẵng: ${address}`)
+
+                return {
+                    lat: parseFloat(data[0].lat),
+                    lng: parseFloat(data[0].lon)
+                }
+            }
 
             const handleThanhToan = async () => {
                 if (!selectedBankCode.value) {
@@ -646,11 +787,6 @@
                 return tenNhanViens.value[maNhanVien]
             }
 
-            onMounted(() => {
-                fetchDonHang()
-                fetchNhanViens()
-            })
-
             const handleTienHanhThanhToan = () => {
                 daTienHanhThanhToan.value = true
             }
@@ -697,6 +833,10 @@
             }
 
             return {
+                mapRef,
+                loading,
+                error,
+                isLoadingPage,
                 handleTienHanhThanhToan,
                 daTienHanhThanhToan,
                 banks,
@@ -728,6 +868,10 @@
 </script>
 
 <style>
+    .leaflet-routing-container {
+        display: none !important;
+    }
+
     .bank-button {
         margin-left: 10px;
         margin-top: 10px;
