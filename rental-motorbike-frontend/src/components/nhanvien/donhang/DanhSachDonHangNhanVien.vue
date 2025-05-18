@@ -107,28 +107,55 @@
                             :key="(item as any).donHang.maDonHang"
                         >
                             <td>
-                                {{ index + 1 }}
+                                <router-link
+                                    :to="{ name: 'ChiTietDonHangNhanVienView', params: { trangThaiDonHang: trangThaiDonHangParams, maDonHang: String((item as any).donHang.maDonHang) }}"
+                                >
+                                    {{ index + 1 }}</router-link
+                                >
                             </td>
                             <td>
-                                {{ (item as any).donHang.maDonHang }}
+                                <router-link
+                                    :to="{ name: 'ChiTietDonHangNhanVienView', params: { trangThaiDonHang: trangThaiDonHangParams, maDonHang: String((item as any).donHang.maDonHang) }}"
+                                >
+                                    {{ (item as any).donHang.maDonHang }}</router-link
+                                >
                             </td>
                             <td>
-                                {{
-                                    (item as any).donHang.ngayTao
-                                        ? formatDateTime(String((item as any).donHang.ngayTao))
-                                        : null
-                                }}
+                                <router-link
+                                    :to="{ name: 'ChiTietDonHangNhanVienView', params: { trangThaiDonHang: trangThaiDonHangParams, maDonHang: String((item as any).donHang.maDonHang) }}"
+                                >
+                                    {{
+                                        (item as any).donHang.ngayTao
+                                            ? formatDateTime(String((item as any).donHang.ngayTao))
+                                            : null
+                                    }}</router-link
+                                >
                             </td>
                             <td>
-                                {{
-                                    tenKhachHangs[String((item as any).donHang.maKhachHang)] ||
-                                    'Đang tải...'
-                                }}
+                                <router-link
+                                    :to="{ name: 'ChiTietDonHangNhanVienView', params: { trangThaiDonHang: trangThaiDonHangParams, maDonHang: String((item as any).donHang.maDonHang) }}"
+                                >
+                                    {{
+                                        tenKhachHangs[String((item as any).donHang.maKhachHang)] ||
+                                        'Đang tải...'
+                                    }}</router-link
+                                >
                             </td>
                             <td>
-                                {{ tenNhanViens[String((item as any).donHang.maNhanVien)] ?? '' }}
+                                <router-link
+                                    :to="{ name: 'ChiTietDonHangNhanVienView', params: { trangThaiDonHang: trangThaiDonHangParams, maDonHang: String((item as any).donHang.maDonHang) }}"
+                                >
+                                    {{
+                                        tenNhanViens[String((item as any).donHang.maNhanVien)] ?? ''
+                                    }}</router-link
+                                >
                             </td>
-                            <td>{{ (item as any).donHang.trangThaiDonHang }}</td>
+                            <td>
+                                <router-link
+                                    :to="{ name: 'ChiTietDonHangNhanVienView', params: { trangThaiDonHang: trangThaiDonHangParams, maDonHang: String((item as any).donHang.maDonHang) }}"
+                                    >{{ (item as any).donHang.trangThaiDonHang }}</router-link
+                                >
+                            </td>
                             <td>
                                 <router-link
                                     v-if="trangThaiDonHangParams === 'Chờ xử lý'"
@@ -171,7 +198,7 @@
             </div>
         </div>
         <PaginationComponent
-            v-if="totalElements > 0"
+            v-if="paginatedDonHangs.length > 0"
             class="text-center mt-3"
             :currentPage="currentPage"
             :totalPages="totalPages"
@@ -181,6 +208,7 @@
         />
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
@@ -218,6 +246,7 @@
             const keyword = ref('') as Ref<string>
             const trangThaiDonHangParams = String(route.params.trangThaiDonHang)
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const formatDateTime = (dateTime: string) => {
                 return useDateTime(dateTime)
@@ -257,7 +286,10 @@
                 }
             }
 
-            onMounted(fetchDonHangs)
+            onMounted(async () => {
+                await Promise.all([fetchDonHangs()])
+                isLoadingPage.value = false
+            })
 
             const getTenKhachHang = async (maKhachHang: string) => {
                 if (!tenKhachHangs.value[maKhachHang]) {
@@ -324,6 +356,7 @@
             }
 
             return {
+                isLoadingPage,
                 isLoading,
                 formatDateTime,
                 paginatedDonHangs,

@@ -227,16 +227,28 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-center">
-                    <button
-                        type="button"
-                        class="btn btn-success"
-                        title="Đăng ký"
-                        @click.prevent="handleDangKy"
-                        :disabled="isLoading"
-                    >
-                        Đăng ký
-                    </button>
+                <div class="row">
+                    <div class="col-6 text-center">
+                        <a
+                            href="/trang-chu"
+                            class="btn btn-outline-danger"
+                            title="Hủy"
+                            :disabled="isLoading"
+                        >
+                            Hủy
+                        </a>
+                    </div>
+                    <div class="col-6 text-center">
+                        <button
+                            type="button"
+                            class="btn btn-success"
+                            title="Đăng ký"
+                            @click.prevent="handleDangKy"
+                            :disabled="isLoading"
+                        >
+                            Đăng ký
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -86,7 +86,13 @@
                 </li>
 
                 <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_NHANVIEN'">
-                    <router-link class="sidebar-link" :to="{ name: 'DanhSachKhieuNaiView' }">
+                    <router-link
+                        class="sidebar-link"
+                        :to="{
+                            name: 'DanhSachDonHangNhanVienView',
+                            params: { trangThaiDonHang: 'Chờ xử lý' }
+                        }"
+                    >
                         <i class="fa-solid fa-pen-to-square"></i>
                         <span class="align-middle">Đơn hàng</span>
                     </router-link>

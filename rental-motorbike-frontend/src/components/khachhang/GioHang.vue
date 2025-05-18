@@ -13,22 +13,43 @@
                 :key="index"
             >
                 <div class="col-3 d-flex flex-column justify-content-center">
-                    <img :src="item.anhXeMay" width="200px" height="120px" />
+                    <router-link
+                        :to="{
+                            name: 'ChiTietXeMayTrangChuView',
+                            params: { maXeMay: item.maXeMay }
+                        }"
+                    >
+                        <img :src="item.anhXeMay" width="200px" height="120px" />
+                    </router-link>
                 </div>
                 <div
                     class="col-6 d-flex flex-column justify-content-center border-start border-black"
                 >
-                    <div>
-                        <strong>{{ item.tenXe }}</strong>
-                    </div>
-                    <div>{{ item.loaiXe }}</div>
+                    <router-link
+                        :to="{
+                            name: 'ChiTietXeMayTrangChuView',
+                            params: { maXeMay: item.maXeMay }
+                        }"
+                    >
+                        <div class="text-black">
+                            <strong>{{ item.tenXe }}</strong>
+                        </div>
+                        <div class="text-black">{{ item.loaiXe }}</div></router-link
+                    >
                 </div>
                 <div
                     class="col-2 d-flex flex-column justify-content-center border-black border-start border-end"
                 >
-                    <div style="color: #dc7916">
-                        <strong>{{ formattedGiaThue(item.giaThue) }} VNĐ/Ngày</strong>
-                    </div>
+                    <router-link
+                        :to="{
+                            name: 'ChiTietXeMayTrangChuView',
+                            params: { maXeMay: item.maXeMay }
+                        }"
+                    >
+                        <div style="color: #dc7916">
+                            <strong>{{ formattedGiaThue(item.giaThue) }} VNĐ/Ngày</strong>
+                        </div></router-link
+                    >
                 </div>
                 <div class="col-1 d-flex flex-column justify-content-center">
                     <div class="text-end">
