@@ -319,6 +319,7 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
@@ -356,6 +357,7 @@
             const hinhAnhSauThueInput = ref<HTMLInputElement | null>(null)
             const danhMucXes = ref<Record<string, unknown>[]>([])
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
             const trangThaiDonHangParams = String(route.params.trangThaiDonHang)
 
             const fetchDanhMucXes = async () => {
@@ -381,10 +383,9 @@
                 chuCuaHang.value = response.vaiTro
             }
 
-            onMounted(() => {
-                fetchChiTiet()
-                fetchDanhMucXes()
-                fetchChuCuaHang()
+            onMounted(async () => {
+                await Promise.all([fetchChiTiet(), fetchDanhMucXes(), fetchChuCuaHang()])
+                isLoadingPage.value = false
             })
 
             const handleFileChangeTruoc = (event: Event) => {
@@ -437,6 +438,7 @@
                     return
                 }
 
+                isLoading.value = true
                 try {
                     const formData = new FormData()
                     formData.append(
@@ -474,6 +476,7 @@
             }
 
             return {
+                isLoadingPage,
                 chuCuaHang,
                 chiTietDonHang,
                 trangThaiDonHangParams,

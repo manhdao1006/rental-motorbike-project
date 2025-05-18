@@ -182,7 +182,7 @@
                     </tbody>
                 </table>
                 <PaginationComponent
-                    v-if="totalElements > 0"
+                    v-if="paginatedDonHangs.length > 0"
                     class="text-center mt-3"
                     :currentPage="currentPage"
                     :totalPages="totalPages"
@@ -194,6 +194,7 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
@@ -234,6 +235,7 @@
             const keyword = ref('') as Ref<string>
             const trangThaiDonHangParams = String(route.params.trangThaiDonHang)
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const formatDateTime = (dateTime: string) => {
                 return useDateTime(dateTime)
@@ -278,9 +280,9 @@
                 }
             }
 
-            onMounted(() => {
-                fetchDonHangs()
-                fetchKhachHang()
+            onMounted(async () => {
+                await Promise.all([fetchDonHangs(), fetchKhachHang()])
+                isLoadingPage.value = false
             })
 
             const getTenNhanVien = async (maNhanVien: string) => {
@@ -338,6 +340,7 @@
             }
 
             return {
+                isLoadingPage,
                 isLoading,
                 formatDateTime,
                 paginatedDonHangs,

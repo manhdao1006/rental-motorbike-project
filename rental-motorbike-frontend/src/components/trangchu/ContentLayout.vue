@@ -72,7 +72,7 @@
                     :key="index"
                     class="carousel-item"
                     :class="{ active: index === 0 }"
-                    data-bs-interval="5000"
+                    data-bs-interval="4500"
                 >
                     <div class="row">
                         <SlideItem
@@ -127,7 +127,7 @@
                     :key="index"
                     class="carousel-item"
                     :class="{ active: index === 0 }"
-                    data-bs-interval="5000"
+                    data-bs-interval="4000"
                 >
                     <div class="row">
                         <SlideItem
@@ -185,7 +185,7 @@
                     :key="index"
                     class="carousel-item"
                     :class="{ active: index === 0 }"
-                    data-bs-interval="5000"
+                    data-bs-interval="3500"
                 >
                     <div class="row">
                         <SlideItem
@@ -240,7 +240,7 @@
                     :key="index"
                     class="carousel-item"
                     :class="{ active: index === 0 }"
-                    data-bs-interval="5000"
+                    data-bs-interval="3000"
                 >
                     <div class="row">
                         <SlideItem
@@ -279,9 +279,11 @@
             </button>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
 </template>
 
 <script lang="ts">
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import { useDate } from '@/composables/useDate'
     import { useDateTime } from '@/composables/useDateTime'
     import {
@@ -299,7 +301,8 @@
         name: 'ContentLayout',
         components: {
             SlideItem,
-            PolicyLayout
+            PolicyLayout,
+            PopupLoading
         },
         setup() {
             const xeMaysQuanHaiChau = ref<Record<string, undefined>[]>([])
@@ -307,6 +310,7 @@
             const xeMaysQuanSonTra = ref<Record<string, undefined>[]>([])
             const xeMaysQuanNguHanhSon = ref<Record<string, undefined>[]>([])
             const xeMaysQuanLienChieu = ref<Record<string, undefined>[]>([])
+            const isLoading = ref(true)
 
             const formatDate = (date: string) => {
                 return useDate(date)
@@ -407,15 +411,19 @@
                 )
             })
 
-            onMounted(() => {
-                fetchXeMaysInQuanHaiChau()
-                fetchXeMaysInQuanThanhKhe()
-                fetchXeMaysInQuanSonTra()
-                fetchXeMaysInQuanNguHanhSon()
-                fetchXeMaysInQuanLienChieu()
+            onMounted(async () => {
+                await Promise.all([
+                    fetchXeMaysInQuanHaiChau(),
+                    fetchXeMaysInQuanThanhKhe(),
+                    fetchXeMaysInQuanSonTra(),
+                    fetchXeMaysInQuanNguHanhSon(),
+                    fetchXeMaysInQuanLienChieu()
+                ])
+                isLoading.value = false
             })
 
             return {
+                isLoading,
                 formatDate,
                 formatDateTime,
                 chunkedXeMaysQuanHaiChau,

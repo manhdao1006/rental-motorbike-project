@@ -99,7 +99,7 @@
             </div>
         </div>
         <PaginationComponent
-            v-if="totalElements > 0"
+            v-if="paginatedLoaiKhieuNais.length > 0"
             class="text-center mt-3"
             :currentPage="currentPage"
             :totalPages="totalPages"
@@ -114,11 +114,13 @@
             :onDelete="confirmDelete"
         />
     </div>
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
     import PopupDelete from '@/components/dungchung/PopupDelete.vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
     import { deleteLoaiKhieuNai, getLoaiKhieuNais } from '@/services/loaiKhieuNaiService'
     import { computed, defineComponent, onMounted, ref, Ref, watch } from 'vue'
@@ -129,7 +131,8 @@
         components: {
             SearchComponent,
             PaginationComponent,
-            PopupDelete
+            PopupDelete,
+            PopupLoading
         },
         setup() {
             const totalPages = computed(() =>
@@ -144,6 +147,7 @@
             const showDeletePopup = ref(false) as Ref<boolean>
             const loaiKhieuNaiToDelete = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
+            const isLoadingPage = ref(true)
 
             const fetchLoaiKhieuNais = async () => {
                 const result = await getLoaiKhieuNais()
@@ -180,11 +184,13 @@
                 }
             }
 
-            onMounted(() => {
-                fetchLoaiKhieuNais()
+            onMounted(async () => {
+                await Promise.all([fetchLoaiKhieuNais()])
+                isLoadingPage.value = false
             })
 
             return {
+                isLoadingPage,
                 paginatedLoaiKhieuNais,
                 currentPage,
                 totalPages,

@@ -256,6 +256,7 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
@@ -278,6 +279,7 @@
             const chuCuaHang = ref<Record<string, null>>({})
             const previewImage = ref<string | null>(null)
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
             const quanHuyens = ref<Array<{ maQuanHuyen: string; tenQuanHuyen: string }>>([])
             const phuongXas = ref<
                 Array<{ maPhuongXa: string; tenPhuongXa: string; maQuanHuyen: string }>
@@ -308,9 +310,9 @@
                 quanHuyens.value = result
             }
 
-            onMounted(() => {
-                fetchChuCuaHang()
-                fetchQuanHuyens()
+            onMounted(async () => {
+                await Promise.all([fetchChuCuaHang(), fetchQuanHuyens()])
+                isLoadingPage.value = false
             })
 
             const handleCapNhat = async () => {
@@ -376,6 +378,7 @@
             }
 
             return {
+                isLoadingPage,
                 isError,
                 messageError,
                 nguoiDung,

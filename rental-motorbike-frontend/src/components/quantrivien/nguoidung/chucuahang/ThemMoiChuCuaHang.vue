@@ -273,6 +273,7 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
@@ -311,6 +312,7 @@
             const messageAnh = ref<string>('')
             const previewImage = ref<string | null>(null)
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const fetchQuanHuyens = async () => {
                 const result = await getQuanHuyens()
@@ -334,8 +336,9 @@
                 }
             })
 
-            onMounted(() => {
-                fetchQuanHuyens()
+            onMounted(async () => {
+                await Promise.all([fetchQuanHuyens()])
+                isLoadingPage.value = false
             })
 
             const handleFileChange = (event: Event) => {
@@ -462,6 +465,7 @@
             }
 
             return {
+                isLoadingPage,
                 fileInput,
                 isError,
                 messageError,

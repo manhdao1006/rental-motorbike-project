@@ -88,7 +88,7 @@
             </div>
         </div>
         <PaginationComponent
-            v-if="totalElements > 0"
+            v-if="paginatedVaiTros.length > 0"
             class="text-center mt-3"
             :currentPage="currentPage"
             :totalPages="totalPages"
@@ -97,10 +97,12 @@
             @pageChanged="onChangePage"
         />
     </div>
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
     import { getVaiTros } from '@/services/vaiTroService'
     import { computed, defineComponent, onMounted, ref, Ref, watch } from 'vue'
@@ -110,7 +112,8 @@
         name: 'DanhSacVaiTro',
         components: {
             SearchComponent,
-            PaginationComponent
+            PaginationComponent,
+            PopupLoading
         },
         setup() {
             const totalPages = computed(() => Math.ceil(vaiTros.value.length / pageSize.value))
@@ -122,8 +125,9 @@
             const pageSize = ref(10) as Ref<number>
             const showDeletePopup = ref(false) as Ref<boolean>
             const keyword = ref('') as Ref<string>
+            const isLoadingPage = ref(true)
 
-            const fetcVaiTros = async () => {
+            const fetchVaiTros = async () => {
                 const result = await getVaiTros()
                 vaiTros.value = result
             }
@@ -135,18 +139,20 @@
 
             watch(currentPage, (newPage) => {
                 router.replace({ query: { ...route.query, page: newPage.toString() } })
-                fetcVaiTros()
+                fetchVaiTros()
             })
 
             const onChangePage = (page: number) => {
                 currentPage.value = page
             }
 
-            onMounted(() => {
-                fetcVaiTros()
+            onMounted(async () => {
+                await Promise.all([fetchVaiTros()])
+                isLoadingPage.value = false
             })
 
             return {
+                isLoadingPage,
                 paginatedVaiTros,
                 currentPage,
                 totalPages,

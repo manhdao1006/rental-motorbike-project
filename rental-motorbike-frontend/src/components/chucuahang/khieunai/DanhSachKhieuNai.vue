@@ -105,7 +105,7 @@
             </div>
         </div>
         <PaginationComponent
-            v-if="totalElements > 0"
+            v-if="paginatedKhieuNais.length > 0"
             class="text-center mt-3"
             :currentPage="currentPage"
             :totalPages="totalPages"
@@ -114,10 +114,12 @@
             @pageChanged="onChangePage"
         />
     </div>
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
     import { useDateTime } from '@/composables/useDateTime'
     import { getKhieuNais } from '@/services/khieuNaiService'
@@ -130,7 +132,8 @@
         name: 'DanhSachKhieuNai',
         components: {
             SearchComponent,
-            PaginationComponent
+            PaginationComponent,
+            PopupLoading
         },
         setup() {
             const totalPages = computed(() => Math.ceil(khieuNais.value.length / pageSize.value))
@@ -144,6 +147,8 @@
             const showDeletePopup = ref(false) as Ref<boolean>
             const khieuNaiToDelete = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
+            const isLoadingPage = ref(true)
+
             const formatDateTime = (dateTime: string) => {
                 return useDateTime(dateTime)
             }
@@ -161,7 +166,10 @@
                 }
             }
 
-            onMounted(fetchKhieuNais)
+            onMounted(async () => {
+                await Promise.all([fetchKhieuNais()])
+                isLoadingPage.value = false
+            })
 
             const getTenLoaiKhieuNai = async (maLoaiKhieuNai: string) => {
                 if (!tenLoaiKhieuNais.value[maLoaiKhieuNai]) {
@@ -183,6 +191,7 @@
             }
 
             return {
+                isLoadingPage,
                 formatDateTime,
                 paginatedKhieuNais,
                 currentPage,

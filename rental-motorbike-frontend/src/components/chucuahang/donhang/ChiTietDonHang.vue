@@ -346,7 +346,9 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
+
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import { useDate } from '@/composables/useDate'
@@ -375,6 +377,7 @@
             const chiTietDonHangs = ref<Record<string, string>[]>([])
             const nhanViens = ref<Record<string, unknown>[]>([])
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
             const trangThaiDonHangParams = String(route.params.trangThaiDonHang)
 
             const minGiaoXeDate = computed(() => {
@@ -496,9 +499,9 @@
                 return new Intl.NumberFormat('vi-VN').format(gia)
             }
 
-            onMounted(() => {
-                fetchDonHang()
-                fetchNhanViens()
+            onMounted(async () => {
+                await Promise.all([fetchDonHang(), fetchNhanViens()])
+                isLoadingPage.value = false
             })
 
             const handleXacNhan = async () => {
@@ -639,6 +642,7 @@
             }
 
             return {
+                isLoadingPage,
                 isAllXeMayAvailable,
                 handleXacNhan,
                 minTraXeDate,

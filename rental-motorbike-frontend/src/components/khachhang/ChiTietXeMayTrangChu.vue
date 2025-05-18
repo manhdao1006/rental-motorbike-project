@@ -360,6 +360,7 @@
             </div>
         </div>
     </div>
+    <PopupLoading :isLoading="isLoading" />
 </template>
 
 <script lang="ts">
@@ -372,9 +373,13 @@
     import { getXeMayByMaXeMay, getXeMays, getXeMaysByChuCuaHang } from '@/services/xeMayService'
     import { computed, defineComponent, inject, nextTick, onMounted, ref, watch } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
+    import PopupLoading from '../dungchung/PopupLoading.vue'
 
     export default defineComponent({
         name: 'ChiTietXeMayTrangChu',
+        components: {
+            PopupLoading
+        },
         setup() {
             const visibleRows = ref(4)
             const itemsPerRow = 4
@@ -393,6 +398,7 @@
             const tenPhuongXas = ref<Record<string, string>>({})
             const anhXeMays = ref<Record<string, string>[]>([])
             const isLoggedIn = inject('isLoggedIn', ref(false))
+            const isLoading = ref(true)
 
             const checkDangNhap = () => {
                 if (!isLoggedIn.value) {
@@ -574,11 +580,14 @@
             }
 
             onMounted(async () => {
-                await Promise.all([fetchQuanHuyens(), fetchXeMay(), fetchXeMayKhacs()])
+                await Promise.all([fetchQuanHuyens(), fetchXeMay()])
+                isLoading.value = false
                 await fetchXeMaysByChuCuaHang()
+                await fetchXeMayKhacs()
             })
 
             return {
+                isLoading,
                 visibleCount,
                 showMore,
                 xeMayKhacs,

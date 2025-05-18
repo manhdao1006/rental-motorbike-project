@@ -166,6 +166,7 @@
             @pageChanged="onChangePage"
         />
     </div>
+    <PopupLoading :isLoading="isLoading" />
 </template>
 
 <script lang="ts">
@@ -175,11 +176,13 @@
     import { computed, defineComponent, onMounted, Ref, ref, watch } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
     import PaginationComponent from '../dungchung/PaginationComponent.vue'
+    import PopupLoading from '../dungchung/PopupLoading.vue'
 
     export default defineComponent({
         name: 'DanhSachXeMayTheoQuan',
         components: {
-            PaginationComponent
+            PaginationComponent,
+            PopupLoading
         },
         setup() {
             const route = useRoute()
@@ -201,6 +204,7 @@
             const loaiXeDaChon = ref<string[]>([])
             const loaiXes = ['Xe số', 'Xe tay ga', 'Xe côn tay']
             const maQuanHuyen = ref<string>('')
+            const isLoading = ref(true)
 
             onMounted(() => {
                 const param = route.params.maQuanHuyen
@@ -357,12 +361,13 @@
                 }
             }
 
-            onMounted(() => {
-                fetchDanhMucXes()
-                fetchXeMays()
+            onMounted(async () => {
+                await Promise.all([fetchDanhMucXes(), fetchXeMays()])
+                isLoading.value = false
             })
 
             return {
+                isLoading,
                 huyLoc,
                 loaiXes,
                 danhMucDaChon,

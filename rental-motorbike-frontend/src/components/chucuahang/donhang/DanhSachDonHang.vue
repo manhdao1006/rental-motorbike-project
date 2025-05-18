@@ -159,7 +159,7 @@
             </div>
         </div>
         <PaginationComponent
-            v-if="totalElements > 0"
+            v-if="paginatedDonHangs.length > 0"
             class="text-center mt-3"
             :currentPage="currentPage"
             :totalPages="totalPages"
@@ -168,10 +168,12 @@
             @pageChanged="onChangePage"
         />
     </div>
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
     import { useDateTime } from '@/composables/useDateTime'
     import { getChiTietDonHangsByMaChuCuaHang } from '@/services/chiTietDonHangService'
@@ -185,7 +187,8 @@
         name: 'DanhSachDonHang',
         components: {
             SearchComponent,
-            PaginationComponent
+            PaginationComponent,
+            PopupLoading
         },
         setup() {
             const totalPages = computed(() => Math.ceil(donHangs.value.length / pageSize.value))
@@ -201,6 +204,7 @@
             const khieuNaiToDelete = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
             const trangThaiDonHangParams = String(route.params.trangThaiDonHang)
+            const isLoadingPage = ref(true)
 
             const formatDateTime = (dateTime: string) => {
                 return useDateTime(dateTime)
@@ -240,7 +244,10 @@
                 }
             }
 
-            onMounted(fetchDonHangs)
+            onMounted(async () => {
+                await Promise.all([fetchDonHangs()])
+                isLoadingPage.value = false
+            })
 
             const getTenKhachHang = async (maKhachHang: string) => {
                 if (!tenKhachHangs.value[maKhachHang]) {
@@ -277,6 +284,7 @@
             }
 
             return {
+                isLoadingPage,
                 formatDateTime,
                 paginatedDonHangs,
                 currentPage,

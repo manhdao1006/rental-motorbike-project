@@ -222,6 +222,7 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
@@ -262,6 +263,7 @@
             const messageAnh = ref<string>('')
             const previewImage = ref<string | null>(null)
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const fetchNguoiDung = async () => {
                 const maNguoiDung = String(route.params.maNguoiDung)
@@ -273,8 +275,9 @@
                     'https://res.cloudinary.com/springboot-cloud/image/upload/v1739427632/user_vqmka8.png'
             }
 
-            onMounted(() => {
-                fetchNguoiDung()
+            onMounted(async () => {
+                await Promise.all([fetchNguoiDung()])
+                isLoadingPage.value = false
             })
 
             const handleFileChange = (event: Event) => {
@@ -406,6 +409,7 @@
             }
 
             return {
+                isLoadingPage,
                 fileInput,
                 isError,
                 messageError,

@@ -181,7 +181,9 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
+
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import { getDanhMucXes } from '@/services/danhMucXeService'
@@ -212,6 +214,7 @@
             const anhXeMayInput = ref<HTMLInputElement | null>(null)
             const danhMucXes = ref<Record<string, unknown>[]>([])
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const fetchDanhMucXes = async () => {
                 const response = await getDanhMucXes()
@@ -228,9 +231,9 @@
                 previewAnhXeMays.value = [...oldAnhXeMays.value]
             }
 
-            onMounted(() => {
-                fetchXeMay()
-                fetchDanhMucXes()
+            onMounted(async () => {
+                await Promise.all([fetchXeMay(), fetchDanhMucXes()])
+                isLoadingPage.value = false
             })
 
             const handleAnhXeMayChange = (event: Event) => {
@@ -343,6 +346,7 @@
             }
 
             return {
+                isLoadingPage,
                 isError,
                 messageError,
                 isErrorGiaThue,

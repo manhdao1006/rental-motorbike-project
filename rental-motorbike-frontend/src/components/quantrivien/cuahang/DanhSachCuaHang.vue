@@ -108,7 +108,7 @@
             </div>
         </div>
         <PaginationComponent
-            v-if="totalElements > 0"
+            v-if="paginatedChuCuaHangs.length > 0"
             class="text-center mt-3"
             :currentPage="currentPage"
             :totalPages="totalPages"
@@ -123,11 +123,13 @@
             :onDelete="confirmDelete"
         />
     </div>
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
     import PopupDelete from '@/components/dungchung/PopupDelete.vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
     import { deleteChuCuaHang, getChuCuaHangs } from '@/services/chuCuaHangService'
     import { computed, defineComponent, onMounted, ref, Ref, watch } from 'vue'
@@ -138,7 +140,8 @@
         components: {
             SearchComponent,
             PaginationComponent,
-            PopupDelete
+            PopupDelete,
+            PopupLoading
         },
         setup() {
             const totalPages = computed(() => Math.ceil(chuCuaHangs.value.length / pageSize.value))
@@ -151,6 +154,7 @@
             const showDeletePopup = ref(false) as Ref<boolean>
             const chuCuaHangToDelete = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
+            const isLoadingPage = ref(true)
 
             const fetchChuCuaHangs = async () => {
                 const response = await getChuCuaHangs()
@@ -194,11 +198,13 @@
                 }
             }
 
-            onMounted(() => {
-                fetchChuCuaHangs()
+            onMounted(async () => {
+                await Promise.all([fetchChuCuaHangs()])
+                isLoadingPage.value = false
             })
 
             return {
+                isLoadingPage,
                 paginatedChuCuaHangs,
                 currentPage,
                 totalPages,

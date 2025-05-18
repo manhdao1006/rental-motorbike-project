@@ -3,10 +3,14 @@
         <div class="container">
             <div class="align-content-center block-navbar hide-navigation" id="blockNavbar">
                 <ul class="nav justify-content-center">
-                    <template v-for="quanHuyen in quanHuyens" :key="quanHuyen.maQuanHuyen">
-                        <NavItem link="#" :content="quanHuyen.tenQuanHuyen" />
-                    </template>
-                    <!-- <NavItem link="#" content="Danh mục khác" /> -->
+                    <NavItem link="#" content="Hải Châu" />
+                    <NavItem link="#" content="Thanh Khê" />
+                    <NavItem link="#" content="Sơn Trà" />
+                    <NavItem link="#" content="Ngũ Hành Sơn" />
+                    <NavItem link="#" content="Liên Chiểu" />
+                    <NavItem link="#" content="Cẩm Lệ" />
+                    <NavItem link="#" content="Hòa Vang" />
+                    <NavItem link="#" content="Hoàng Sa" />
                 </ul>
             </div>
         </div>

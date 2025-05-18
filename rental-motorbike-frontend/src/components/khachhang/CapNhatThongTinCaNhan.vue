@@ -215,13 +215,14 @@
         :onDelete="confirmDelete"
     />
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import {
         deleteKhachHang,
-        getKhachHangByMaNguoiDung,
+        getKhachHangByMaKhachHang,
         updateKhachHangByAdmin
     } from '@/services/khachHangService'
     import {
@@ -265,10 +266,11 @@
             const isLoading = ref(false)
             const showDeletePopup = ref(false) as Ref<boolean>
             const nguoiDungToDelete = ref(null) as Ref<string | null>
+            const isLoadingPage = ref(true)
 
             const fetchNguoiDung = async () => {
                 const maNguoiDung = String(route.params.maNguoiDung)
-                const response = await getKhachHangByMaNguoiDung(maNguoiDung)
+                const response = await getKhachHangByMaKhachHang(maNguoiDung)
                 nguoiDung.value = response.nguoiDung
                 khachHang.value = response.khachHang
                 previewImage.value =
@@ -276,8 +278,9 @@
                     'https://res.cloudinary.com/springboot-cloud/image/upload/v1739427632/user_vqmka8.png'
             }
 
-            onMounted(() => {
-                fetchNguoiDung()
+            onMounted(async () => {
+                await Promise.all([fetchNguoiDung()])
+                isLoadingPage.value = false
             })
 
             const handleFileChange = (event: Event) => {
@@ -424,6 +427,7 @@
             }
 
             return {
+                isLoadingPage,
                 fileInput,
                 isError,
                 messageError,

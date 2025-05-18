@@ -204,7 +204,7 @@
             </div>
         </div>
         <PaginationComponent
-            v-if="totalElements > 0"
+            v-if="paginatedNguoiDungs.length > 0"
             class="text-center mt-3"
             :currentPage="currentPage"
             :totalPages="totalPages"
@@ -224,12 +224,14 @@
             :onBan="confirmBan"
         />
     </div>
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
     import PopupBan from '@/components/dungchung/PopupBan.vue'
     import PopupDelete from '@/components/dungchung/PopupDelete.vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
     import { banChuCuaHang, deleteChuCuaHang } from '@/services/chuCuaHangService'
     import { banKhachHang, deleteKhachHang } from '@/services/khachHangService'
@@ -244,7 +246,8 @@
             SearchComponent,
             PaginationComponent,
             PopupDelete,
-            PopupBan
+            PopupBan,
+            PopupLoading
         },
         setup() {
             const totalPages = computed(() => Math.ceil(nguoiDungs.value.length / pageSize.value))
@@ -260,6 +263,7 @@
             const nguoiDungToBan = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
             const maVaiTroParams = String(route.params.maVaiTro)
+            const isLoadingPage = ref(true)
 
             const fetchNguoiDungs = async () => {
                 const result = await getNguoiDungsByMaVaiTro(String(route.params.maVaiTro))
@@ -283,8 +287,9 @@
                 return nguoiDungs.value.slice(start, start + pageSize.value)
             })
 
-            onMounted(() => {
-                fetchNguoiDungs()
+            onMounted(async () => {
+                await Promise.all([fetchNguoiDungs()])
+                isLoadingPage.value = false
             })
 
             watch(currentPage, (newPage) => {
@@ -348,6 +353,7 @@
             }
 
             return {
+                isLoadingPage,
                 paginatedNguoiDungs,
                 currentPage,
                 totalPages,

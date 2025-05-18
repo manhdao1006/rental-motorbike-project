@@ -126,7 +126,7 @@
             </div>
         </div>
         <PaginationComponent
-            v-if="totalElements > 0"
+            v-if="paginatedNhanViens.length > 0"
             class="text-center mt-3"
             :currentPage="currentPage"
             :totalPages="totalPages"
@@ -146,12 +146,14 @@
             :onBan="confirmBan"
         />
     </div>
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
     import PopupBan from '@/components/dungchung/PopupBan.vue'
     import PopupDelete from '@/components/dungchung/PopupDelete.vue'
+    import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
     import { getMaNguoiDung } from '@/services/localStorageService'
     import {
@@ -167,7 +169,8 @@
             SearchComponent,
             PaginationComponent,
             PopupDelete,
-            PopupBan
+            PopupBan,
+            PopupLoading
         },
         setup() {
             const totalPages = computed(() => Math.ceil(nhanViens.value.length / pageSize.value))
@@ -183,6 +186,7 @@
             const nhanVienToDelete = ref(null) as Ref<string | null>
             const nhanVienToBan = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
+            const isLoadingPage = ref(true)
 
             const fetchNhanViens = async () => {
                 const result = await getNhanViensByChuCuaHang(getMaNguoiDung())
@@ -235,11 +239,13 @@
                 }
             }
 
-            onMounted(() => {
-                fetchNhanViens()
+            onMounted(async () => {
+                await Promise.all([fetchNhanViens()])
+                isLoadingPage.value = false
             })
 
             return {
+                isLoadingPage,
                 paginatedNhanViens,
                 currentPage,
                 totalPages,

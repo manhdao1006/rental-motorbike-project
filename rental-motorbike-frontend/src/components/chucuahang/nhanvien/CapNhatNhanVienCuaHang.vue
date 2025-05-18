@@ -154,7 +154,9 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
+
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import { getNhanVienByMaNguoiDung, updateNhanVien } from '@/services/nhanVienService'
@@ -185,6 +187,7 @@
             const messageAnh = ref<string>('')
             const previewImage = ref<string | null>(null)
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
 
             const fetchNguoiDung = async () => {
                 const maNhanVien = String(route.params.maNhanVien)
@@ -196,8 +199,9 @@
                     'https://res.cloudinary.com/springboot-cloud/image/upload/v1739427632/user_vqmka8.png'
             }
 
-            onMounted(() => {
-                fetchNguoiDung()
+            onMounted(async () => {
+                await Promise.all([fetchNguoiDung()])
+                isLoadingPage.value = false
             })
 
             const handleFileChange = (event: Event) => {
@@ -298,6 +302,7 @@
             }
 
             return {
+                isLoadingPage,
                 isErrorSoCCCD,
                 messageSoCCCD,
                 isLoading,
