@@ -1,5 +1,20 @@
 <template>
     <div class="container-xl mt-4" style="font-family: Arial">
+        <div class="row bg-white mb-3 p-2">
+            <div class="route-link-detail">
+                <a href="/trang-chu">Trang chủ</a> >>
+                <router-link
+                    :to="{
+                        name: 'DanhSachXeMayTheoQuanView',
+                        params: { maQuanHuyen: maQuanHuyens[chuCuaHang.maPhuongXa] }
+                    }"
+                    >{{ tenQuanHuyens[chuCuaHang.maPhuongXa] }}
+                </router-link>
+                >>
+                <span>{{ xeMay.tenXe }}</span>
+            </div>
+        </div>
+
         <div class="row bg-white">
             <div class="col-7 p-4">
                 <div class="row">
@@ -394,6 +409,7 @@
             const xeMayKhacs = ref<Record<string, string>[]>([])
             const quanHuyens = ref<Record<string, unknown>[]>([])
             const maXeMay = ref(String(route.params.maXeMay))
+            const maQuanHuyens = ref<Record<string, string>>({})
             const tenQuanHuyens = ref<Record<string, string>>({})
             const tenPhuongXas = ref<Record<string, string>>({})
             const anhXeMays = ref<Record<string, string>[]>([])
@@ -433,7 +449,8 @@
 
                 const [phuongXa, quanHuyen] = await Promise.all([
                     getTenPhuongXa(String(response?.chuCuaHang?.maPhuongXa)),
-                    getTenQuanHuyen(String(response?.chuCuaHang?.maPhuongXa))
+                    getTenQuanHuyen(String(response?.chuCuaHang?.maPhuongXa)),
+                    getMaQuanHuyen(String(response?.chuCuaHang?.maPhuongXa))
                 ])
 
                 tenPhuongXas.value[response.chuCuaHang?.maPhuongXa] = phuongXa
@@ -514,6 +531,16 @@
                         : 'Không xác định'
                 }
                 return tenQuanHuyens.value[maPhuongXa]
+            }
+
+            const getMaQuanHuyen = async (maPhuongXa: string) => {
+                if (!maQuanHuyens.value[maPhuongXa]) {
+                    const quanHuyen = await getQuanHuyenByMaPhuongXa(maPhuongXa)
+                    maQuanHuyens.value[maPhuongXa] = quanHuyen
+                        ? quanHuyen.maQuanHuyen
+                        : 'Không xác định'
+                }
+                return maQuanHuyens.value[maPhuongXa]
             }
 
             watch(
@@ -599,6 +626,7 @@
                 nguoiDung,
                 formattedGiaThue,
                 tenPhuongXas,
+                maQuanHuyens,
                 tenQuanHuyens,
                 xeMays,
                 anhXeMays,
@@ -611,6 +639,20 @@
 </script>
 
 <style>
+    .route-link-detail > span {
+        color: #23689b;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .route-link-detail > a {
+        color: #000000;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .route-link-detail > a:hover {
+        color: #ff8435;
+    }
+
     .card-address {
         color: #000000;
         font-family: 'Arial';

@@ -1,5 +1,25 @@
 <template>
     <div class="container-xl mt-4" style="font-family: Arial">
+        <div class="row bg-white mb-3 p-2">
+            <div class="route-link-detail">
+                <a href="/trang-chu">Trang chủ</a> >>
+                <router-link
+                    :to="{
+                        name: 'DanhSachXeMayTheoQuanView',
+                        params: { maQuanHuyen: maQuanHuyens[chuCuaHang.maPhuongXa] }
+                    }"
+                    >{{ tenQuanHuyens[chuCuaHang.maPhuongXa] }}
+                </router-link>
+                >>
+                <router-link
+                    :to="{ name: 'ChiTietXeMayTrangChuView', params: { maXeMay: xeMay.maXeMay } }"
+                    >{{ xeMay.tenXe }}</router-link
+                >
+                >>
+                <span>Thuê xe</span>
+            </div>
+        </div>
+
         <div class="row bg-white p-3">
             <div class="row">
                 <div class="text-uppercase card-price fw-bolder fs-5 mt-3 mb-0 pb-0 ps-2">
@@ -346,6 +366,7 @@
             PopupLoading
         },
         setup() {
+            const maQuanHuyens = ref<Record<string, string>>({})
             const visibleRows = ref(4)
             const itemsPerRow = 4
             const visibleCount = computed(() => visibleRows.value * itemsPerRow)
@@ -429,16 +450,28 @@
                 return tenQuanHuyens.value[maPhuongXa]
             }
 
+            const getMaQuanHuyen = async (maPhuongXa: string) => {
+                if (!maQuanHuyens.value[maPhuongXa]) {
+                    const quanHuyen = await getQuanHuyenByMaPhuongXa(maPhuongXa)
+                    maQuanHuyens.value[maPhuongXa] = quanHuyen
+                        ? quanHuyen.maQuanHuyen
+                        : 'Không xác định'
+                }
+                return maQuanHuyens.value[maPhuongXa]
+            }
+
             const fetchXeMays = async () => {
                 const response = await getXeMays()
                 const maPhuongXaList = response.map(
                     (item: { chuCuaHang: { maPhuongXa: string } }) => item.chuCuaHang?.maPhuongXa
                 )
 
-                const [tenPhuongXaResults, tenQuanHuyenResults] = await Promise.all([
-                    Promise.all(maPhuongXaList.map(getTenPhuongXa)),
-                    Promise.all(maPhuongXaList.map(getTenQuanHuyen))
-                ])
+                const [tenPhuongXaResults, tenQuanHuyenResults, maQuanHuyenResults] =
+                    await Promise.all([
+                        Promise.all(maPhuongXaList.map(getTenPhuongXa)),
+                        Promise.all(maPhuongXaList.map(getTenQuanHuyen)),
+                        Promise.all(maPhuongXaList.map(getMaQuanHuyen))
+                    ])
 
                 xeMays.value = response
                     .filter(
@@ -448,7 +481,8 @@
                     .map((item: object, index: number) => ({
                         ...item,
                         tenPhuongXa: tenPhuongXaResults[index],
-                        tenQuanHuyen: tenQuanHuyenResults[index]
+                        tenQuanHuyen: tenQuanHuyenResults[index],
+                        maQuanHuyen: maQuanHuyenResults[index]
                     }))
             }
 
@@ -701,6 +735,7 @@
                 formattedGiaThue,
                 anhXeMays,
                 khachHang,
+                maQuanHuyens,
                 nguoiDungKhachHang,
                 donHang,
                 chiTietDonHang,
