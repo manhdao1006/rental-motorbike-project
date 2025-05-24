@@ -3,8 +3,9 @@ import DangKy from './components/auth/DangKy.vue'
 import DangKyChuCuaHang from './components/auth/DangKyChuCuaHang.vue'
 import DangNhap from './components/auth/DangNhap.vue'
 import LoginSuccess from './components/auth/LoginSuccess.vue'
-import { dangXuat, getNguoiDungByMaNguoiDung } from './services/authService'
-import { getMaNguoiDung, getToken } from './services/localStorageService'
+import { getNguoiDungByMaNguoiDung } from './services/authService'
+import { getMaNguoiDung } from './services/localStorageService'
+import ChatView from './views/ChatView.vue'
 import ChiTietDonHangView from './views/chucuahang/donhang/ChiTietDonHangView.vue'
 import DanhSachDonHangView from './views/chucuahang/donhang/DanhSachDonHangView.vue'
 import DanhSachKhieuNaiView from './views/chucuahang/khieunai/DanhSachKhieuNaiView.vue'
@@ -20,6 +21,7 @@ import ChiTietXeMayTrangChuView from './views/khachhang/ChiTietXeMayTrangChuView
 import DanhSachDonHangKhachHangView from './views/khachhang/DanhSachDonHangKhachHangView.vue'
 import DanhSachXeMayTheoQuanView from './views/khachhang/DanhSachXeMayTheoQuanView.vue'
 import GioHangView from './views/khachhang/GioHangView.vue'
+import GuiKhieuNaiView from './views/khachhang/GuiKhieuNaiView.vue'
 import ThueXeMayView from './views/khachhang/ThueXeMayView.vue'
 import TrangChuView from './views/khachhang/TrangChuView.vue'
 import CapNhatTinhTrangXeView from './views/nhanvien/donhang/CapNhatTinhTrangXeView.vue'
@@ -45,6 +47,11 @@ import DanhSachVaiTroView from './views/quantrivien/vaitro/DanhSachVaiTroView.vu
 import ThemMoiVaiTroView from './views/quantrivien/vaitro/ThemMoiVaiTroView.vue'
 
 const routes: Array<RouteRecordRaw> = [
+    {
+        path: '/chat/:maHoiThoai/:maNguoiDung',
+        name: 'ChatView',
+        component: ChatView
+    },
     {
         path: '/',
         redirect: '/trang-chu'
@@ -93,6 +100,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/gio-hang',
         name: 'GioHangView',
         component: GioHangView
+    },
+    {
+        path: '/gui-khieu-nai/:maDonHang',
+        name: 'GuiKhieuNaiView',
+        component: GuiKhieuNaiView
     },
     {
         path: '/nguoi-dung/cap-nhat/:maNguoiDung',
@@ -297,32 +309,11 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-    const token = getToken()
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
-    const publicPages = ['/trang-chu', '/dang-nhap', '/dang-ky']
-
-    if (!token || !isLoggedIn || token.trim() === '') {
-        if (publicPages.includes(to.path)) {
-            return next()
-        } else {
-            localStorage.removeItem('isLoggedIn')
-            localStorage.removeItem('maNguoiDung')
-            dangXuat()
-            return next('/trang-chu')
-        }
-    }
-
     if (!to.meta.requiresRole) {
         return next()
     }
 
     try {
-        const maNguoiDung = getMaNguoiDung()
-        if (!maNguoiDung) {
-            dangXuat()
-            return next('/trang-chu')
-        }
-
         const result = await getNguoiDungByMaNguoiDung(getMaNguoiDung())
         const hasVaiTroQuanTri =
             result.vaiTro.tenVaiTro.includes('ROLE_QUANTRIVIEN') ||

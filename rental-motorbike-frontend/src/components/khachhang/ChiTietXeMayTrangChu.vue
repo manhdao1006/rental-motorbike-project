@@ -117,7 +117,7 @@
                             type="button"
                             class="btn btn-primary"
                             title="Đặt thuê xe"
-                            @click.prevent="checkDangNhap"
+                            @click.prevent="checkDangNhapThue"
                         >
                             Đặt thuê xe
                         </button>
@@ -136,6 +136,16 @@
                         <div class="detail-address">
                             {{ nguoiDung.diaChi }}, {{ tenPhuongXas[chuCuaHang.maPhuongXa] }},
                             {{ tenQuanHuyens[chuCuaHang.maPhuongXa] }}, Đà Nẵng
+                        </div>
+                        <div class="">
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                title="Nhắn tin"
+                                @click.prevent="checkDangNhapChat"
+                            >
+                                Nhắn tin <i class="fa-solid fa-message"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="col-6">
@@ -384,6 +394,7 @@
         getQuanHuyenByMaPhuongXa,
         getQuanHuyens
     } from '@/services/authService'
+    import { startConversation } from '@/services/chatApi'
     import { getMaNguoiDung } from '@/services/localStorageService'
     import { getXeMayByMaXeMay, getXeMays, getXeMaysByChuCuaHang } from '@/services/xeMayService'
     import { computed, defineComponent, inject, nextTick, onMounted, ref, watch } from 'vue'
@@ -416,11 +427,23 @@
             const isLoggedIn = inject('isLoggedIn', ref(false))
             const isLoading = ref(true)
 
-            const checkDangNhap = () => {
+            const checkDangNhapThue = () => {
                 if (!isLoggedIn.value) {
                     alert('Vui lòng đăng nhập để đặt xe!')
                 } else {
                     router.push({ name: 'ThueXeMayView', params: { maXeMay: xeMay.value.maXeMay } })
+                }
+            }
+
+            const checkDangNhapChat = async () => {
+                if (!isLoggedIn.value) {
+                    alert('Vui lòng đăng nhập!')
+                } else {
+                    const maHoiThoai = await startConversation(
+                        getMaNguoiDung(),
+                        chuCuaHang.value.maChuCuaHang
+                    )
+                    router.push(`/chat/${maHoiThoai}/${getMaNguoiDung()}`)
                 }
             }
 
@@ -631,7 +654,8 @@
                 xeMays,
                 anhXeMays,
                 chunkedAnhXeMays,
-                checkDangNhap,
+                checkDangNhapThue,
+                checkDangNhapChat,
                 themVaoGioHang
             }
         }
