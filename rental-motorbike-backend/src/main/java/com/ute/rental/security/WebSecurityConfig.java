@@ -41,6 +41,8 @@ public class WebSecurityConfig {
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers("/api/auth/**", "/api/trang-chu/**", "/login/oauth2/code/google").permitAll()
+                        .requestMatchers("/chat/**").permitAll()
+                        .requestMatchers("/ws-chat/**").permitAll()
                         .requestMatchers("/quan-tri-vien/**").permitAll()
                         .requestMatchers("/chu-cua-hang/**").permitAll()
                         .requestMatchers("/nhan-vien/**").permitAll()
