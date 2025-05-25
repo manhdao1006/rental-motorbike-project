@@ -1,6 +1,7 @@
 package com.ute.rental.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +23,6 @@ public class KhieuNaiDTO {
     private String trangThaiXoa;
     private String maLoaiKhieuNai;
     private String maDonHang;
+    private List<AnhKhieuNaiDTO> anhKhieuNais;
 
 }

@@ -10,7 +10,7 @@ import com.ute.rental.dto.KhieuNaiDTO;
 import com.ute.rental.entity.KhieuNaiEntity;
 
 @Mapper(componentModel = "spring", uses = { LoaiKhieuNaiConverter.class,
-        ChiTietDonHangConverter.class }, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        DonHangConverter.class }, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface KhieuNaiConverter {
 
     KhieuNaiConverter INSTANCE = Mappers.getMapper(KhieuNaiConverter.class);

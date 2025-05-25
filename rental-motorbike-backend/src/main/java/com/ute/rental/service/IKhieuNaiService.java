@@ -1,6 +1,9 @@
 package com.ute.rental.service;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ute.rental.dto.KhieuNaiDTO;
 import com.ute.rental.dto.KhieuNaiResponseDTO;
@@ -15,9 +18,10 @@ public interface IKhieuNaiService {
 
     List<KhieuNaiResponseDTO> getKhieuNaisByMaChuCuaHang(String maChuCuaHang);
 
-    KhieuNaiDTO addKhieuNai(KhieuNaiDTO khieuNaiDTO);
+    KhieuNaiDTO addKhieuNai(KhieuNaiDTO khieuNaiDTO, List<MultipartFile> anhKhieuNaiList) throws IOException;
 
-    KhieuNaiDTO updateKhieuNai(String maKhieuNai, KhieuNaiDTO updatedKhieuNai);
+    KhieuNaiDTO updateKhieuNai(String maKhieuNai, KhieuNaiDTO updatedKhieuNai, List<MultipartFile> anhKhieuNaiList,
+            List<String> deletedAnhKhieuNais) throws IOException;
 
     void deleteKhieuNai(String maKhieuNai);
 

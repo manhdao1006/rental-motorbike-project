@@ -16,7 +16,7 @@ public interface IXeMayService {
 
     XeMayDTO addXeMay(XeMayDTO xeMayDTO, List<MultipartFile> anhXeMayList) throws IOException;
 
-    XeMayDTO updateXeMay(String maXeMay, XeMayDTO xeMayDTO, List<MultipartFile> anhCaVetList,
+    XeMayDTO updateXeMay(String maXeMay, XeMayDTO xeMayDTO, List<MultipartFile> anhXeMayList,
             List<String> deletedAnhXeMays) throws IOException;
 
     void deleteXeMay(String maXeMay);

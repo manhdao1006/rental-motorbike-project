@@ -21,7 +21,7 @@ public interface AnhXeMayConverter {
     AnhXeMayDTO toDTO(AnhXeMayEntity entity);
 
     @Mapping(target = "maXeMay", source = "xeMay.maXeMay")
-    List<AnhXeMayDTO> toDTOs(List<AnhXeMayEntity> entity);
+    List<AnhXeMayDTO> toDTOs(List<AnhXeMayEntity> entities);
 
     AnhXeMayEntity toEntity(AnhXeMayDTO dto);
 
