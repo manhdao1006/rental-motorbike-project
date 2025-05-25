@@ -10,6 +10,7 @@ import DanhSachChatChuCuaHangView from './views/chucuahang/DanhSachChatChuCuaHan
 import ChiTietDonHangView from './views/chucuahang/donhang/ChiTietDonHangView.vue'
 import DanhSachDonHangView from './views/chucuahang/donhang/DanhSachDonHangView.vue'
 import DanhSachKhieuNaiView from './views/chucuahang/khieunai/DanhSachKhieuNaiView.vue'
+import XuLyKhieuNaiView from './views/chucuahang/khieunai/XuLyKhieuNaiView.vue'
 import CapNhatNhanVienCuaHangView from './views/chucuahang/nhanvien/CapNhatNhanVienCuaHangView.vue'
 import DanhSachNhanVienCuaHangView from './views/chucuahang/nhanvien/DanhSachNhanVienCuaHangView.vue'
 import ThemMoiNhanVienCuaHangView from './views/chucuahang/nhanvien/ThemMoiNhanVienCuaHangView.vue'
@@ -19,9 +20,11 @@ import ThemMoiXeMayView from './views/chucuahang/xemay/ThemMoiXeMayView.vue'
 import CapNhatThongTinCaNhanView from './views/khachhang/CapNhatThongTinCaNhanView.vue'
 import ChatBoxKhachHangView from './views/khachhang/ChatBoxKhachHangView.vue'
 import ChiTietDonHangKhachHangView from './views/khachhang/ChiTietDonHangKhachHangView.vue'
+import ChiTietKhieuNaiView from './views/khachhang/ChiTietKhieuNaiView.vue'
 import ChiTietXeMayTrangChuView from './views/khachhang/ChiTietXeMayTrangChuView.vue'
 import DanhSachChatKhachHangView from './views/khachhang/DanhSachChatKhachHangView.vue'
 import DanhSachDonHangKhachHangView from './views/khachhang/DanhSachDonHangKhachHangView.vue'
+import DanhSachKhieuNaiKhachHangView from './views/khachhang/DanhSachKhieuNaiKhachHangView.vue'
 import DanhSachXeMayTheoQuanView from './views/khachhang/DanhSachXeMayTheoQuanView.vue'
 import GioHangView from './views/khachhang/GioHangView.vue'
 import GuiKhieuNaiView from './views/khachhang/GuiKhieuNaiView.vue'
@@ -69,6 +72,16 @@ const routes: Array<RouteRecordRaw> = [
         path: '/tin-nhan-chu/:maHoiThoai/:maNguoiDung',
         name: 'ChatBoxChuCuaHangView',
         component: ChatBoxChuCuaHangView
+    },
+    {
+        path: '/khach-hang/khieu-nai/danh-sach',
+        name: 'DanhSachKhieuNaiKhachHangView',
+        component: DanhSachKhieuNaiKhachHangView
+    },
+    {
+        path: '/khach-hang/khieu-nai/chi-tiet/:maKhieuNai',
+        name: 'ChiTietKhieuNaiView',
+        component: ChiTietKhieuNaiView
     },
     {
         path: '/',
@@ -299,6 +312,12 @@ const routes: Array<RouteRecordRaw> = [
         path: '/chu-cua-hang/khieu-nai/danh-sach',
         name: 'DanhSachKhieuNaiView',
         component: DanhSachKhieuNaiView,
+        meta: { requiresRole: ['ROLE_QUANTRIVIEN', 'ROLE_CHUCUAHANG'] }
+    },
+    {
+        path: '/chu-cua-hang/khieu-nai/xu-ly/:maKhieuNai',
+        name: 'XuLyKhieuNaiView',
+        component: XuLyKhieuNaiView,
         meta: { requiresRole: ['ROLE_QUANTRIVIEN', 'ROLE_CHUCUAHANG'] }
     },
     {

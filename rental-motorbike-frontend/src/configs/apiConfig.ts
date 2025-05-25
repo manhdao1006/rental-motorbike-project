@@ -158,7 +158,7 @@ export const API_ENDPOINTS = {
         GET_BY_MAKHIEUNAI: (maKhieuNai: string) =>
             `${BASE_URL}/khach-hang/khieu-nai/maKhieuNai/${maKhieuNai}`,
         ADD: `${BASE_URL}/khach-hang/khieu-nai/add`,
-        UPDATE: (maKhieuNai: string) => `${BASE_URL}/khach-hang/khieu-nai/edit/${maKhieuNai}`,
+        UPDATE: (maKhieuNai: string) => `${BASE_URL}/chu-cua-hang/khieu-nai/edit/${maKhieuNai}`,
         DELETE: (maKhieuNai: string) => `${BASE_URL}/khach-hang/khieu-nai/delete/${maKhieuNai}`
     }
 }

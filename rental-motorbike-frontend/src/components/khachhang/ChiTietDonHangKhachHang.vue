@@ -399,6 +399,18 @@
                             Xác nhận
                         </button>
                     </div>
+                    <div class="text-center" v-if="trangThaiDonHangParams === 'Đã trả xe'">
+                        <router-link
+                            :to="{
+                                name: 'GuiKhieuNaiView',
+                                params: { maDonHang: donHang.maDonHang }
+                            }"
+                            class="btn btn-success"
+                            title="Khiếu nại"
+                        >
+                            Khiếu nại
+                        </router-link>
+                    </div>
                 </div>
             </div>
         </div>

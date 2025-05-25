@@ -65,38 +65,86 @@
                             :key="(item as any).khieuNai.maKhieuNai"
                         >
                             <td>
-                                {{ index + 1 }}
-                            </td>
-                            <td>
-                                {{ (item as any).khieuNai.maKhieuNai }}
-                            </td>
-                            <td>
-                                {{ (item as any).khieuNai.noiDung }}
-                            </td>
-                            <td>
-                                {{
-                                    tenLoaiKhieuNais[
-                                        String((item as any).khieuNai.maLoaiKhieuNai)
-                                    ] || 'Đang tải...'
-                                }}
-                            </td>
-                            <td>
-                                {{
-                                    (item as any).khieuNai.ngayKhieuNai
-                                        ? formatDateTime(
-                                              String((item as any).khieuNai.ngayKhieuNai)
-                                          )
-                                        : null
-                                }}
-                            </td>
-                            <td>{{ (item as any).khieuNai.trangThaiXuLy }}</td>
-                            <td>
                                 <router-link
                                     :to="{
+                                        name: 'XuLyKhieuNaiView',
                                         params: { maKhieuNai: String((item as any).khieuNai.maKhieuNai) }
                                     }"
                                 >
-                                    <i class="fas fa-recycle text-warning" title="Xử lý"></i>
+                                    {{ index + 1 }}</router-link
+                                >
+                            </td>
+                            <td>
+                                <router-link
+                                    :to="{
+                                        name: 'XuLyKhieuNaiView',
+                                        params: { maKhieuNai: String((item as any).khieuNai.maKhieuNai) }
+                                    }"
+                                >
+                                    {{ (item as any).khieuNai.maKhieuNai }}</router-link
+                                >
+                            </td>
+                            <td>
+                                <router-link
+                                    :to="{
+                                        name: 'XuLyKhieuNaiView',
+                                        params: { maKhieuNai: String((item as any).khieuNai.maKhieuNai) }
+                                    }"
+                                >
+                                    {{ (item as any).khieuNai.noiDungKhieuNai }}</router-link
+                                >
+                            </td>
+                            <td>
+                                <router-link
+                                    :to="{
+                                        name: 'XuLyKhieuNaiView',
+                                        params: { maKhieuNai: String((item as any).khieuNai.maKhieuNai) }
+                                    }"
+                                >
+                                    {{
+                                        tenLoaiKhieuNais[
+                                            String((item as any).khieuNai.maLoaiKhieuNai)
+                                        ] || 'Đang tải...'
+                                    }}</router-link
+                                >
+                            </td>
+                            <td>
+                                <router-link
+                                    :to="{
+                                        name: 'XuLyKhieuNaiView',
+                                        params: { maKhieuNai: String((item as any).khieuNai.maKhieuNai) }
+                                    }"
+                                >
+                                    {{
+                                        (item as any).khieuNai.ngayKhieuNai
+                                            ? formatDateTime(
+                                                  String((item as any).khieuNai.ngayKhieuNai)
+                                              )
+                                            : null
+                                    }}</router-link
+                                >
+                            </td>
+                            <td>
+                                <router-link
+                                    :to="{
+                                        name: 'XuLyKhieuNaiView',
+                                        params: { maKhieuNai: String((item as any).khieuNai.maKhieuNai) }
+                                    }"
+                                    >{{ (item as any).khieuNai.trangThaiXuLy }}</router-link
+                                >
+                            </td>
+                            <td>
+                                <router-link
+                                    :to="{
+                                        name: 'XuLyKhieuNaiView',
+                                        params: { maKhieuNai: String((item as any).khieuNai.maKhieuNai) }
+                                    }"
+                                >
+                                    <i
+                                        v-if="String((item as any).khieuNai.trangThaiXuLy) === 'Chờ xử lý'"
+                                        class="fas fa-recycle text-warning"
+                                        title="Xử lý"
+                                    ></i>
                                 </router-link>
                             </td>
                         </tr>
@@ -122,7 +170,7 @@
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
     import { useDateTime } from '@/composables/useDateTime'
-    import { getKhieuNais } from '@/services/khieuNaiService'
+    import { getKhieuNaisByChuCuaHang } from '@/services/khieuNaiService'
     import { getLoaiKhieuNaiByMaLoaiKhieuNai } from '@/services/loaiKhieuNaiService'
     import { getMaNguoiDung } from '@/services/localStorageService'
     import { computed, defineComponent, onMounted, ref, Ref, watch } from 'vue'
@@ -144,8 +192,6 @@
             const tenLoaiKhieuNais = ref<Record<string, string>>({})
             const totalElements = ref() as Ref<number>
             const pageSize = ref(10) as Ref<number>
-            const showDeletePopup = ref(false) as Ref<boolean>
-            const khieuNaiToDelete = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
             const isLoadingPage = ref(true)
 
@@ -158,7 +204,7 @@
             })
 
             const fetchKhieuNais = async () => {
-                const result = await getKhieuNais(getMaNguoiDung())
+                const result = await getKhieuNaisByChuCuaHang(getMaNguoiDung())
                 khieuNais.value = result
 
                 for (const item of result) {
@@ -199,8 +245,6 @@
                 totalElements,
                 pageSize,
                 onChangePage,
-                showDeletePopup,
-                khieuNaiToDelete,
                 tenLoaiKhieuNais,
                 keyword
             }
