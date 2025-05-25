@@ -36,6 +36,9 @@
             >
         </li>
         <li class="nav-item">
+            <a class="nav-link custom-hover" href="/danh-sach-tin-nhan">Tin nhắn</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link custom-hover" href="" @click="handleLogout">Đăng xuất</a>
         </li>
     </ul>

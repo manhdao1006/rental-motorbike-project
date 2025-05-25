@@ -443,7 +443,7 @@
                         getMaNguoiDung(),
                         chuCuaHang.value.maChuCuaHang
                     )
-                    router.push(`/chat/${maHoiThoai}/${getMaNguoiDung()}`)
+                    router.push(`/tin-nhan/${maHoiThoai}/${getMaNguoiDung()}`)
                 }
             }
 

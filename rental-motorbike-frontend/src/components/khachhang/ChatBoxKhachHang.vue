@@ -10,7 +10,7 @@
             <div class="col-3 me-5" style="max-height: 400px; overflow-y: auto">
                 <div v-for="ht in hoiThoais" :key="String(ht.maHoiThoai)" class="conversation-item">
                     <router-link
-                        :to="`/chat/${ht.maHoiThoai}/${maNguoiDungHienTai}`"
+                        :to="`/tin-nhan/${ht.maHoiThoai}/${maNguoiDungHienTai}`"
                         class="justify-content-between align-items-center row pt-3 pb-3 border-bottom text-black"
                         :class="{ 'bg-selected': ht.maHoiThoai === selectedMaHoiThoai }"
                     >
@@ -105,10 +105,10 @@
     import { getMaNguoiDung } from '@/services/localStorageService'
     import { defineComponent, nextTick, onBeforeUnmount, onMounted, ref, Ref, watch } from 'vue'
     import { useRoute } from 'vue-router'
-    import ThongTinKhachHang from './dungchung/ThongTinKhachHang.vue'
+    import ThongTinKhachHang from '../dungchung/ThongTinKhachHang.vue'
 
     export default defineComponent({
-        name: 'ChatBox',
+        name: 'ChatBoxKhachHang',
         components: {
             ThongTinKhachHang
         },
@@ -141,8 +141,6 @@
 
             const fetchHoiThoais = async () => {
                 const response = await getHoiThoaisByKhachHang(getMaNguoiDung())
-                console.log(response)
-
                 const danhSach = response
 
                 const allResponses = await Promise.all(
@@ -182,7 +180,7 @@
                 }
             }
 
-            function scrollToBottom() {
+            const scrollToBottom = () => {
                 nextTick(() => {
                     if (messageListRef.value) {
                         messageListRef.value.scrollTop = messageListRef.value.scrollHeight
@@ -212,11 +210,11 @@
                 }
             }
 
-            function formatTimestamp(ts: string) {
+            const formatTimestamp = (ts: string) => {
                 return useTime(ts)
             }
 
-            function formatDate(ts: string) {
+            const formatDate = (ts: string) => {
                 return useDate(ts)
             }
 
@@ -286,7 +284,7 @@
     }
 
     .bg-selected {
-        background-color: #d1d1d1; /* màu sẫm bạn muốn */
+        background-color: #d1d1d1;
     }
 
     .chat-container {
@@ -310,7 +308,6 @@
         scroll-behavior: smooth;
     }
 
-    /* Tin nhắn người khác */
     .message.other {
         align-self: flex-start;
         background-color: #fff;
@@ -321,7 +318,6 @@
         max-width: 70%;
     }
 
-    /* Tin nhắn mình */
     .message.me {
         align-self: flex-end;
         background-color: #0084ff;
@@ -334,7 +330,7 @@
 
     .content {
         font-size: 15px;
-        white-space: pre-wrap; /* xuống dòng tự nhiên */
+        white-space: pre-wrap;
     }
 
     .timestamp {

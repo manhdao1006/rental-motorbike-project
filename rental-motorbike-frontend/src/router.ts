@@ -5,7 +5,8 @@ import DangNhap from './components/auth/DangNhap.vue'
 import LoginSuccess from './components/auth/LoginSuccess.vue'
 import { getNguoiDungByMaNguoiDung } from './services/authService'
 import { getMaNguoiDung } from './services/localStorageService'
-import ChatView from './views/ChatView.vue'
+import ChatBoxChuCuaHangView from './views/chucuahang/ChatBoxChuCuaHangView.vue'
+import DanhSachChatChuCuaHangView from './views/chucuahang/DanhSachChatChuCuaHangView.vue'
 import ChiTietDonHangView from './views/chucuahang/donhang/ChiTietDonHangView.vue'
 import DanhSachDonHangView from './views/chucuahang/donhang/DanhSachDonHangView.vue'
 import DanhSachKhieuNaiView from './views/chucuahang/khieunai/DanhSachKhieuNaiView.vue'
@@ -16,8 +17,10 @@ import CapNhatXeMayView from './views/chucuahang/xemay/CapNhatXeMayView.vue'
 import DanhSachXeMayView from './views/chucuahang/xemay/DanhSachXeMayView.vue'
 import ThemMoiXeMayView from './views/chucuahang/xemay/ThemMoiXeMayView.vue'
 import CapNhatThongTinCaNhanView from './views/khachhang/CapNhatThongTinCaNhanView.vue'
+import ChatBoxKhachHangView from './views/khachhang/ChatBoxKhachHangView.vue'
 import ChiTietDonHangKhachHangView from './views/khachhang/ChiTietDonHangKhachHangView.vue'
 import ChiTietXeMayTrangChuView from './views/khachhang/ChiTietXeMayTrangChuView.vue'
+import DanhSachChatKhachHangView from './views/khachhang/DanhSachChatKhachHangView.vue'
 import DanhSachDonHangKhachHangView from './views/khachhang/DanhSachDonHangKhachHangView.vue'
 import DanhSachXeMayTheoQuanView from './views/khachhang/DanhSachXeMayTheoQuanView.vue'
 import GioHangView from './views/khachhang/GioHangView.vue'
@@ -48,9 +51,24 @@ import ThemMoiVaiTroView from './views/quantrivien/vaitro/ThemMoiVaiTroView.vue'
 
 const routes: Array<RouteRecordRaw> = [
     {
-        path: '/chat/:maHoiThoai/:maNguoiDung',
-        name: 'ChatView',
-        component: ChatView
+        path: '/danh-sach-tin-nhan',
+        name: 'DanhSachChatKhachHangView',
+        component: DanhSachChatKhachHangView
+    },
+    {
+        path: '/tin-nhan/:maHoiThoai/:maNguoiDung',
+        name: 'ChatBoxKhachHangView',
+        component: ChatBoxKhachHangView
+    },
+    {
+        path: '/danh-sach-tin-nhan-chu',
+        name: 'DanhSachChatChuCuaHangView',
+        component: DanhSachChatChuCuaHangView
+    },
+    {
+        path: '/tin-nhan-chu/:maHoiThoai/:maNguoiDung',
+        name: 'ChatBoxChuCuaHangView',
+        component: ChatBoxChuCuaHangView
     },
     {
         path: '/',

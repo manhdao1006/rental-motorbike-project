@@ -85,6 +85,13 @@
                     </router-link>
                 </li>
 
+                <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_CHUCUAHANG'">
+                    <router-link class="sidebar-link" :to="{ name: 'DanhSachChatChuCuaHangView' }">
+                        <i class="fa-solid fa-message"></i>
+                        <span class="align-middle">Tin nhắn</span>
+                    </router-link>
+                </li>
+
                 <li class="sidebar-item" v-if="tenVaiTro === 'ROLE_NHANVIEN'">
                     <router-link
                         class="sidebar-link"

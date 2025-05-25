@@ -1,7 +1,7 @@
 <template>
     <HeaderLayout />
     <NavigationLayout />
-    <ChatBox />
+    <ChatBoxKhachHang />
     <FooterLayout />
 
     <button id="backToTop" class="btn btn-primary rounded-circle shadow" @click="scrollToTop">
@@ -10,15 +10,20 @@
 </template>
 
 <script lang="ts">
-    import ChatBox from '@/components/ChatBox.vue'
+    import ChatBoxKhachHang from '@/components/khachhang/ChatBoxKhachHang.vue'
     import FooterLayout from '@/components/trangchu/FooterLayout.vue'
     import HeaderLayout from '@/components/trangchu/HeaderLayout.vue'
     import NavigationLayout from '@/components/trangchu/NavigationLayout.vue'
     import { defineComponent, onMounted, onUnmounted } from 'vue'
 
     export default defineComponent({
-        name: 'ChatView',
-        components: { ChatBox, HeaderLayout, NavigationLayout, FooterLayout },
+        name: 'ChatBoxKhachHangView',
+        components: {
+            ChatBoxKhachHang,
+            HeaderLayout,
+            NavigationLayout,
+            FooterLayout
+        },
         setup() {
             const handleScroll = () => {
                 const button = document.getElementById('backToTop')

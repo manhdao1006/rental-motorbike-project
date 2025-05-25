@@ -23,3 +23,13 @@ export const getHoiThoaisByKhachHang = async (maKhachHang: string): Promise<unkn
     })
     return res.data
 }
+
+export const getHoiThoaisByChuCuaHang = async (maChuCuaHang: string): Promise<unknown[]> => {
+    const res = await axios.get(`http://localhost:8080/chat/conversations/chu-cua-hang`, {
+        params: { maChuCuaHang },
+        headers: {
+            Authorization: `Bearer ${getToken()}`
+        }
+    })
+    return res.data
+}
