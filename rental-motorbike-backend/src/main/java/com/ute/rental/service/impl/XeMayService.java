@@ -432,4 +432,15 @@ public class XeMayService implements IXeMayService {
         return responseList;
     }
 
+    @Transactional
+    @Override
+    public void capNhatTrangThaiXeMay(String maXeMay, String trangThaiHoatDong) {
+        XeMayEntity xeMayEntity = xeMayRepository.findOneByMaXeMay(maXeMay)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không tìm thấy xe máy nào với mã xe máy là: "
+                                + maXeMay));
+        xeMayEntity.setTrangThaiHoatDong(trangThaiHoatDong);
+        xeMayRepository.save(xeMayEntity);
+    }
+
 }

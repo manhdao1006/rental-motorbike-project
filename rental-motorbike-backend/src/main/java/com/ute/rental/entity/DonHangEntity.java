@@ -48,6 +48,9 @@ public class DonHangEntity {
     @Column(name = "phuongThucThanhToan")
     private String phuongThucThanhToan;
 
+    @Column(name = "phuongThucNhanXe")
+    private String phuongThucNhanXe;
+
     @Column(name = "ngayTraXe")
     private LocalDateTime ngayTraXe;
 

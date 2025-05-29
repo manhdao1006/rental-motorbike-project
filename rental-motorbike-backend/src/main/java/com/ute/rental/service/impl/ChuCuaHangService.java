@@ -248,4 +248,16 @@ public class ChuCuaHangService implements IChuCuaHangService {
                 chuCuaHangConverter.toDTO(chuCuaHangEntity));
     }
 
+    @Override
+    public ChuCuaHangResponseDTO getChuCuaHangByMaXeMay(String maXeMay) {
+        ChuCuaHangEntity chuCuaHangEntity = chuCuaHangRepository.findChuCuaHangByMaXeMay(maXeMay)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Không có chủ cửa hàng nào có mã xe máy là " + maXeMay));
+        ChuCuaHangDTO chuCuaHangDTO = chuCuaHangConverter.toDTO(chuCuaHangEntity);
+        NguoiDungEntity nguoiDungEntity = chuCuaHangEntity.getNguoiDung();
+        NguoiDungDTO nguoiDungDTO = nguoiDungConverter.toDTO(nguoiDungEntity);
+
+        return new ChuCuaHangResponseDTO(nguoiDungDTO, chuCuaHangDTO);
+    }
+
 }

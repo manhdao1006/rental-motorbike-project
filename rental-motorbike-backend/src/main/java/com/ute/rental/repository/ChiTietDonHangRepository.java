@@ -1,9 +1,12 @@
 package com.ute.rental.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ute.rental.entity.ChiTietDonHangEntity;
@@ -33,5 +36,8 @@ public interface ChiTietDonHangRepository extends JpaRepository<ChiTietDonHangEn
 
     List<ChiTietDonHangEntity> findChiTietDonHangsByXeMay_ChuCuaHang_MaChuCuaHangAndDonHang_TrangThaiDonHangAndTrangThaiXoa(
             String maChuCuaHang, String trangThaiDonHang, String trangThaiXoa);
+
+    @Query("SELECT c FROM ChiTietDonHangEntity c WHERE c.tuNgay = :homNay")
+    List<ChiTietDonHangEntity> findAllByTuNgay(@Param("homNay") LocalDate homNay);
 
 }

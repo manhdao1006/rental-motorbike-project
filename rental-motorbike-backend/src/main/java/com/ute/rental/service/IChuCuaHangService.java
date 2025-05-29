@@ -15,6 +15,8 @@ public interface IChuCuaHangService {
 
     ChuCuaHangResponseDTO getChuCuaHangByMaChuCuaHang(String maNguoiDung);
 
+    ChuCuaHangResponseDTO getChuCuaHangByMaXeMay(String maXeMay);
+
     ChuCuaHangResponseDTO addChuCuaHang(NguoiDungDTO nguoiDungDTO, ChuCuaHangDTO chuCuaHangDTO, MultipartFile avatar)
             throws IOException;
 

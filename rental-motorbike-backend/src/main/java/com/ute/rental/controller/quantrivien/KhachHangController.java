@@ -34,7 +34,7 @@ public class KhachHangController {
     public ApiResponse<List<KhachHangResponseDTO>> getKhachHangs() {
         return ApiResponse.<List<KhachHangResponseDTO>>builder()
                 .code(200)
-                .message("Danh sách người mua")
+                .message("Danh sách khách hàng")
                 .result(khachHangService.getKhachHangs())
                 .build();
     }
@@ -44,7 +44,7 @@ public class KhachHangController {
             @PathVariable("maNguoiDung") String maNguoiDung) {
         return ApiResponse.<KhachHangResponseDTO>builder()
                 .code(200)
-                .message("Người mua với mã người mua là " + maNguoiDung)
+                .message("Khách hàng với mã khách hàng là " + maNguoiDung)
                 .result(khachHangService.getKhachHangByMaKhachHang(maNguoiDung))
                 .build();
     }

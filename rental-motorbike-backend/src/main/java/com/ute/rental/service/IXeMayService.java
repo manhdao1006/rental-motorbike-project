@@ -21,6 +21,8 @@ public interface IXeMayService {
 
     void deleteXeMay(String maXeMay);
 
+    void capNhatTrangThaiXeMay(String maXeMay, String trangThaiHoatDong);
+
     XeMayResponseDTO getXeMayByMaXeMay(String maXeMay);
 
     List<XeMayResponseDTO> getXeMaysInQuanHaiChau();

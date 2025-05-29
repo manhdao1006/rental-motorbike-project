@@ -49,6 +49,16 @@ public class ChuCuaHangController {
                 .build();
     }
 
+    @GetMapping("/xe-may/{maXeMay}")
+    public ApiResponse<ChuCuaHangResponseDTO> getChuCuaHangByMaXeMay(
+            @PathVariable("maXeMay") String maXeMay) {
+        return ApiResponse.<ChuCuaHangResponseDTO>builder()
+                .code(200)
+                .message("Chủ cửa hàng với mã xe máy là " + maXeMay)
+                .result(chuCuaHangService.getChuCuaHangByMaXeMay(maXeMay))
+                .build();
+    }
+
     @PostMapping("/add")
     public ApiResponse<ChuCuaHangResponseDTO> addChuCuaHang(
             @ModelAttribute NguoiDungDTO nguoiDungDTO,
