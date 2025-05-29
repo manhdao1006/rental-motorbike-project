@@ -53,6 +53,8 @@ export const API_ENDPOINTS = {
         GET_CHUCUAHANGS: `${BASE_URL}/chu-cua-hang/chu-cua-hang/list`,
         GET_BY_MANGUOIDUNG: (maNguoiDung: string) =>
             `${BASE_URL}/chu-cua-hang/chu-cua-hang/${maNguoiDung}`,
+        GET_BY_MAXEMAY: (maXeMay: string) =>
+            `${BASE_URL}/chu-cua-hang/chu-cua-hang/xe-may/${maXeMay}`,
         ADD: `${BASE_URL}/chu-cua-hang/chu-cua-hang/add`,
         UPDATE: (maNguoiDung: string) =>
             `${BASE_URL}/chu-cua-hang/chu-cua-hang/edit/${maNguoiDung}`,

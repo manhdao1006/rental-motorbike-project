@@ -265,16 +265,19 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="diaChiGiaoXe" class="form-label"
-                            >Địa chỉ giao xe<span class="text-danger">*</span></label
+                        <label for="phuongThucNhanXe" class="form-label"
+                            >Phương thức nhận xe<span class="text-danger">*</span></label
                         >
-                        <textarea
-                            v-model="donHang.diaChiGiaoXe"
-                            type="text"
-                            class="form-control"
-                            id="diaChiGiaoXe"
+                        <select
+                            v-model="donHang.phuongThucNhanXe"
+                            class="form-select"
+                            aria-label="Default select example"
                             disabled
-                        ></textarea>
+                        >
+                            <option selected disabled>Chọn phương thức nhận xe</option>
+                            <option value="Nhận tại cửa hàng">Nhận tại cửa hàng</option>
+                            <option value="Giao xe tận nơi">Giao xe tận nơi</option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-6">
@@ -309,6 +312,19 @@
                             disabled
                         ></textarea>
                     </div>
+                </div>
+                <div class="mb-3">
+                    <label for="diaChiGiaoXe" class="form-label"
+                        >Địa chỉ giao xe<span class="text-danger">*</span></label
+                    >
+                    <textarea
+                        :value="donHang.diaChiGiaoXe || nguoiDungKhachHang.diaChi"
+                        type="text"
+                        class="form-control"
+                        id="diaChiGiaoXe"
+                        rows="1"
+                        disabled
+                    ></textarea>
                 </div>
             </div>
             <div class="text-center mt-3">

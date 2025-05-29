@@ -342,6 +342,7 @@
         </div>
     </div>
     <PopupLoading :isLoading="isLoading" />
+    <PopupLoading :isLoading="isLoadingPage" />
 </template>
 
 <script lang="ts">
@@ -356,7 +357,7 @@
     import { addDonHang } from '@/services/donHangService'
     import { getKhachHangByMaKhachHang, updateKhachHang } from '@/services/khachHangService'
     import { getMaNguoiDung } from '@/services/localStorageService'
-    import { getXeMays, updateXeMay } from '@/services/xeMayService'
+    import { getXeMays } from '@/services/xeMayService'
     import { computed, defineComponent, onMounted, ref } from 'vue'
     import { useRouter } from 'vue-router'
     import PopupLoading from '../dungchung/PopupLoading.vue'
@@ -395,6 +396,7 @@
             const isErrorSoGPLX = ref(false)
             const messageSoGPLX = ref<string>('')
             const isLoading = ref(false)
+            const isLoadingPage = ref(true)
             const cart = ref<Record<string, string>[]>([])
             const minDate = new Date().toISOString().split('T')[0]
             const minDenNgay = computed(() => {
@@ -518,6 +520,7 @@
                     cart.value = JSON.parse(storedCart)
                 }
                 await Promise.all([fetchXeMays(), fetchKhachHang(), fetchChuCuaHang()])
+                isLoadingPage.value = false
             })
 
             const handleThueXe = async () => {
@@ -624,27 +627,8 @@
                                         formDataChiTiet.append(key, value || '')
                                     })
 
-                                    const responseChiTiet = await addChiTietDonHang(formDataChiTiet)
-                                    if (responseChiTiet.success) {
-                                        const formDataUpdate = new FormData()
-                                        formDataUpdate.append('trangThaiHoatDong', 'Đang cho thuê')
-
-                                        const responseXeMay = await updateXeMay(
-                                            xe.maXeMay,
-                                            formDataUpdate
-                                        )
-                                        if (!responseXeMay.success) {
-                                            allSuccess = false
-                                            console.error(
-                                                `Lỗi khi cập nhật trạng thái xe ${xe.maXeMay}`
-                                            )
-                                        }
-                                    } else {
-                                        allSuccess = false
-                                        console.error(
-                                            `Lỗi khi thêm chi tiết đơn hàng cho xe ${xe.maXeMay}`
-                                        )
-                                    }
+                                    await addChiTietDonHang(formDataChiTiet)
+                                    allSuccess = false
                                 }
 
                                 if (allSuccess) {
@@ -707,7 +691,8 @@
                 donHang,
                 chiTietDonHang,
                 cart,
-                hienFormDatThue
+                hienFormDatThue,
+                isLoadingPage
             }
         }
     })

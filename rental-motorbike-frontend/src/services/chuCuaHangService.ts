@@ -22,6 +22,16 @@ export const getChuCuaHangByMaNguoiDung = async (maNguoiDung: string) => {
     return response.data.result
 }
 
+export const getChuCuaHangByMaXeMay = async (maXeMay: string) => {
+    const response = await axios.get(API_ENDPOINTS.CHUCUAHANG.GET_BY_MAXEMAY(maXeMay), {
+        headers: {
+            Authorization: `Bearer ${getToken()}`
+        }
+    })
+
+    return response.data.result
+}
+
 export const addChuCuaHang = async (formData: FormData) => {
     try {
         const response = await axios.post(API_ENDPOINTS.CHUCUAHANG.ADD, formData, {

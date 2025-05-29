@@ -25,6 +25,9 @@
                 <div class="text-uppercase card-price fw-bolder fs-5 mt-3 mb-0 pb-0 ps-2">
                     <span>Thông tin đơn hàng</span>
                 </div>
+                <div v-if="isError" class="alert alert-danger">
+                    {{ messageError }}
+                </div>
                 <div class="col-7">
                     <div class="row">
                         <div class="col-4 p-4">
@@ -103,15 +106,44 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="diaChiGiaoXe" class="form-label"
-                            >Địa chỉ giao xe<span class="text-danger">*</span></label
+                        <label for="phuongThucNhanXe" class="form-label"
+                            >Phương thức nhận xe<span class="text-danger">*</span></label
                         >
-                        <textarea
-                            v-model="donHang.diaChiGiaoXe"
-                            type="text"
-                            class="form-control"
-                            id="diaChiGiaoXe"
-                        ></textarea>
+                        <select
+                            v-model="donHang.phuongThucNhanXe"
+                            class="form-select"
+                            aria-label="Default select example"
+                        >
+                            <option selected disabled>Chọn phương thức nhận xe</option>
+                            <option value="Nhận tại cửa hàng">Nhận tại cửa hàng</option>
+                            <option value="Giao xe tận nơi">Giao xe tận nơi</option>
+                        </select>
+                    </div>
+                    <div v-if="donHang.phuongThucNhanXe === 'Giao xe tận nơi'" class="mb-3">
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                id="giaoToi"
+                                value="SELF"
+                                v-model="donHang.kieuGiaoXe"
+                            />
+                            <label class="form-check-label" for="giaoToi">
+                                Giao đến địa chỉ của tôi
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                id="giaoKhac"
+                                value="OTHER"
+                                v-model="donHang.kieuGiaoXe"
+                            />
+                            <label class="form-check-label" for="giaoKhac">
+                                Giao đến địa chỉ khác
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="col-6">
@@ -142,8 +174,33 @@
                             type="text"
                             class="form-control"
                             id="lyDoThueXe"
+                            rows="4"
                         ></textarea>
                     </div>
+                </div>
+                <div class="mb-3" v-if="donHang.kieuGiaoXe === 'SELF'">
+                    <label for="diaChi" class="form-label"
+                        >Địa chỉ của tôi<span class="text-danger">*</span></label
+                    >
+                    <textarea
+                        v-model="nguoiDungKhachHang.diaChi"
+                        type="text"
+                        class="form-control"
+                        id="diaChi"
+                        rows="1"
+                    ></textarea>
+                </div>
+                <div class="mb-3" v-if="donHang.kieuGiaoXe === 'OTHER'">
+                    <label for="diaChiGiaoXe" class="form-label"
+                        >Địa chỉ khác<span class="text-danger">*</span></label
+                    >
+                    <textarea
+                        v-model="donHang.diaChiGiaoXe"
+                        type="text"
+                        class="form-control"
+                        id="diaChiGiaoXe"
+                        rows="1"
+                    ></textarea>
                 </div>
             </div>
             <div
@@ -158,9 +215,6 @@
                 <span>Thông tin khách hàng</span>
             </div>
             <div class="row">
-                <div v-if="isError" class="alert alert-danger">
-                    {{ messageError }}
-                </div>
                 <div class="col-6">
                     <div class="mb-3">
                         <label for="hoVaTen" class="form-label"
@@ -349,14 +403,14 @@
     import { addDonHang } from '@/services/donHangService'
     import { getKhachHangByMaKhachHang, updateKhachHang } from '@/services/khachHangService'
     import { getMaNguoiDung } from '@/services/localStorageService'
-    import { getXeMayByMaXeMay, getXeMays, updateXeMay } from '@/services/xeMayService'
+    import { getXeMayByMaXeMay, getXeMays } from '@/services/xeMayService'
     import {
         validateEmail,
         validateSoCCCD,
         validateSoDienThoai,
         validateSoGPLX
     } from '@/utils/validation'
-    import { computed, defineComponent, onMounted, ref } from 'vue'
+    import { computed, defineComponent, onMounted, ref, watch } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
     import PopupLoading from '../dungchung/PopupLoading.vue'
 
@@ -414,6 +468,17 @@
             const showMore = () => {
                 visibleRows.value += 4
             }
+
+            watch(
+                () => donHang.value.phuongThucNhanXe,
+                (newValue) => {
+                    if (newValue === 'Giao xe tận nơi') {
+                        donHang.value.kieuGiaoXe = 'SELF'
+                    } else {
+                        donHang.value.kieuGiaoXe = ''
+                    }
+                }
+            )
 
             const fetchXeMay = async () => {
                 const response = await getXeMayByMaXeMay(String(route.params.maXeMay))
@@ -522,10 +587,23 @@
                     !nguoiDungKhachHang.value.soCCCD ||
                     !khachHang.value.soGPLX ||
                     !donHang.value.phuongThucThanhToan ||
-                    !donHang.value.diaChiGiaoXe ||
+                    !donHang.value.phuongThucNhanXe ||
                     !donHang.value.lyDoThueXe ||
                     !chiTietDonHang.value.tuNgay ||
                     !chiTietDonHang.value.denNgay
+                ) {
+                    isError.value = true
+                    messageError.value = 'Vui lòng nhập đầy đủ các trường dữ liệu!'
+                    setTimeout(() => {
+                        isError.value = false
+                        messageError.value = ''
+                    }, 3000)
+                    return
+                }
+
+                if (
+                    (donHang.value.kieuGiaoXe === 'SELF' && !nguoiDungKhachHang.value.diaChi) ||
+                    (donHang.value.kieuGiaoXe === 'OTHER' && !donHang.value.diaChiGiaoXe)
                 ) {
                     isError.value = true
                     messageError.value = 'Vui lòng nhập đầy đủ các trường dữ liệu!'
@@ -679,22 +757,13 @@
                                 const responseChiTietDonHang = await addChiTietDonHang(formData)
 
                                 if (responseChiTietDonHang.success) {
-                                    const formData = new FormData()
-                                    formData.append('trangThaiHoatDong', 'Đang cho thuê')
-                                    const responseXeMay = await updateXeMay(
-                                        xeMay.value.maXeMay,
-                                        formData
-                                    )
-
-                                    if (responseXeMay.success) {
-                                        await router.push({
-                                            name: 'ChiTietDonHangKhachHangView',
-                                            params: {
-                                                trangThaiDonHang: 'Chờ xử lý',
-                                                maDonHang: responseDonHang.result.maDonHang
-                                            }
-                                        })
-                                    }
+                                    await router.push({
+                                        name: 'ChiTietDonHangKhachHangView',
+                                        params: {
+                                            trangThaiDonHang: 'Chờ xử lý',
+                                            maDonHang: responseDonHang.result.maDonHang
+                                        }
+                                    })
                                 }
                             }
                         }

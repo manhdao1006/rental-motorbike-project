@@ -188,44 +188,71 @@
                         </div>
                     </div>
                     <div class="col-4 bg-white p-4">
-                        <div class="text-black fw-bolder mb-3 text-center">
-                            Thông tin khách hàng
-                        </div>
-                        <div class="row">
-                            <div class="col-4 title-user">Họ và tên:</div>
-                            <div class="col-8 content-user">{{ nguoiDungKhachHang.hoVaTen }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 title-user">Email:</div>
-                            <div class="col-8 content-user">{{ nguoiDungKhachHang.email }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 title-user">Giới tính:</div>
-                            <div class="col-8 content-user">{{ nguoiDungKhachHang.gioiTinh }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 title-user">Ngày sinh:</div>
-                            <div class="col-8 content-user">
-                                {{
-                                    nguoiDungKhachHang.ngaySinh
-                                        ? formatDate(String(nguoiDungKhachHang.ngaySinh))
-                                        : 'NaN'
-                                }}
+                        <div>
+                            <div class="text-black fw-bolder text-center">Thông tin cửa hàng</div>
+                            <div class="row">
+                                <div class="col-4 title-user">Quản lý:</div>
+                                <div class="col-8 content-user">
+                                    {{ nguoiDungChuCuaHang.hoVaTen }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 title-user">Cửa hàng:</div>
+                                <div class="col-8 content-user">{{ chuCuaHang.tenCuaHang }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 title-user">Địa chỉ:</div>
+                                <div class="col-8 content-user">{{ chuCuaHang.diaChiCuaHang }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 title-user">SĐT:</div>
+                                <div class="col-8 content-user">
+                                    {{ chuCuaHang.soDienThoaiCuaHang }}
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-4 title-user">SĐT:</div>
-                            <div class="col-8 content-user">
-                                {{ nguoiDungKhachHang.soDienThoai }}
+                        <div v-if="nguoiDungNhanVien && nguoiDungNhanVien.hoVaTen">
+                            <div class="text-black fw-bolder mt-3 text-center border-top">
+                                Thông tin nhân viên giao xe
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 title-user">Số CCCD:</div>
-                            <div class="col-8 content-user">{{ nguoiDungKhachHang.soCCCD }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 title-user">Số GPLX:</div>
-                            <div class="col-8 content-user">{{ khachHang.soGPLX }}</div>
+                            <div class="row">
+                                <div class="col-4 title-user">Họ và tên:</div>
+                                <div class="col-8 content-user">
+                                    {{ nguoiDungNhanVien.hoVaTen }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 title-user">Email:</div>
+                                <div class="col-8 content-user">{{ nguoiDungNhanVien.email }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 title-user">Giới tính:</div>
+                                <div class="col-8 content-user">
+                                    {{ nguoiDungNhanVien.gioiTinh }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 title-user">Ngày sinh:</div>
+                                <div class="col-8 content-user">
+                                    {{
+                                        nguoiDungNhanVien.ngaySinh
+                                            ? formatDate(String(nguoiDungNhanVien.ngaySinh))
+                                            : 'NaN'
+                                    }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 title-user">SĐT:</div>
+                                <div class="col-8 content-user">
+                                    {{ nguoiDungNhanVien.soDienThoai }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 title-user">Số CCCD:</div>
+                                <div class="col-8 content-user">
+                                    {{ nguoiDungNhanVien.soCCCD }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -266,16 +293,19 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="diaChiGiaoXe" class="form-label"
-                                >Địa chỉ giao xe<span class="text-danger">*</span></label
+                            <label for="phuongThucNhanXe" class="form-label"
+                                >Phương thức nhận xe<span class="text-danger">*</span></label
                             >
-                            <textarea
-                                v-model="donHang.diaChiGiaoXe"
-                                type="text"
-                                class="form-control"
-                                id="diaChiGiaoXe"
+                            <select
+                                v-model="donHang.phuongThucNhanXe"
+                                class="form-select"
+                                aria-label="Default select example"
                                 disabled
-                            ></textarea>
+                            >
+                                <option selected disabled>Chọn phương thức nhận xe</option>
+                                <option value="Nhận tại cửa hàng">Nhận tại cửa hàng</option>
+                                <option value="Giao xe tận nơi">Giao xe tận nơi</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-6">
@@ -310,6 +340,19 @@
                                 disabled
                             ></textarea>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="diaChiGiaoXe" class="form-label"
+                            >Địa chỉ giao xe<span class="text-danger">*</span></label
+                        >
+                        <textarea
+                            :value="donHang.diaChiGiaoXe || nguoiDungKhachHang.diaChi"
+                            type="text"
+                            class="form-control"
+                            id="diaChiGiaoXe"
+                            rows="1"
+                            disabled
+                        ></textarea>
                     </div>
                 </div>
                 <div
@@ -421,6 +464,7 @@
 <script lang="ts">
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import { useDate } from '@/composables/useDate'
+    import { getChuCuaHangByMaXeMay } from '@/services/chuCuaHangService'
     import { getDonHangByMaDonHang, updateDonHang } from '@/services/donHangService'
     import { getKhachHangByMaNguoiDung } from '@/services/khachHangService'
     import { getNhanVienByMaNguoiDung, getNhanViensByChuCuaHang } from '@/services/nhanVienService'
@@ -447,7 +491,10 @@
             const donHang = ref<Record<string, null>>({})
             const nguoiDungKhachHang = ref<Record<string, null>>({})
             const khachHang = ref<Record<string, null>>({})
+            const nguoiDungChuCuaHang = ref<Record<string, null>>({})
             const chuCuaHang = ref<Record<string, null>>({})
+            const nguoiDungNhanVien = ref<Record<string, null>>({})
+            const nhanVien = ref<Record<string, null>>({})
             const xeMays = ref<Record<string, string>[]>([])
             const chiTietDonHangs = ref<Record<string, string>[]>([])
             const nhanViens = ref<Record<string, unknown>[]>([])
@@ -720,13 +767,28 @@
                 const responseDonHang = await getDonHangByMaDonHang(String(route.params.maDonHang))
                 donHang.value = responseDonHang.donHang
                 khachHang.value = responseDonHang.khachHang
-                chuCuaHang.value = responseDonHang.chuCuaHang
+                nhanVien.value = responseDonHang.nhanVien
                 chiTietDonHangs.value = responseDonHang.chiTietDonHangs
 
                 const responseKhachHang = await getKhachHangByMaNguoiDung(
                     responseDonHang.khachHang.maKhachHang
                 )
                 nguoiDungKhachHang.value = responseKhachHang.nguoiDung
+
+                if (responseDonHang.nhanVien) {
+                    const responseNhanVien = await getNhanVienByMaNguoiDung(
+                        responseDonHang.nhanVien.maNhanVien
+                    )
+                    nguoiDungNhanVien.value = responseNhanVien.nguoiDung
+                }
+
+                if (chiTietDonHangs.value.length > 0) {
+                    const responseChuCuaHang = await getChuCuaHangByMaXeMay(
+                        chiTietDonHangs.value[0].maXeMay
+                    )
+                    nguoiDungChuCuaHang.value = responseChuCuaHang.nguoiDung
+                    chuCuaHang.value = responseChuCuaHang.chuCuaHang
+                }
 
                 const maXeMays = responseDonHang.chiTietDonHangs
                     .map((chiTiet: { maXeMay: string }) => chiTiet.maXeMay)
@@ -871,6 +933,10 @@
                 nhanViens,
                 nguoiDungKhachHang,
                 khachHang,
+                nguoiDungChuCuaHang,
+                chuCuaHang,
+                nhanVien,
+                nguoiDungNhanVien,
                 isLoading,
                 chiTietDonHangs,
                 handleXacNhan
