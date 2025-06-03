@@ -28,4 +28,10 @@ public interface DonHangRepository extends JpaRepository<DonHangEntity, String> 
     @Query("SELECT COUNT(dh) FROM DonHangEntity dh WHERE dh.maDonHang LIKE :prefix%")
     int countByMaDonHangStartingWith(@Param("prefix") String prefix);
 
+    @Query("""
+                SELECT dh FROM DonHangEntity dh
+                WHERE dh.trangThaiThanhToan = 'Chưa thanh toán' AND dh.phuongThucThanhToan = 'Thanh toán qua ngân hàng'
+            """)
+    List<DonHangEntity> findDonHangChuaThanhToan();
+
 }

@@ -48,6 +48,9 @@ public class DonHangEntity {
     @Column(name = "phuongThucThanhToan")
     private String phuongThucThanhToan;
 
+    @Column(name = "maGiaoDich")
+    private String maGiaoDich;
+
     @Column(name = "phuongThucNhanXe")
     private String phuongThucNhanXe;
 

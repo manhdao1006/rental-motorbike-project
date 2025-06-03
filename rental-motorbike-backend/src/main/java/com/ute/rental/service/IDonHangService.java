@@ -23,4 +23,6 @@ public interface IDonHangService {
 
     DonHangResponseDTO getDonHangByMaDonHang(String maDonHang);
 
+    void capNhatTrangThaiVaLyDoHuy(String maDonHang, String trangThai, String lyDoHuy);
+
 }

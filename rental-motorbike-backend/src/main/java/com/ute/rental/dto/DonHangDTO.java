@@ -24,6 +24,7 @@ public class DonHangDTO {
     private String phuongThucThanhToan;
     private String phuongThucNhanXe;
     private LocalDateTime ngayTraXe;
+    private String maGiaoDich;
     private String lyDoThueXe;
     private String lyDoHuy;
     private String tepDinhKem;

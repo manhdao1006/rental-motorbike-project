@@ -250,4 +250,15 @@ public class DonHangService implements IDonHangService {
         return responseList;
     }
 
+    @Transactional
+    @Override
+    public void capNhatTrangThaiVaLyDoHuy(String maDonHang, String trangThai, String lyDoHuy) {
+        DonHangEntity donHang = donHangRepository.findOneByMaDonHang(maDonHang)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng"));
+
+        donHang.setTrangThaiDonHang(trangThai);
+        donHang.setLyDoHuy(lyDoHuy);
+        donHangRepository.save(donHang);
+    }
+
 }
