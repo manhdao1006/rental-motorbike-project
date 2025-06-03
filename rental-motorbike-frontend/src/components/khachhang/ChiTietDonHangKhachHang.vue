@@ -354,13 +354,27 @@
                             disabled
                         ></textarea>
                     </div>
+                    <div
+                        class="text-danger"
+                        v-if="
+                            donHang.trangThaiThanhToan === 'Chưa thanh toán' &&
+                            !daTienHanhThanhToan &&
+                            donHang.trangThaiDonHang === 'Chờ xử lý' &&
+                            donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng'
+                        "
+                    >
+                        Lưu ý: Quý khách có 24 giờ kể từ thời điểm đặt xe để hoàn tất việc đặt cọc
+                        hoặc thanh toán. Quá thời hạn, đơn hàng có thể bị hủy.
+                    </div>
                 </div>
                 <div
                     class="row"
                     v-if="
-                        donHang.trangThaiThanhToan === 'Chưa thanh toán' &&
+                        (donHang.trangThaiThanhToan === 'Chưa thanh toán' ||
+                            donHang.trangThaiThanhToan === 'Đặt cọc') &&
                         daTienHanhThanhToan &&
-                        donHang.trangThaiDonHang === 'Chờ xử lý' &&
+                        (donHang.trangThaiDonHang === 'Chờ xử lý' ||
+                            donHang.trangThaiDonHang === 'Đã giao xe') &&
                         donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng'
                     "
                 >
@@ -386,9 +400,9 @@
                         </label>
                     </div>
                 </div>
-                <div class="mt-3 mb-3">
+                <div class="mt-3 mb-3 row">
                     <div
-                        class="text-center"
+                        class="text-center col-6"
                         v-if="
                             donHang.trangThaiThanhToan === 'Chưa thanh toán' &&
                             daTienHanhThanhToan &&
@@ -399,8 +413,46 @@
                         <button
                             type="button"
                             class="btn btn-primary"
-                            title="Thanh toán"
+                            title="Đặt cọc 20%"
+                            @click.prevent="handleDatCoc"
+                            :disabled="isLoading"
+                        >
+                            Đặt cọc 20%
+                        </button>
+                    </div>
+                    <div
+                        class="text-center col-6"
+                        v-if="
+                            donHang.trangThaiThanhToan === 'Chưa thanh toán' &&
+                            daTienHanhThanhToan &&
+                            donHang.trangThaiDonHang === 'Chờ xử lý' &&
+                            donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng'
+                        "
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            title="Thanh toán toàn bộ"
                             @click.prevent="handleThanhToan"
+                            :disabled="isLoading"
+                        >
+                            Thanh toán toàn bộ
+                        </button>
+                    </div>
+                    <div
+                        class="text-center"
+                        v-if="
+                            donHang.trangThaiThanhToan === 'Đặt cọc' &&
+                            daTienHanhThanhToan &&
+                            donHang.trangThaiDonHang === 'Đã giao xe' &&
+                            donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng'
+                        "
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            title="Thanh toán"
+                            @click.prevent="handleThanhToanConLai"
                             :disabled="isLoading"
                         >
                             Thanh toán
@@ -409,9 +461,11 @@
                     <div
                         class="text-center"
                         v-if="
-                            donHang.trangThaiThanhToan === 'Chưa thanh toán' &&
+                            (donHang.trangThaiThanhToan === 'Chưa thanh toán' ||
+                                donHang.trangThaiThanhToan === 'Đặt cọc') &&
                             !daTienHanhThanhToan &&
-                            donHang.trangThaiDonHang === 'Chờ xử lý' &&
+                            (donHang.trangThaiDonHang === 'Chờ xử lý' ||
+                                donHang.trangThaiDonHang === 'Đã giao xe') &&
                             donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng'
                         "
                     >
@@ -468,7 +522,7 @@
     import { getDonHangByMaDonHang, updateDonHang } from '@/services/donHangService'
     import { getKhachHangByMaNguoiDung } from '@/services/khachHangService'
     import { getNhanVienByMaNguoiDung, getNhanViensByChuCuaHang } from '@/services/nhanVienService'
-    import { createPayment } from '@/services/thanhToanService'
+    import { createPayment, refundDeposit } from '@/services/thanhToanService'
     import { getXeMayByMaXeMay, updateXeMay } from '@/services/xeMayService'
     import L from 'leaflet'
     import 'leaflet-routing-machine'
@@ -709,10 +763,66 @@
                 }
 
                 try {
+                    const txnRefToanBo = `${donHang.value.maDonHang}-THANHTOANTOANBO`
+
                     const response = await createPayment(
                         Number(tongTien.value),
                         selectedBankCode.value,
-                        String(donHang.value.maDonHang)
+                        String(txnRefToanBo)
+                    )
+
+                    if (response.status === 'Ok') {
+                        window.location.href = response.url
+                    } else {
+                        alert('Tạo thanh toán thất bại: ' + response.message)
+                    }
+                } catch (error) {
+                    console.error('Lỗi thanh toán:', error)
+                    alert('Đã xảy ra lỗi trong quá trình thanh toán.')
+                }
+            }
+
+            const handleThanhToanConLai = async () => {
+                if (!selectedBankCode.value) {
+                    alert('Vui lòng chọn ngân hàng để thanh toán!')
+                    return
+                }
+
+                try {
+                    const txnRefConLai = `${donHang.value.maDonHang}-THANHTOANCONLAI`
+                    const tienConLai = Number(tongTien.value) * 0.8
+
+                    const response = await createPayment(
+                        tienConLai,
+                        selectedBankCode.value,
+                        String(txnRefConLai)
+                    )
+
+                    if (response.status === 'Ok') {
+                        window.location.href = response.url
+                    } else {
+                        alert('Tạo thanh toán thất bại: ' + response.message)
+                    }
+                } catch (error) {
+                    console.error('Lỗi thanh toán:', error)
+                    alert('Đã xảy ra lỗi trong quá trình thanh toán.')
+                }
+            }
+
+            const handleDatCoc = async () => {
+                if (!selectedBankCode.value) {
+                    alert('Vui lòng chọn ngân hàng để thanh toán!')
+                    return
+                }
+
+                try {
+                    const txnRefDatCoc = `${donHang.value.maDonHang}-DATCOC`
+                    const tienDatCoc = Number(tongTien.value) * 0.2
+
+                    const response = await createPayment(
+                        tienDatCoc,
+                        selectedBankCode.value,
+                        String(txnRefDatCoc)
                     )
 
                     if (response.status === 'Ok') {
@@ -878,6 +988,17 @@
 
                 isLoading.value = true
                 try {
+                    if (donHang.value.trangThaiThanhToan === 'Đặt cọc') {
+                        const refundResponse = await refundDeposit(
+                            String(donHang.value.maDonHang),
+                            tongTien.value * 0.2
+                        )
+
+                        if (refundResponse.status !== 200) {
+                            throw new Error('Hoàn cọc thất bại')
+                        }
+                    }
+
                     const formData = new FormData()
                     formData.append('trangThaiDonHang', 'Đã hủy')
                     formData.append('lyDoHuy', donHang.value.lyDoHuy)
@@ -916,6 +1037,8 @@
                 banks,
                 selectedBankCode,
                 handleThanhToan,
+                handleDatCoc,
+                handleThanhToanConLai,
                 tenNhanViens,
                 minTraXeDate,
                 maxTraXeDate,

@@ -16,3 +16,17 @@ export const createPayment = async (amount: number, bankCode: string, txnRef: st
 
     return response.data
 }
+
+export const refundDeposit = async (maDonHang: string, soTienHoan: number) => {
+    const response = await apiClient.post(API_ENDPOINTS.PAYMENT.REFUND, {
+        params: {
+            maDonHang,
+            soTienHoan
+        },
+        headers: {
+            Authorization: `Bearer ${getToken()}`
+        }
+    })
+
+    return response.data
+}

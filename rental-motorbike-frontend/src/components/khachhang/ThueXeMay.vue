@@ -403,7 +403,7 @@
     import { addDonHang } from '@/services/donHangService'
     import { getKhachHangByMaKhachHang, updateKhachHang } from '@/services/khachHangService'
     import { getMaNguoiDung } from '@/services/localStorageService'
-    import { getXeMayByMaXeMay, getXeMays } from '@/services/xeMayService'
+    import { getXeMayByMaXeMay, getXeMays, updateXeMay } from '@/services/xeMayService'
     import {
         validateEmail,
         validateSoCCCD,
@@ -757,6 +757,18 @@
                                 const responseChiTietDonHang = await addChiTietDonHang(formData)
 
                                 if (responseChiTietDonHang.success) {
+                                    const formatDate = (date: string | Date) =>
+                                        new Date(date).toISOString().slice(0, 10)
+
+                                    const today = formatDate(new Date())
+                                    const tuNgay = formatDate(chiTietDonHang.value.tuNgay)
+
+                                    if (tuNgay === today) {
+                                        const formData = new FormData()
+                                        formData.append('trangThaiHoatDong', 'Đang cho thuê')
+                                        await updateXeMay(xeMay.value.maXeMay, formData)
+                                    }
+
                                     await router.push({
                                         name: 'ChiTietDonHangKhachHangView',
                                         params: {

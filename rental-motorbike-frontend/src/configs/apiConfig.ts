@@ -2,7 +2,8 @@ export const BASE_URL = 'http://localhost:8080'
 
 export const API_ENDPOINTS = {
     PAYMENT: {
-        CREATE_PAYMENT: `${BASE_URL}/api/auth/payment/create-payment`
+        CREATE_PAYMENT: `${BASE_URL}/api/auth/payment/create-payment`,
+        REFUND: `${BASE_URL}/api/auth/payment/refund`
     },
     AUTH: {
         DANGKY_QUANTRIVIEN: `${BASE_URL}/api/auth/register-admin`,

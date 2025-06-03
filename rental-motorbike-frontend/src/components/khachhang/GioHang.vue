@@ -357,7 +357,7 @@
     import { addDonHang } from '@/services/donHangService'
     import { getKhachHangByMaKhachHang, updateKhachHang } from '@/services/khachHangService'
     import { getMaNguoiDung } from '@/services/localStorageService'
-    import { getXeMays } from '@/services/xeMayService'
+    import { getXeMays, updateXeMay } from '@/services/xeMayService'
     import { computed, defineComponent, onMounted, ref } from 'vue'
     import { useRouter } from 'vue-router'
     import PopupLoading from '../dungchung/PopupLoading.vue'
@@ -627,8 +627,32 @@
                                         formDataChiTiet.append(key, value || '')
                                     })
 
-                                    await addChiTietDonHang(formDataChiTiet)
-                                    allSuccess = false
+                                    const responseChiTiet = await addChiTietDonHang(formDataChiTiet)
+                                    const formatDate = (date: string | Date) =>
+                                        new Date(date).toISOString().slice(0, 10)
+
+                                    const today = formatDate(new Date())
+                                    const tuNgay = formatDate(chiTietDonHang.value.tuNgay)
+                                    if (responseChiTiet.success && tuNgay === today) {
+                                        const formData = new FormData()
+                                        formData.append('trangThaiHoatDong', 'Đang cho thuê')
+                                        const responseXeMay = await updateXeMay(
+                                            xeMay.value.maXeMay,
+                                            formData
+                                        )
+
+                                        if (!responseXeMay.success) {
+                                            allSuccess = false
+                                            console.error(
+                                                `Lỗi khi cập nhật trạng thái xe ${xe.maXeMay}`
+                                            )
+                                        }
+                                    } else {
+                                        allSuccess = false
+                                        console.error(
+                                            `Lỗi khi thêm chi tiết đơn hàng cho xe ${xe.maXeMay}`
+                                        )
+                                    }
                                 }
 
                                 if (allSuccess) {
