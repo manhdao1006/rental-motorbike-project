@@ -6,29 +6,6 @@
                     <div class="col-6">
                         <SearchComponent class="w-100" v-model="keyword" />
                     </div>
-                    <div class="col-6 text-end pt-2 pe-4">
-                        <div class="dropdown">
-                            <a
-                                class="btn btn-outline-dark dropdown-toggle"
-                                href="#"
-                                role="button"
-                                id="dropdownMenuLink"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                Mặc định
-                            </a>
-
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <li>
-                                    <button class="dropdown-item">Người dùng</button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item">Quản trị viên</button>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="row justify-content-evenly">
@@ -147,6 +124,20 @@
             const keyword = ref('') as Ref<string>
             const isLoadingPage = ref(true)
 
+            const filteredDanhMucXes = computed(() => {
+                if (!keyword.value.trim()) return danhMucXes.value
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return danhMucXes.value.filter((item: any) => {
+                    const maDanhMucXe = String(item.maDanhMucXe).toLowerCase()
+                    const tenDanhMucXe = String(item.tenDanhMucXe).toLowerCase()
+
+                    const kw = keyword.value.trim().toLowerCase()
+
+                    return maDanhMucXe.includes(kw) || tenDanhMucXe.includes(kw)
+                })
+            })
+
             const fetcDanhMucXes = async () => {
                 const result = await getDanhMucXes()
                 danhMucXes.value = result
@@ -154,7 +145,7 @@
 
             const paginatedDanhMucXes = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return danhMucXes.value.slice(start, start + pageSize.value)
+                return filteredDanhMucXes.value.slice(start, start + pageSize.value)
             })
 
             watch(currentPage, (newPage) => {

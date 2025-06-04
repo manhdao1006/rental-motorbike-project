@@ -9,7 +9,6 @@
                     placeholder="Nhập từ khóa ..."
                     aria-label="Search"
                 />
-                <button class="btn btn-outline-success" type="submit">Tìm</button>
             </form>
         </div>
     </nav>
@@ -21,21 +20,18 @@
     export default defineComponent({
         name: 'SearchComponent',
         props: {
-            searchKeyword: String,
-            onSearch: Function
+            modelValue: String
         },
-        emits: ['update:searchKeyword'],
+        emits: ['update:modelValue'],
         setup(props, { emit }) {
-            const keyword = ref(props.searchKeyword)
+            const keyword = ref(props.modelValue || '')
 
             const handleSearch = () => {
-                if (props.onSearch) {
-                    props.onSearch(keyword.value)
-                }
+                emit('update:modelValue', keyword.value)
             }
 
             watch(keyword, (newKeyword) => {
-                emit('update:searchKeyword', newKeyword)
+                emit('update:modelValue', newKeyword)
             })
 
             return { keyword, handleSearch }

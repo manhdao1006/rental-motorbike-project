@@ -6,29 +6,6 @@
                     <div class="col-6">
                         <SearchComponent class="w-100" v-model="keyword" />
                     </div>
-                    <div class="col-6 text-end pt-2 pe-4">
-                        <div class="dropdown">
-                            <a
-                                class="btn btn-outline-dark dropdown-toggle"
-                                href="#"
-                                role="button"
-                                id="dropdownMenuLink"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                Mặc định
-                            </a>
-
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <li>
-                                    <button class="dropdown-item">Người dùng</button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item">Quản trị viên</button>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="row justify-content-evenly">
@@ -149,6 +126,20 @@
             const keyword = ref('') as Ref<string>
             const isLoadingPage = ref(true)
 
+            const filteredLoaiKhieuNais = computed(() => {
+                if (!keyword.value.trim()) return loaiKhieuNais.value
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return loaiKhieuNais.value.filter((item: any) => {
+                    const maLoaiKhieuNai = String(item.maLoaiKhieuNai).toLowerCase()
+                    const tenLoaiKhieuNai = String(item.tenLoaiKhieuNai).toLowerCase()
+
+                    const kw = keyword.value.trim().toLowerCase()
+
+                    return maLoaiKhieuNai.includes(kw) || tenLoaiKhieuNai.includes(kw)
+                })
+            })
+
             const fetchLoaiKhieuNais = async () => {
                 const result = await getLoaiKhieuNais()
                 loaiKhieuNais.value = result
@@ -156,7 +147,7 @@
 
             const paginatedLoaiKhieuNais = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return loaiKhieuNais.value.slice(start, start + pageSize.value)
+                return filteredLoaiKhieuNais.value.slice(start, start + pageSize.value)
             })
 
             watch(currentPage, (newPage) => {

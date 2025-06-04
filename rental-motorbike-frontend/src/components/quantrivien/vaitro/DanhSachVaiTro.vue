@@ -6,29 +6,6 @@
                     <div class="col-6">
                         <SearchComponent class="w-100" v-model="keyword" />
                     </div>
-                    <div class="col-6 text-end pt-2 pe-4">
-                        <div class="dropdown">
-                            <a
-                                class="btn btn-outline-dark dropdown-toggle"
-                                href="#"
-                                role="button"
-                                id="dropdownMenuLink"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                Mặc định
-                            </a>
-
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                <li>
-                                    <button class="dropdown-item">Người dùng</button>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item">Quản trị viên</button>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="row justify-content-evenly">
@@ -127,6 +104,20 @@
             const keyword = ref('') as Ref<string>
             const isLoadingPage = ref(true)
 
+            const filteredVaiTros = computed(() => {
+                if (!keyword.value.trim()) return vaiTros.value
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return vaiTros.value.filter((item: any) => {
+                    const maVaiTro = String(item.maVaiTro).toLowerCase()
+                    const tenVaiTro = String(item.tenVaiTro).toLowerCase()
+
+                    const kw = keyword.value.trim().toLowerCase()
+
+                    return maVaiTro.includes(kw) || tenVaiTro.includes(kw)
+                })
+            })
+
             const fetchVaiTros = async () => {
                 const result = await getVaiTros()
                 vaiTros.value = result
@@ -134,7 +125,7 @@
 
             const paginatedVaiTros = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return vaiTros.value.slice(start, start + pageSize.value)
+                return filteredVaiTros.value.slice(start, start + pageSize.value)
             })
 
             watch(currentPage, (newPage) => {

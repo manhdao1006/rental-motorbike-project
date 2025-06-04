@@ -47,15 +47,18 @@
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
                             >
-                                Mặc định
+                                {{ selectedSortLabel }}
                             </a>
-
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                 <li>
-                                    <button class="dropdown-item">Người dùng</button>
+                                    <button class="dropdown-item" @click="setSortOption('moiNhat')">
+                                        Mới nhất
+                                    </button>
                                 </li>
                                 <li>
-                                    <button class="dropdown-item">Quản trị viên</button>
+                                    <button class="dropdown-item" @click="setSortOption('cuNhat')">
+                                        Cũ nhất
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -264,6 +267,39 @@
             const keyword = ref('') as Ref<string>
             const maVaiTroParams = String(route.params.maVaiTro)
             const isLoadingPage = ref(true)
+            const selectedSort = ref<'moiNhat' | 'cuNhat'>('moiNhat')
+
+            const selectedSortLabel = computed(() => {
+                return selectedSort.value === 'moiNhat' ? 'Mới nhất' : 'Cũ nhất'
+            })
+
+            const setSortOption = (option: 'moiNhat' | 'cuNhat') => {
+                selectedSort.value = option
+                fetchNguoiDungs()
+            }
+
+            const filteredNguoiDungs = computed(() => {
+                if (!keyword.value.trim()) return nguoiDungs.value
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return nguoiDungs.value.filter((item: any) => {
+                    const maNguoiDung = String(item.maNguoiDung).toLowerCase()
+                    const hoVaTen = String(item.hoVaTen).toLowerCase()
+                    const email = String(item.email).toLowerCase()
+                    const soDienThoai = String(item.soDienThoai).toLowerCase()
+                    const trangThaiHoatDong = String(item.trangThaiHoatDong).toLowerCase()
+
+                    const kw = keyword.value.trim().toLowerCase()
+
+                    return (
+                        maNguoiDung.includes(kw) ||
+                        hoVaTen.includes(kw) ||
+                        email.includes(kw) ||
+                        soDienThoai.includes(kw) ||
+                        trangThaiHoatDong.includes(kw)
+                    )
+                })
+            })
 
             const fetchNguoiDungs = async () => {
                 const result = await getNguoiDungsByMaVaiTro(String(route.params.maVaiTro))
@@ -276,15 +312,19 @@
                         (
                             firstDate: { ngayDangKy: string | number | Date },
                             secondDate: { ngayDangKy: string | number | Date }
-                        ) =>
-                            new Date(secondDate.ngayDangKy).getTime() -
-                            new Date(firstDate.ngayDangKy).getTime()
+                        ) => {
+                            const dateFirst = new Date(firstDate.ngayDangKy).getTime()
+                            const dateSecond = new Date(secondDate.ngayDangKy).getTime()
+                            return selectedSort.value === 'moiNhat'
+                                ? dateSecond - dateFirst
+                                : dateFirst - dateSecond
+                        }
                     )
             }
 
             const paginatedNguoiDungs = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return nguoiDungs.value.slice(start, start + pageSize.value)
+                return filteredNguoiDungs.value.slice(start, start + pageSize.value)
             })
 
             onMounted(async () => {
@@ -367,7 +407,9 @@
                 showConfirmBanPopup,
                 confirmDelete,
                 confirmBan,
-                maVaiTroParams
+                maVaiTroParams,
+                selectedSortLabel,
+                setSortOption
             }
         }
     })

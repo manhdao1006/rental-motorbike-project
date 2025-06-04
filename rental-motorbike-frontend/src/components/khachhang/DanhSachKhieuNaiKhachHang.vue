@@ -23,15 +23,24 @@
                                     data-bs-toggle="dropdown"
                                     aria-expanded="false"
                                 >
-                                    Mặc định
+                                    {{ selectedSortLabel }}
                                 </a>
-
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                     <li>
-                                        <button class="dropdown-item">Người dùng</button>
+                                        <button
+                                            class="dropdown-item"
+                                            @click="setSortOption('moiNhat')"
+                                        >
+                                            Mới nhất
+                                        </button>
                                     </li>
                                     <li>
-                                        <button class="dropdown-item">Quản trị viên</button>
+                                        <button
+                                            class="dropdown-item"
+                                            @click="setSortOption('cuNhat')"
+                                        >
+                                            Cũ nhất
+                                        </button>
                                     </li>
                                 </ul>
                             </div>
@@ -162,6 +171,7 @@
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
+    import { useDate } from '@/composables/useDate'
     import { useDateTime } from '@/composables/useDateTime'
     import { getNguoiDungByMaNguoiDung } from '@/services/authService'
     import { getKhieuNaisByKhachHang } from '@/services/khieuNaiService'
@@ -191,6 +201,45 @@
             const keyword = ref('') as Ref<string>
             const isLoadingPage = ref(true)
             const nguoiDungKhachHang = ref<Record<string, null>>({})
+            const selectedSort = ref<'moiNhat' | 'cuNhat'>('moiNhat')
+
+            const selectedSortLabel = computed(() => {
+                return selectedSort.value === 'moiNhat' ? 'Mới nhất' : 'Cũ nhất'
+            })
+
+            const setSortOption = (option: 'moiNhat' | 'cuNhat') => {
+                selectedSort.value = option
+                fetchKhieuNais()
+            }
+
+            const filteredKhieuNais = computed(() => {
+                if (!keyword.value.trim()) return khieuNais.value
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return khieuNais.value.filter((item: any) => {
+                    const maKhieuNai = String(item.khieuNai.maKhieuNai).toLowerCase()
+                    const noiDungKhieuNai = String(item.khieuNai.noiDungKhieuNai).toLowerCase()
+                    const ngayKhieuNai = formatDate(item.khieuNai.ngayKhieuNai).toLowerCase()
+                    const trangThaiXuLy = String(item.khieuNai.trangThaiXuLy).toLowerCase()
+                    const tenLoaiKhieuNai = (
+                        tenLoaiKhieuNais.value[String(item.khieuNai.maLoaiKhieuNai)] || ''
+                    ).toLowerCase()
+
+                    const kw = keyword.value.trim().toLowerCase()
+
+                    return (
+                        maKhieuNai.includes(kw) ||
+                        noiDungKhieuNai.includes(kw) ||
+                        ngayKhieuNai.includes(kw) ||
+                        trangThaiXuLy.includes(kw) ||
+                        tenLoaiKhieuNai.includes(kw)
+                    )
+                })
+            })
+
+            const formatDate = (date: string) => {
+                return useDate(date)
+            }
 
             const fetchKhachHang = async () => {
                 const response = await getNguoiDungByMaNguoiDung(getMaNguoiDung())
@@ -200,14 +249,36 @@
             const formatDateTime = (dateTime: string) => {
                 return useDateTime(dateTime)
             }
+
             const paginatedKhieuNais = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return khieuNais.value.slice(start, start + pageSize.value)
+                return filteredKhieuNais.value.slice(start, start + pageSize.value)
             })
 
             const fetchKhieuNais = async () => {
                 const result = await getKhieuNaisByKhachHang(getMaNguoiDung())
-                khieuNais.value = result
+
+                result.sort(
+                    (
+                        firstDate: { khieuNai: { ngayKhieuNai: string | number | Date } },
+                        secondDate: { khieuNai: { ngayKhieuNai: string | number | Date } }
+                    ) => {
+                        const dateFirst = new Date(firstDate.khieuNai.ngayKhieuNai).getTime()
+                        const dateSecond = new Date(secondDate.khieuNai.ngayKhieuNai).getTime()
+                        return selectedSort.value === 'moiNhat'
+                            ? dateSecond - dateFirst
+                            : dateFirst - dateSecond
+                    }
+                )
+
+                khieuNais.value = result.filter(
+                    (item: { khieuNai: { maKhieuNai: string } }, index: number, self: []) =>
+                        index ===
+                        self.findIndex(
+                            (t: { khieuNai: { maKhieuNai: string } }) =>
+                                t.khieuNai.maKhieuNai === item.khieuNai.maKhieuNai
+                        )
+                )
 
                 for (const item of result) {
                     getTenLoaiKhieuNai(String(item.khieuNai.maLoaiKhieuNai))
@@ -249,7 +320,9 @@
                 onChangePage,
                 tenLoaiKhieuNais,
                 keyword,
-                nguoiDungKhachHang
+                nguoiDungKhachHang,
+                selectedSortLabel,
+                setSortOption
             }
         }
     })
