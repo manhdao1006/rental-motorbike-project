@@ -16,15 +16,18 @@
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
                             >
-                                Mặc định
+                                {{ selectedSortLabel }}
                             </a>
-
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                 <li>
-                                    <button class="dropdown-item">Người dùng</button>
+                                    <button class="dropdown-item" @click="setSortOption('moiNhat')">
+                                        Mới nhất
+                                    </button>
                                 </li>
                                 <li>
-                                    <button class="dropdown-item">Quản trị viên</button>
+                                    <button class="dropdown-item" @click="setSortOption('cuNhat')">
+                                        Cũ nhất
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -54,7 +57,7 @@
                             <th>Email</th>
                             <th>Số điện thoại</th>
                             <th>Giới tính</th>
-                            <th>Trạng thái hoạt động</th>
+                            <th>Trạng thái</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -187,15 +190,71 @@
             const nhanVienToBan = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
             const isLoadingPage = ref(true)
+            const selectedSort = ref<'moiNhat' | 'cuNhat'>('moiNhat')
+
+            const selectedSortLabel = computed(() => {
+                return selectedSort.value === 'moiNhat' ? 'Mới nhất' : 'Cũ nhất'
+            })
+
+            const setSortOption = (option: 'moiNhat' | 'cuNhat') => {
+                selectedSort.value = option
+                fetchNhanViens()
+            }
+
+            const filteredNhanViens = computed(() => {
+                if (!keyword.value.trim()) return nhanViens.value
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return nhanViens.value.filter((item: any) => {
+                    const maNhanVien = String(item.nhanVien.maNhanVien).toLowerCase()
+                    const hoVaTen = String(item.nguoiDung.hoVaTen).toLowerCase()
+                    const email = String(item.nguoiDung.email).toLowerCase()
+                    const soDienThoai = String(item.nguoiDung.soDienThoai).toLowerCase()
+                    const gioiTinh = String(item.nguoiDung.gioiTinh).toLowerCase()
+                    const trangThaiHoatDong = String(item.nguoiDung.trangThaiHoatDong).toLowerCase()
+
+                    const kw = keyword.value.trim().toLowerCase()
+
+                    return (
+                        maNhanVien.includes(kw) ||
+                        hoVaTen.includes(kw) ||
+                        email.includes(kw) ||
+                        soDienThoai.includes(kw) ||
+                        gioiTinh.includes(kw) ||
+                        trangThaiHoatDong.includes(kw)
+                    )
+                })
+            })
 
             const fetchNhanViens = async () => {
                 const result = await getNhanViensByChuCuaHang(getMaNguoiDung())
-                nhanViens.value = result
+
+                result.sort(
+                    (
+                        firstDate: { nguoiDung: { ngayDangKy: string | number | Date } },
+                        secondDate: { nguoiDung: { ngayDangKy: string | number | Date } }
+                    ) => {
+                        const dateFirst = new Date(firstDate.nguoiDung.ngayDangKy).getTime()
+                        const dateSecond = new Date(secondDate.nguoiDung.ngayDangKy).getTime()
+                        return selectedSort.value === 'moiNhat'
+                            ? dateSecond - dateFirst
+                            : dateFirst - dateSecond
+                    }
+                )
+
+                nhanViens.value = result.filter(
+                    (item: { nhanVien: { maNhanVien: string } }, index: number, self: []) =>
+                        index ===
+                        self.findIndex(
+                            (t: { nhanVien: { maNhanVien: string } }) =>
+                                t.nhanVien.maNhanVien === item.nhanVien.maNhanVien
+                        )
+                )
             }
 
             const paginatedNhanViens = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return nhanViens.value.slice(start, start + pageSize.value)
+                return filteredNhanViens.value.slice(start, start + pageSize.value)
             })
 
             watch(currentPage, (newPage) => {
@@ -260,7 +319,9 @@
                 showBanPopup,
                 nhanVienToDelete,
                 tenChuCuaHangs,
-                keyword
+                keyword,
+                selectedSortLabel,
+                setSortOption
             }
         }
     })

@@ -65,14 +65,18 @@
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
                             >
-                                Mặc định
+                                {{ selectedSortLabel }}
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                 <li>
-                                    <button class="dropdown-item">Người dùng</button>
+                                    <button class="dropdown-item" @click="setSortOption('moiNhat')">
+                                        Mới nhất
+                                    </button>
                                 </li>
                                 <li>
-                                    <button class="dropdown-item">Quản trị viên</button>
+                                    <button class="dropdown-item" @click="setSortOption('cuNhat')">
+                                        Cũ nhất
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -175,6 +179,7 @@
     import PaginationComponent from '@/components/dungchung/PaginationComponent.vue'
     import PopupLoading from '@/components/dungchung/PopupLoading.vue'
     import SearchComponent from '@/components/dungchung/SearchComponent.vue'
+    import { useDate } from '@/composables/useDate'
     import { useDateTime } from '@/composables/useDateTime'
     import { getChiTietDonHangsByMaChuCuaHang } from '@/services/chiTietDonHangService'
     import { getKhachHangByMaNguoiDung } from '@/services/khachHangService'
@@ -205,6 +210,45 @@
             const keyword = ref('') as Ref<string>
             const trangThaiDonHangParams = String(route.params.trangThaiDonHang)
             const isLoadingPage = ref(true)
+            const selectedSort = ref<'moiNhat' | 'cuNhat'>('moiNhat')
+
+            const selectedSortLabel = computed(() => {
+                return selectedSort.value === 'moiNhat' ? 'Mới nhất' : 'Cũ nhất'
+            })
+
+            const setSortOption = (option: 'moiNhat' | 'cuNhat') => {
+                selectedSort.value = option
+                fetchDonHangs()
+            }
+
+            const filteredDonHangs = computed(() => {
+                if (!keyword.value.trim()) return donHangs.value
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return donHangs.value.filter((item: any) => {
+                    const maDonHang = String(item.donHang.maDonHang).toLowerCase()
+                    const ngayTao = formatDate(item.donHang.ngayTao).toLowerCase()
+                    const tenNhanVien = (
+                        tenNhanViens.value[String(item.donHang.maNhanVien)] || ''
+                    ).toLowerCase()
+                    const tenKhachHang = (
+                        tenKhachHangs.value[String(item.donHang.maKhachHang)] || ''
+                    ).toLowerCase()
+
+                    const kw = keyword.value.trim().toLowerCase()
+
+                    return (
+                        maDonHang.includes(kw) ||
+                        ngayTao.includes(kw) ||
+                        tenNhanVien.includes(kw) ||
+                        tenKhachHang.includes(kw)
+                    )
+                })
+            })
+
+            const formatDate = (date: string) => {
+                return useDate(date)
+            }
 
             const formatDateTime = (dateTime: string) => {
                 return useDateTime(dateTime)
@@ -212,7 +256,7 @@
 
             const paginatedDonHangs = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return donHangs.value.slice(start, start + pageSize.value)
+                return filteredDonHangs.value.slice(start, start + pageSize.value)
             })
 
             const fetchDonHangs = async () => {
@@ -220,13 +264,18 @@
                     getMaNguoiDung(),
                     trangThaiDonHangParams
                 )
+
                 result.sort(
                     (
                         firstDate: { donHang: { ngayTao: string | number | Date } },
                         secondDate: { donHang: { ngayTao: string | number | Date } }
-                    ) =>
-                        new Date(secondDate.donHang.ngayTao).getTime() -
-                        new Date(firstDate.donHang.ngayTao).getTime()
+                    ) => {
+                        const dateFirst = new Date(firstDate.donHang.ngayTao).getTime()
+                        const dateSecond = new Date(secondDate.donHang.ngayTao).getTime()
+                        return selectedSort.value === 'moiNhat'
+                            ? dateSecond - dateFirst
+                            : dateFirst - dateSecond
+                    }
                 )
 
                 donHangs.value = result.filter(
@@ -297,7 +346,9 @@
                 tenKhachHangs,
                 tenNhanViens,
                 keyword,
-                trangThaiDonHangParams
+                trangThaiDonHangParams,
+                selectedSortLabel,
+                setSortOption
             }
         }
     })

@@ -16,15 +16,18 @@
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
                             >
-                                Mặc định
+                                {{ selectedSortLabel }}
                             </a>
-
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                 <li>
-                                    <button class="dropdown-item">Người dùng</button>
+                                    <button class="dropdown-item" @click="setSortOption('moiNhat')">
+                                        Mới nhất
+                                    </button>
                                 </li>
                                 <li>
-                                    <button class="dropdown-item">Quản trị viên</button>
+                                    <button class="dropdown-item" @click="setSortOption('cuNhat')">
+                                        Cũ nhất
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -51,7 +54,7 @@
                             <th>Biển số xe</th>
                             <th>Danh mục xe</th>
                             <th>Giá thuê</th>
-                            <th>Trạng thái hoạt động</th>
+                            <th>Trạng thái</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -155,6 +158,41 @@
             const xeMayToDelete = ref(null) as Ref<string | null>
             const keyword = ref('') as Ref<string>
             const isLoadingPage = ref(true)
+            const selectedSort = ref<'moiNhat' | 'cuNhat'>('moiNhat')
+
+            const selectedSortLabel = computed(() => {
+                return selectedSort.value === 'moiNhat' ? 'Mới nhất' : 'Cũ nhất'
+            })
+
+            const setSortOption = (option: 'moiNhat' | 'cuNhat') => {
+                selectedSort.value = option
+                fetchXeMays()
+            }
+
+            const filteredXeMays = computed(() => {
+                if (!keyword.value.trim()) return xeMays.value
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return xeMays.value.filter((item: any) => {
+                    const maXeMay = String(item.xeMay.maXeMay).toLowerCase()
+                    const tenXe = String(item.xeMay.tenXe).toLowerCase()
+                    const bienSoXe = String(item.xeMay.bienSoXe).toLowerCase()
+                    const tenDanhMucXe = String(item.danhMucXe.tenDanhMucXe).toLowerCase()
+                    const giaThue = String(item.xeMay.giaThue).toLowerCase()
+                    const trangThaiHoatDong = String(item.xeMay.trangThaiHoatDong).toLowerCase()
+
+                    const kw = keyword.value.trim().toLowerCase()
+
+                    return (
+                        maXeMay.includes(kw) ||
+                        tenXe.includes(kw) ||
+                        bienSoXe.includes(kw) ||
+                        tenDanhMucXe.includes(kw) ||
+                        giaThue.includes(kw) ||
+                        trangThaiHoatDong.includes(kw)
+                    )
+                })
+            })
 
             const formattedGiaThue = (giaThue: string) => {
                 if (!giaThue) return '0'
@@ -164,12 +202,53 @@
 
             const fetchXeMays = async () => {
                 const result = await getXeMaysByChuCuaHang(getMaNguoiDung())
-                xeMays.value = result
+
+                result.sort(
+                    (a: { xeMay: { maXeMay: string } }, b: { xeMay: { maXeMay: string } }) => {
+                        const getNgayVaThuTu = (ma: string): { date: number; order: number } => {
+                            const raw = ma.replace('XM', '')
+                            const datePart = raw.slice(0, 8)
+                            const orderPart = raw.slice(8) || '0'
+
+                            const year = datePart.slice(0, 4)
+                            const month = datePart.slice(4, 6)
+                            const day = datePart.slice(6, 8)
+                            const isoDate = `${year}-${month}-${day}`
+
+                            return {
+                                date: new Date(isoDate).getTime(),
+                                order: parseInt(orderPart, 10)
+                            }
+                        }
+
+                        const infoA = getNgayVaThuTu(a.xeMay.maXeMay)
+                        const infoB = getNgayVaThuTu(b.xeMay.maXeMay)
+
+                        if (infoA.date !== infoB.date) {
+                            return selectedSort.value === 'moiNhat'
+                                ? infoB.date - infoA.date
+                                : infoA.date - infoB.date
+                        }
+
+                        return selectedSort.value === 'moiNhat'
+                            ? infoB.order - infoA.order
+                            : infoA.order - infoB.order
+                    }
+                )
+
+                xeMays.value = result.filter(
+                    (item: { xeMay: { maXeMay: string } }, index: number, self: []) =>
+                        index ===
+                        self.findIndex(
+                            (t: { xeMay: { maXeMay: string } }) =>
+                                t.xeMay.maXeMay === item.xeMay.maXeMay
+                        )
+                )
             }
 
             const paginatedXeMays = computed(() => {
                 const start = (currentPage.value - 1) * pageSize.value
-                return xeMays.value.slice(start, start + pageSize.value)
+                return filteredXeMays.value.slice(start, start + pageSize.value)
             })
 
             watch(currentPage, (newPage) => {
@@ -216,7 +295,9 @@
                 xeMayToDelete,
                 tenChuCuaHangs,
                 keyword,
-                formattedGiaThue
+                formattedGiaThue,
+                selectedSortLabel,
+                setSortOption
             }
         }
     })
