@@ -151,24 +151,27 @@ public class PaymentController {
     @PostMapping("/refund")
     public ResponseEntity<?> refundDeposit(
             @RequestParam String maDonHang,
-            @RequestParam long soTienHoan) { // ← nhận từ FE
+            @RequestParam long soTienHoan) {
 
         DonHangEntity donHang = donHangRepository.findOneByMaDonHang(maDonHang)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng"));
 
-        if (!"Đặt cọc".equalsIgnoreCase(donHang.getTrangThaiThanhToan())) {
+        String trangThai = donHang.getTrangThaiThanhToan();
+        if (!trangThai.equalsIgnoreCase("Đặt cọc") &&
+                !trangThai.equalsIgnoreCase("Đã thanh toán")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Chỉ hoàn được đơn hàng đang ở trạng thái 'Đặt cọc'");
+                    .body("Chỉ hoàn được đơn hàng đã đặt cọc hoặc đã thanh toán");
         }
 
-        String vnp_TxnRef = donHang.getMaDonHang() + "-DATCOC";
-        long refundAmount = soTienHoan * 100; // VNPAY yêu cầu đơn vị là VND * 100
-        String vnp_TransactionNo = donHang.getMaGiaoDich(); // lấy từ đơn hàng đã lưu khi thanh toán thành công
+        String loaiThanhToan = trangThai.equalsIgnoreCase("Đặt cọc") ? "DATCOC" : "THANHTOANTOANBO";
+        String vnp_TxnRef = donHang.getMaDonHang() + "-" + loaiThanhToan;
+        long refundAmount = soTienHoan * 100;
+        String vnp_TransactionNo = donHang.getMaGiaoDich();
 
         boolean success = vnpayRefundRequest(vnp_TxnRef, refundAmount, vnp_TransactionNo);
 
         if (success) {
-            donHang.setTrangThaiThanhToan("Hoàn cọc");
+            donHang.setTrangThaiThanhToan(loaiThanhToan.equals("DATCOC") ? "Hoàn cọc" : "Hoàn toàn bộ");
             donHangRepository.save(donHang);
             return ResponseEntity.ok("Hoàn cọc thành công");
         } else {
@@ -185,17 +188,17 @@ public class PaymentController {
             vnp_Params.put("vnp_TmnCode", PaymentConfig.vnp_TmnCode);
             vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
             vnp_Params.put("vnp_Amount", String.valueOf(amount));
-            vnp_Params.put("vnp_TransactionType", "02"); // Hoàn toàn
+            vnp_Params.put("vnp_TransactionType", "02");
             vnp_Params.put("vnp_CreateBy", "admin");
             vnp_Params.put("vnp_OrderInfo", "Hoan coc don hang: " + vnp_TxnRef);
-            vnp_Params.put("vnp_TransactionNo", vnp_TransactionNo); // ← dùng mã thật
+            vnp_Params.put("vnp_TransactionNo", vnp_TransactionNo);
             vnp_Params.put("vnp_CreateDate", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
 
             String hashData = PaymentConfig.hashAllFields(vnp_Params);
             vnp_Params.put("vnp_SecureHash", hashData);
 
             System.out.println("Send refund to VNPAY: " + vnp_Params);
-            return true; // Sau này thay bằng POST thực tế đến VNPAY
+            return true;
 
         } catch (Exception e) {
             e.printStackTrace();

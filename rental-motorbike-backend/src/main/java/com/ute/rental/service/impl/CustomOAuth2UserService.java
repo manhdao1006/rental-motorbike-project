@@ -47,7 +47,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         NguoiDungEntity newUser = new NguoiDungEntity();
         newUser.setMaNguoiDung(generateMaNguoiDung());
         newUser.setEmail(email);
-        newUser.setMatKhau(passwordEncoder.encode("User@123")); // Mật khẩu mặc định
+        newUser.setMatKhau(passwordEncoder.encode("123456")); // Mật khẩu mặc định
         newUser.setHoVaTen(name);
         newUser.setAnhDaiDien(picture);
         newUser.setNgayDangKy(LocalDateTime.now());

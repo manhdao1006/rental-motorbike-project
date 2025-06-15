@@ -999,6 +999,17 @@
                         }
                     }
 
+                    if (donHang.value.trangThaiThanhToan === 'Đã thanh toán') {
+                        const refundResponse = await refundDeposit(
+                            String(donHang.value.maDonHang),
+                            tongTien.value
+                        )
+
+                        if (refundResponse.status !== 200) {
+                            throw new Error('Hoàn tiền thất bại')
+                        }
+                    }
+
                     const formData = new FormData()
                     formData.append('trangThaiDonHang', 'Đã hủy')
                     formData.append('lyDoHuy', donHang.value.lyDoHuy)
