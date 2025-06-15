@@ -3,14 +3,14 @@
         <div class="container">
             <div class="align-content-center block-navbar hide-navigation" id="blockNavbar">
                 <ul class="nav justify-content-center">
-                    <NavItem link="#" content="Hải Châu" />
-                    <NavItem link="#" content="Thanh Khê" />
-                    <NavItem link="#" content="Sơn Trà" />
-                    <NavItem link="#" content="Ngũ Hành Sơn" />
-                    <NavItem link="#" content="Liên Chiểu" />
-                    <NavItem link="#" content="Cẩm Lệ" />
-                    <NavItem link="#" content="Hòa Vang" />
-                    <NavItem link="#" content="Hoàng Sa" />
+                    <NavItem link="/danh-sach-xe/QH01" content="Hải Châu" />
+                    <NavItem link="/danh-sach-xe/QH02" content="Thanh Khê" />
+                    <NavItem link="/danh-sach-xe/QH03" content="Sơn Trà" />
+                    <NavItem link="/danh-sach-xe/QH04" content="Ngũ Hành Sơn" />
+                    <NavItem link="/danh-sach-xe/QH05" content="Liên Chiểu" />
+                    <NavItem link="/danh-sach-xe/QH06" content="Cẩm Lệ" />
+                    <NavItem link="/danh-sach-xe/QH07" content="Hòa Vang" />
+                    <NavItem link="/danh-sach-xe/QH08" content="Hoàng Sa" />
                 </ul>
             </div>
         </div>
