@@ -763,7 +763,7 @@
                 }
 
                 try {
-                    const txnRefToanBo = `${donHang.value.maDonHang}-THANHTOANTOANBO`
+                    const txnRefToanBo = `${donHang.value.maDonHang}THANHTOANTOANBO`
 
                     const response = await createPayment(
                         Number(tongTien.value),
@@ -789,7 +789,7 @@
                 }
 
                 try {
-                    const txnRefConLai = `${donHang.value.maDonHang}-THANHTOANCONLAI`
+                    const txnRefConLai = `${donHang.value.maDonHang}THANHTOANCONLAI`
                     const tienConLai = Number(tongTien.value) * 0.8
 
                     const response = await createPayment(
@@ -816,7 +816,7 @@
                 }
 
                 try {
-                    const txnRefDatCoc = `${donHang.value.maDonHang}-DATCOC`
+                    const txnRefDatCoc = `${donHang.value.maDonHang}DATCOC`
                     const tienDatCoc = Number(tongTien.value) * 0.2
 
                     const response = await createPayment(

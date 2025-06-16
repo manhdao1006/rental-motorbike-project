@@ -51,8 +51,8 @@ public class PaymentController {
         String vnp_TmnCode = PaymentConfig.vnp_TmnCode;
 
         Map<String, String> vnp_Params = new HashMap<>();
-        vnp_Params.put("vnp_Version", PaymentConfig.vnp_Version);
-        vnp_Params.put("vnp_Command", PaymentConfig.vnp_Command);
+        vnp_Params.put("vnp_Version", "2.1.0");
+        vnp_Params.put("vnp_Command", "pay");
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
         vnp_Params.put("vnp_Amount", String.valueOf(amount * 100));
         vnp_Params.put("vnp_CurrCode", "VND");
@@ -60,7 +60,7 @@ public class PaymentController {
             vnp_Params.put("vnp_BankCode", bankCode);
         }
         vnp_Params.put("vnp_TxnRef", txnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang: " + txnRef);
+        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + txnRef);
         vnp_Params.put("vnp_OrderType", "other");
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_ReturnUrl", PaymentConfig.vnp_ReturnUrl);
@@ -97,11 +97,10 @@ public class PaymentController {
                 }
             }
         }
+        String queryUrl = query.toString();
         String vnp_SecureHash = PaymentConfig.hmacSHA512(PaymentConfig.secretKey, hashData.toString());
-        query.append("&vnp_SecureHash=");
-        query.append(vnp_SecureHash);
-
-        String paymentUrl = PaymentConfig.vnp_PayUrl + "?" + query.toString();
+        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+        String paymentUrl = PaymentConfig.vnp_PayUrl + "?" + queryUrl;
 
         PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO();
         paymentResponseDTO.setStatus("Ok");
@@ -120,9 +119,22 @@ public class PaymentController {
             @RequestParam(value = "vnp_ResponseCode") String responseCode,
             @RequestParam(value = "vnp_TransactionNo") String transactionNo) {
 
-        String[] parts = txnRef.split("-");
-        String maDonHang = parts[0];
-        String loaiThanhToan = parts.length > 1 ? parts[1] : "FULL";
+        String maDonHang;
+        String loaiThanhToan;
+
+        if (txnRef.endsWith("THANHTOANCONLAI")) {
+            maDonHang = txnRef.replace("THANHTOANCONLAI", "");
+            loaiThanhToan = "THANHTOANCONLAI";
+        } else if (txnRef.endsWith("THANHTOANTOANBO")) {
+            maDonHang = txnRef.replace("THANHTOANTOANBO", "");
+            loaiThanhToan = "THANHTOANTOANBO";
+        } else if (txnRef.endsWith("DATCOC")) {
+            maDonHang = txnRef.replace("DATCOC", "");
+            loaiThanhToan = "DATCOC";
+        } else {
+            maDonHang = txnRef;
+            loaiThanhToan = "FULL";
+        }
 
         DonHangEntity donHangEntity = donHangRepository.findOneByMaDonHang(maDonHang)
                 .orElseThrow(() -> new ResourceNotFoundException(
