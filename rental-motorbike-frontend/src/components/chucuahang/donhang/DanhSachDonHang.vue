@@ -97,7 +97,14 @@
                             <th>Khách hàng</th>
                             <th>Nhân viên giao xe</th>
                             <th>Trạng thái đơn hàng</th>
-                            <th>Thao tác</th>
+                            <th
+                                v-if="
+                                    trangThaiDonHangParams === 'Chờ xử lý' ||
+                                    trangThaiDonHangParams === 'Đã trả xe'
+                                "
+                            >
+                                Thao tác
+                            </th>
                         </tr>
                     </thead>
                     <tbody>

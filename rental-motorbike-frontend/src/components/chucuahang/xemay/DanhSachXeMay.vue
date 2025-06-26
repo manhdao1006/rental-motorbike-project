@@ -272,7 +272,7 @@
             const confirmDelete = async () => {
                 if (xeMayToDelete.value) {
                     await deleteXeMay(xeMayToDelete.value)
-                    fetchXeMays()
+                    router.go(0)
                 }
             }
 

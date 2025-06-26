@@ -247,6 +247,7 @@
                                     id="ngayGiaoXe"
                                     :min="minGiaoXeDate"
                                     :max="maxGiaoXeDate"
+                                    :disabled="trangThaiDonHangParams === 'Đã trả xe'"
                                 />
                             </div>
                         </div>
@@ -260,6 +261,7 @@
                                     id="ngayTraXe"
                                     :min="minTraXeDate"
                                     :max="maxTraXeDate"
+                                    :disabled="trangThaiDonHangParams === 'Đã trả xe'"
                                 />
                             </div>
                         </div>
@@ -327,7 +329,7 @@
                     ></textarea>
                 </div>
             </div>
-            <div class="text-center mt-3">
+            <div class="text-center mt-3 mb-3">
                 <button
                     v-if="donHang.trangThaiDonHang === 'Đã hủy'"
                     type="button"
@@ -616,7 +618,6 @@
                 if (
                     !donHang.value.trangThaiDonHang ||
                     !donHang.value.ngayGiaoXe ||
-                    !donHang.value.diaChiGiaoXe ||
                     !donHang.value.maNhanVien
                 ) {
                     isError.value = true
@@ -645,10 +646,20 @@
 
                     const response = await updateDonHang(String(donHang.value.maDonHang), formData)
                     if (response.success) {
-                        await router.push({
-                            name: 'DanhSachDonHangView',
-                            params: { trangThaiDonHang: 'Chờ xử lý' }
-                        })
+                        const formData = new FormData()
+                        formData.append('trangThaiHoatDong', 'Đang cho thuê')
+                        for (let xe of xeMays.value) {
+                            const responseXeMay = await updateXeMay(
+                                (xe.xeMay as unknown as { maXeMay: string }).maXeMay,
+                                formData
+                            )
+                            if (responseXeMay.success) {
+                                await router.push({
+                                    name: 'DanhSachDonHangView',
+                                    params: { trangThaiDonHang: 'Chờ xử lý' }
+                                })
+                            }
+                        }
                     }
                 } catch (error) {
                     console.error('Lỗi khi cập nhật: ', error)
