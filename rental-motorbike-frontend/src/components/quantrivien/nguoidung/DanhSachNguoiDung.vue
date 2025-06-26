@@ -308,18 +308,36 @@
                         (nguoiDung: { trangThaiHoatDong: string }) =>
                             nguoiDung.trangThaiHoatDong !== 'Từ chối'
                     )
-                    .sort(
-                        (
-                            firstDate: { ngayDangKy: string | number | Date },
-                            secondDate: { ngayDangKy: string | number | Date }
-                        ) => {
-                            const dateFirst = new Date(firstDate.ngayDangKy).getTime()
-                            const dateSecond = new Date(secondDate.ngayDangKy).getTime()
-                            return selectedSort.value === 'moiNhat'
-                                ? dateSecond - dateFirst
-                                : dateFirst - dateSecond
+                    .sort((a: { maNguoiDung: string }, b: { maNguoiDung: string }) => {
+                        const getNgayVaThuTu = (ma: string): { date: number; order: number } => {
+                            const raw = ma.replace('ND', '')
+                            const datePart = raw.slice(0, 8)
+                            const orderPart = raw.slice(8) || '0'
+
+                            const year = datePart.slice(0, 4)
+                            const month = datePart.slice(4, 6)
+                            const day = datePart.slice(6, 8)
+                            const isoDate = `${year}-${month}-${day}`
+
+                            return {
+                                date: new Date(isoDate).getTime(),
+                                order: parseInt(orderPart, 10)
+                            }
                         }
-                    )
+
+                        const infoA = getNgayVaThuTu(a.maNguoiDung)
+                        const infoB = getNgayVaThuTu(b.maNguoiDung)
+
+                        if (infoA.date !== infoB.date) {
+                            return selectedSort.value === 'moiNhat'
+                                ? infoB.date - infoA.date
+                                : infoA.date - infoB.date
+                        }
+
+                        return selectedSort.value === 'moiNhat'
+                            ? infoB.order - infoA.order
+                            : infoA.order - infoB.order
+                    })
             }
 
             const paginatedNguoiDungs = computed(() => {
@@ -367,28 +385,40 @@
             }
 
             const confirmDelete = async () => {
-                if (nguoiDungToDelete.value) {
-                    if (maVaiTroParams === 'VT2') {
-                        await deleteChuCuaHang(nguoiDungToDelete.value)
-                    } else if (maVaiTroParams === 'VT3') {
-                        await deleteNhanVien(nguoiDungToDelete.value)
-                    } else if (maVaiTroParams === 'VT4') {
-                        await deleteKhachHang(nguoiDungToDelete.value)
-                    }
-                    fetchNguoiDungs()
+                if (!nguoiDungToDelete.value) return
+
+                let response
+                if (maVaiTroParams === 'VT2') {
+                    response = await deleteChuCuaHang(nguoiDungToDelete.value)
+                } else if (maVaiTroParams === 'VT3') {
+                    response = await deleteNhanVien(nguoiDungToDelete.value)
+                } else if (maVaiTroParams === 'VT4') {
+                    response = await deleteKhachHang(nguoiDungToDelete.value)
+                }
+
+                if (response?.success) {
+                    router.go(0)
+                } else {
+                    alert(response?.message || 'Có lỗi xảy ra khi xóa')
                 }
             }
 
             const confirmBan = async () => {
-                if (nguoiDungToBan.value) {
-                    if (maVaiTroParams === 'VT2') {
-                        await banChuCuaHang(nguoiDungToBan.value)
-                    } else if (maVaiTroParams === 'VT3') {
-                        await banNhanVien(nguoiDungToBan.value)
-                    } else if (maVaiTroParams === 'VT4') {
-                        await banKhachHang(nguoiDungToBan.value)
-                    }
-                    fetchNguoiDungs()
+                if (!nguoiDungToBan.value) return
+
+                let response
+                if (maVaiTroParams === 'VT2') {
+                    response = await banChuCuaHang(nguoiDungToBan.value)
+                } else if (maVaiTroParams === 'VT3') {
+                    response = await banNhanVien(nguoiDungToBan.value)
+                } else if (maVaiTroParams === 'VT4') {
+                    response = await banKhachHang(nguoiDungToBan.value)
+                }
+
+                if (response?.success) {
+                    router.go(0)
+                } else {
+                    alert(response?.message || 'Có lỗi xảy ra khi ban')
                 }
             }
 

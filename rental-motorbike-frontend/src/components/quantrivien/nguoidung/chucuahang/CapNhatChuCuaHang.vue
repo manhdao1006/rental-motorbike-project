@@ -263,7 +263,7 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center">
+            <div class="text-center mb-3">
                 <button
                     type="button"
                     class="btn btn-success"
