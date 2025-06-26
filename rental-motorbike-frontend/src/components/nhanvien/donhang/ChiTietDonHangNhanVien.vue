@@ -200,6 +200,7 @@
                                     id="ngayGiaoXe"
                                     :min="minGiaoXeDate"
                                     :max="maxGiaoXeDate"
+                                    disabled
                                 />
                             </div>
                         </div>

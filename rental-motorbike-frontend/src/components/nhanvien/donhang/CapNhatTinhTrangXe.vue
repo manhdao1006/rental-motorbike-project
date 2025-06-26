@@ -300,7 +300,7 @@
             </div>
             <div class="row"></div>
             <div
-                class="text-center mt-3"
+                class="text-center mt-3 mb-3"
                 v-if="
                     chuCuaHang.tenVaiTro !== 'ROLE_CHUCUAHANG' &&
                     xeMay.trangThaiHoatDong !== 'Có sẵn'
