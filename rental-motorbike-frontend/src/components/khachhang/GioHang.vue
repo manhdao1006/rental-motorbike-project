@@ -476,7 +476,7 @@
                     (item: { chuCuaHang: { maPhuongXa: string } }) => item.chuCuaHang?.maPhuongXa
                 )
 
-                const [tenPhuongXaResults, tenQuanHuyenResults] = await Promise.all([
+                await Promise.all([
                     Promise.all(maPhuongXaList.map(getTenPhuongXa)),
                     Promise.all(maPhuongXaList.map(getTenQuanHuyen))
                 ])
@@ -486,11 +486,41 @@
                         (item: { xeMay: { maXeMay: string } }) =>
                             !cart.value.some((c) => c.maXeMay === item.xeMay.maXeMay)
                     )
-                    .map((item: object, index: number) => ({
+                    .map((item: { chuCuaHang: { maPhuongXa: string } }) => ({
                         ...item,
-                        tenPhuongXa: tenPhuongXaResults[index],
-                        tenQuanHuyen: tenQuanHuyenResults[index]
+                        tenPhuongXa: tenPhuongXas.value[item.chuCuaHang?.maPhuongXa ?? ''],
+                        tenQuanHuyen: tenQuanHuyens.value[item.chuCuaHang?.maPhuongXa ?? '']
                     }))
+                    .sort(
+                        (a: { xeMay: { maXeMay: string } }, b: { xeMay: { maXeMay: string } }) => {
+                            const getNgayVaThuTu = (
+                                ma: string
+                            ): { date: number; order: number } => {
+                                const raw = ma.replace('XM', '')
+                                const datePart = raw.slice(0, 8)
+                                const orderPart = raw.slice(8) || '0'
+
+                                const year = datePart.slice(0, 4)
+                                const month = datePart.slice(4, 6)
+                                const day = datePart.slice(6, 8)
+                                const isoDate = `${year}-${month}-${day}`
+
+                                return {
+                                    date: new Date(isoDate).getTime(),
+                                    order: parseInt(orderPart, 10)
+                                }
+                            }
+
+                            const infoA = getNgayVaThuTu(a.xeMay.maXeMay)
+                            const infoB = getNgayVaThuTu(b.xeMay.maXeMay)
+
+                            if (infoA.date !== infoB.date) {
+                                return infoB.date - infoA.date
+                            } else {
+                                return infoB.order - infoA.order
+                            }
+                        }
+                    )
             }
 
             const getTenPhuongXa = async (maPhuongXa: string) => {

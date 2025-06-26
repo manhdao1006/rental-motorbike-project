@@ -287,7 +287,6 @@
                                         id="ngayTraXe"
                                         :min="minTraXeDate"
                                         :max="maxTraXeDate"
-                                        disabled
                                     />
                                 </div>
                             </div>
@@ -494,6 +493,17 @@
                             :disabled="isLoading"
                         >
                             Xác nhận
+                        </button>
+                    </div>
+                    <div class="text-center" v-if="trangThaiDonHangParams === 'Đã giao xe'">
+                        <button
+                            type="button"
+                            class="btn btn-success"
+                            title="Trả xe"
+                            @click.prevent="handleTraXe"
+                            :disabled="isLoading"
+                        >
+                            Trả xe
                         </button>
                     </div>
                     <div class="text-center" v-if="trangThaiDonHangParams === 'Đã trả xe'">
@@ -1038,7 +1048,47 @@
                 }
             }
 
+            const handleTraXe = async () => {
+                if (!donHang.value.ngayTraXe) {
+                    isError.value = true
+                    messageError.value = 'Vui lòng nhập đầy đủ các trường dữ liệu!'
+                    setTimeout(() => {
+                        isError.value = false
+                        messageError.value = ''
+                    }, 3000)
+                    return
+                }
+
+                isLoading.value = true
+                try {
+                    const formData = new FormData()
+                    formData.append('trangThaiDonHang', 'Đã trả xe')
+                    formData.append('ngayTraXe', donHang.value.ngayTraXe)
+
+                    const response = await updateDonHang(String(donHang.value.maDonHang), formData)
+                    if (response.success) {
+                        alert('Gửi yêu cầu trả xe thành công!')
+
+                        const currentTrangThai = Array.isArray(route.params.trangThaiDonHang)
+                            ? route.params.trangThaiDonHang[0]
+                            : route.params.trangThaiDonHang
+
+                        if (currentTrangThai === 'Đã giao xe') {
+                            await router.replace({
+                                name: 'DanhSachDonHangKhachHangView',
+                                params: { trangThaiDonHang: 'Đã giao xe' }
+                            })
+                        }
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi cập nhật: ', error)
+                } finally {
+                    isLoading.value = false
+                }
+            }
+
             return {
+                handleTraXe,
                 mapRef,
                 loading,
                 error,

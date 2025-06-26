@@ -102,14 +102,7 @@
                             <th>Ngày tạo</th>
                             <th>Nhân viên giao xe</th>
                             <th>Trạng thái đơn hàng</th>
-                            <th
-                                v-if="
-                                    trangThaiDonHangParams === 'Đã giao xe' ||
-                                    trangThaiDonHangParams === 'Chờ xử lý'
-                                "
-                            >
-                                Thao tác
-                            </th>
+                            <th v-if="trangThaiDonHangParams === 'Chờ xử lý'">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -174,13 +167,6 @@
                                 >
                                     <i class="fa-solid fa-ban text-warning" title="Hủy đơn"></i>
                                 </router-link>
-                                <div
-                                    v-if="trangThaiDonHangParams === 'Đã giao xe'"
-                                    @click="handleTraXe(String((item as any).donHang.maDonHang))"
-                                    style="cursor: pointer"
-                                >
-                                    <i class="fas fa-recycle text-warning" title="Trả xe"></i>
-                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -209,7 +195,6 @@
     import { useDateTime } from '@/composables/useDateTime'
     import { getNguoiDungByMaNguoiDung } from '@/services/authService'
     import { getChiTietDonHangsByMaKhachHang } from '@/services/chiTietDonHangService'
-    import { updateDonHang } from '@/services/donHangService'
     import { getMaNguoiDung } from '@/services/localStorageService'
     import { getNhanVienByMaNguoiDung } from '@/services/nhanVienService'
     import { computed, defineComponent, onMounted, ref, Ref, watch } from 'vue'
@@ -352,36 +337,6 @@
                 currentPage.value = page
             }
 
-            const handleTraXe = async (maDonHang: string) => {
-                isLoading.value = true
-                try {
-                    const formData = new FormData()
-                    formData.append('trangThaiDonHang', 'Đã trả xe')
-
-                    const response = await updateDonHang(maDonHang, formData)
-                    if (response.success) {
-                        alert('Gửi yêu cầu trả xe thành công!')
-
-                        const currentTrangThai = Array.isArray(route.params.trangThaiDonHang)
-                            ? route.params.trangThaiDonHang[0]
-                            : route.params.trangThaiDonHang
-
-                        if (currentTrangThai === 'Đã giao xe') {
-                            await router.replace({
-                                name: 'DanhSachDonHangKhachHangView',
-                                params: { trangThaiDonHang: 'Đã giao xe' }
-                            })
-                        } else {
-                            await fetchDonHangs()
-                        }
-                    }
-                } catch (error) {
-                    console.error('Lỗi khi cập nhật: ', error)
-                } finally {
-                    isLoading.value = false
-                }
-            }
-
             return {
                 isLoadingPage,
                 isLoading,
@@ -399,7 +354,6 @@
                 tenNhanViens,
                 keyword,
                 trangThaiDonHangParams,
-                handleTraXe,
                 selectedSortLabel,
                 setSortOption
             }
