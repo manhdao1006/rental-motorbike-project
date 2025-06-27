@@ -74,7 +74,17 @@
                 {{ messageError }}
             </div>
             <div class="row">
-                <div class="col-6" v-if="trangThaiDonHangParams !== 'Đã trả xe'">
+                <div
+                    class="col-6"
+                    v-if="
+                        trangThaiDonHangParams !== 'Đã trả xe' &&
+                        (donHang.phuongThucThanhToan === 'Thanh toán bằng tiền mặt' ||
+                            (donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng' &&
+                                ['Đặt cọc', 'Đã thanh toán'].includes(
+                                    String(donHang.trangThaiThanhToan)
+                                )))
+                    "
+                >
                     <div class="mb-3">
                         <label for="trangThaiDonHang" class="form-label"
                             >Trạng thái đơn hàng<span class="text-danger">*</span></label
@@ -91,8 +101,29 @@
                         </select>
                     </div>
                 </div>
+                <div
+                    class="col-6"
+                    v-if="
+                        donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng' &&
+                        ['Chưa thanh toán'].includes(String(donHang.trangThaiThanhToan))
+                    "
+                >
+                    <div class="alert alert-danger" role="alert">
+                        Khách hàng chưa đặt cọc hoặc thanh toán!
+                    </div>
+                </div>
                 <div class="col-6">
-                    <div class="mb-3" v-if="donHang.trangThaiDonHang === 'Đã hủy'">
+                    <div
+                        class="mb-3"
+                        v-if="
+                            donHang.trangThaiDonHang === 'Đã hủy' &&
+                            (donHang.phuongThucThanhToan === 'Thanh toán bằng tiền mặt' ||
+                                (donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng' &&
+                                    ['Đặt cọc', 'Đã thanh toán'].includes(
+                                        String(donHang.trangThaiThanhToan)
+                                    )))
+                        "
+                    >
                         <label for="lyDoHuy" class="form-label"
                             >Lý do từ chối<span class="text-danger">*</span></label
                         >
@@ -103,7 +134,17 @@
                             id="lyDoHuy"
                         />
                     </div>
-                    <div class="mb-3" v-if="donHang.trangThaiDonHang === 'Chờ xử lý'">
+                    <div
+                        class="mb-3"
+                        v-if="
+                            donHang.trangThaiDonHang === 'Chờ xử lý' &&
+                            (donHang.phuongThucThanhToan === 'Thanh toán bằng tiền mặt' ||
+                                (donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng' &&
+                                    ['Đặt cọc', 'Đã thanh toán'].includes(
+                                        String(donHang.trangThaiThanhToan)
+                                    )))
+                        "
+                    >
                         <label for="maNhanVien" class="form-label"
                             >Nhân viên giao xe<span class="text-danger">*</span></label
                         >
@@ -331,7 +372,14 @@
             </div>
             <div class="text-center mt-3 mb-3">
                 <button
-                    v-if="donHang.trangThaiDonHang === 'Đã hủy'"
+                    v-if="
+                        donHang.trangThaiDonHang === 'Đã hủy' &&
+                        (donHang.phuongThucThanhToan === 'Thanh toán bằng tiền mặt' ||
+                            (donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng' &&
+                                ['Đặt cọc', 'Đã thanh toán'].includes(
+                                    String(donHang.trangThaiThanhToan)
+                                )))
+                    "
                     type="button"
                     class="btn btn-success"
                     title="Xác nhận"
@@ -341,7 +389,14 @@
                     Xác nhận
                 </button>
                 <button
-                    v-if="donHang.trangThaiDonHang === 'Chờ xử lý'"
+                    v-if="
+                        donHang.trangThaiDonHang === 'Chờ xử lý' &&
+                        (donHang.phuongThucThanhToan === 'Thanh toán bằng tiền mặt' ||
+                            (donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng' &&
+                                ['Đặt cọc', 'Đã thanh toán'].includes(
+                                    String(donHang.trangThaiThanhToan)
+                                )))
+                    "
                     type="button"
                     class="btn btn-success"
                     title="Duyệt đơn"
@@ -526,6 +581,9 @@
                 isLoading.value = true
                 try {
                     const formData = new FormData()
+                    if (donHang.value.phuongThucThanhToan === 'Thanh toán bằng tiền mặt') {
+                        formData.append('trangThaiThanhToan', 'Đã thanh toán')
+                    }
                     Object.entries(donHang.value).forEach(([key, value]) => {
                         if (
                             key !== 'chiTietDonHangs' &&

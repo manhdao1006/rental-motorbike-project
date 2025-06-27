@@ -287,6 +287,7 @@
                                         id="ngayTraXe"
                                         :min="minTraXeDate"
                                         :max="maxTraXeDate"
+                                        :disabled="trangThaiDonHangParams !== 'Đã giao xe'"
                                     />
                                 </div>
                             </div>
@@ -363,7 +364,7 @@
                         "
                     >
                         Lưu ý: Quý khách có 24 giờ kể từ thời điểm đặt xe để hoàn tất việc đặt cọc
-                        hoặc thanh toán. Quá thời hạn, đơn hàng có thể bị hủy.
+                        hoặc thanh toán. Quá thời hạn, đơn hàng sẽ bị hủy.
                     </div>
                 </div>
                 <div

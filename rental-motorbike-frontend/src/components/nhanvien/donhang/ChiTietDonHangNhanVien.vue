@@ -214,6 +214,7 @@
                                     id="ngayTraXe"
                                     :min="minTraXeDate"
                                     :max="maxTraXeDate"
+                                    :disabled="trangThaiDonHangParams !== 'Đã giao xe'"
                                 />
                             </div>
                         </div>
@@ -280,7 +281,13 @@
                     ></textarea>
                 </div>
             </div>
-            <div class="text-center mt-3 mb-3" v-if="trangThaiDonHangParams !== 'Đang giao xe'">
+            <div
+                class="text-center mt-3 mb-3"
+                v-if="
+                    trangThaiDonHangParams !== 'Đang giao xe' &&
+                    trangThaiDonHangParams !== 'Đã giao xe'
+                "
+            >
                 <button
                     v-if="!isAllXeMayAvailable"
                     type="button"

@@ -252,6 +252,7 @@
                             type="date"
                             class="form-control"
                             id="ngaySinh"
+                            :max="maxNgaySinh"
                         />
                     </div>
                     <div class="mb-3">
@@ -453,6 +454,12 @@
             const minDate = new Date().toISOString().split('T')[0]
             const minDenNgay = computed(() => {
                 return chiTietDonHang.value.tuNgay || minDate
+            })
+
+            const maxNgaySinh = computed(() => {
+                const today = new Date()
+                today.setFullYear(today.getFullYear() - 18)
+                return today.toISOString().slice(0, 10)
             })
 
             const formattedTongTien = (gia: number) => {
@@ -788,6 +795,7 @@
             }
 
             return {
+                maxNgaySinh,
                 showMore,
                 visibleCount,
                 xeMays,
