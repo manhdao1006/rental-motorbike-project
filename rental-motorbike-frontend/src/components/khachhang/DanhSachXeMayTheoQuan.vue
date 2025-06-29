@@ -58,7 +58,7 @@
                             :min="giaTu ?? 0"
                         />
                     </div>
-                    <div class="text-center mt-3">
+                    <div class="text-center mt-3 mb-3">
                         <button class="btn btn-primary shadow-sm me-5" @click="locTuKhoa">
                             Tìm
                         </button>

@@ -444,18 +444,19 @@
                         v-if="
                             donHang.trangThaiThanhToan === 'Đặt cọc' &&
                             daTienHanhThanhToan &&
-                            donHang.trangThaiDonHang === 'Đã giao xe' &&
+                            (donHang.trangThaiDonHang === 'Đã giao xe' ||
+                                donHang.trangThaiDonHang === 'Chờ xử lý') &&
                             donHang.phuongThucThanhToan === 'Thanh toán qua ngân hàng'
                         "
                     >
                         <button
                             type="button"
                             class="btn btn-primary"
-                            title="Thanh toán"
+                            title="Thanh toán số tiền còn lại"
                             @click.prevent="handleThanhToanConLai"
                             :disabled="isLoading"
                         >
-                            Thanh toán
+                            Thanh toán số tiền còn lại
                         </button>
                     </div>
                     <div
